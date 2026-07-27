@@ -188,7 +188,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','SF Pro Display'
   </div>
   <div class="stats" id="stats"></div>
   <div class="pills" id="pills"></div>
-  <div id="list"></div>
+  <div id="list">
+  <div class="skeleton-card">
+    <div class="sk-head"></div>
+    <div class="sk-teams">
+      <div class="sk-circle"></div>
+      <div class="sk-vs"></div>
+      <div class="sk-circle"></div>
+    </div>
+    <div class="sk-bar"></div>
+    <div class="sk-text"></div>
+    <div class="sk-text short"></div>
+  </div>
+  <div class="skeleton-card">
+    <div class="sk-head"></div>
+    <div class="sk-teams">
+      <div class="sk-circle"></div>
+      <div class="sk-vs"></div>
+      <div class="sk-circle"></div>
+    </div>
+    <div class="sk-bar"></div>
+    <div class="sk-text"></div>
+    <div class="sk-text short"></div>
+  </div>
+</div>
   <div class="community">
     <h3>💬 赛事交流群</h3>
     <p>扫码添加微信，加入足球分析交流群<br>每日赛事讨论 · 数据分析分享 · 共同提高</p>
@@ -274,16 +297,29 @@ function estimateLambda(probs, isHome) {
   }
   return { lambda: best, goalProbs: gp };
 }
-// 泊松模型计算概率
-function poissonModel(hL, aL) {
+// 联联赛系数（场均进球基准）
+const LEAGUE_AVG = {
+  '瑞超': 2.8, '挪超': 2.7, '巴甲': 2.2, '巴乙': 2.1,
+  'default': 2.5
+};
+
+// 主场优势因子（全球平均约+0.35球）
+const HOME_ADVANTAGE = 0.35;
+
+// 泊松模型计算概率（含主客场因子）
+function poissonModel(hL, aL, league) {
+  // 应用主场优势
+  const adjHL = hL + HOME_ADVANTAGE;
+  const adjAL = Math.max(0.3, aL - HOME_ADVANTAGE * 0.3);
+  
   let h = 0, d = 0, a = 0;
   for (let i = 0; i <= 6; i++) {
     for (let j = 0; j <= 6; j++) {
-      const p = poissonPMF(i, hL) * poissonPMF(j, aL);
+      const p = poissonPMF(i, adjHL) * poissonPMF(j, adjAL);
       if (i > j) h += p; else if (i === j) d += p; else a += p;
     }
   }
-  return { home: h, draw: d, away: a };
+  return { home: h, draw: d, away: a, homeLambda: adjHL, awayLambda: adjAL };
 }
 // 泊松比分概率
 function poissonScores(hL, aL) {
@@ -446,11 +482,11 @@ function ana(m) {
     .map(([k, p]) => ({ s: `${+k.slice(1,3)}-${+k.slice(4,6)}`, p }))
     .sort((a, b) => b.p - a.p);
   
-  // 泊松模型
+  // 泊松模型（含主客场因子）
   const homeEst = estimateLambda(crsProbs, true);
   const awayEst = estimateLambda(crsProbs, false);
-  const poissonHDA = poissonModel(homeEst.lambda, awayEst.lambda);
-  const poissonScores_ = poissonScores(homeEst.lambda, awayEst.lambda);
+  const poissonHDA = poissonModel(homeEst.lambda, awayEst.lambda, m.league);
+  const poissonScores_ = poissonScores(poissonHDA.homeLambda, poissonHDA.awayLambda);
   
   // 真实边际（泊松 vs 市场）
   const marketProb = calibrateProbs(m.odds);
@@ -458,6 +494,13 @@ function ana(m) {
     home: (poissonHDA.home - marketProb.home) * 100,
     draw: (poissonHDA.draw - marketProb.draw) * 100,
     away: (poissonHDA.away - marketProb.away) * 100
+  };
+  
+  // 置信区间（基于概率大小）
+  const ciWidth = {
+    home: Math.round(Math.sqrt(poissonHDA.home * (1-poissonHDA.home) / 30) * 100 * 2),
+    draw: Math.round(Math.sqrt(poissonHDA.draw * (1-poissonHDA.draw) / 30) * 100 * 2),
+    away: Math.round(Math.sqrt(poissonHDA.away * (1-poissonHDA.away) / 30) * 100 * 2)
   };
   
   // 大小球
@@ -486,11 +529,12 @@ function ana(m) {
     confidence,
     edge,
     trueEdge,
+    ciWidth,
     risk,
     scoreRank,
     poisson: { hda: poissonHDA, scores: poissonScores_, homeLambda: homeEst.lambda, awayLambda: awayEst.lambda },
     o25,
-    xg: { home: homeEst.lambda, away: awayEst.lambda, total: homeEst.lambda + awayEst.lambda },
+    xg: { home: poissonHDA.homeLambda, away: poissonHDA.awayLambda, total: poissonHDA.homeLambda + poissonHDA.awayLambda },
     value
   };
 }
@@ -504,7 +548,7 @@ function aiRead(m, a) {
   const topScore = a.scoreRank[0];
   const vals = Object.entries(a.value).filter(([_,v]) => v > 0.05);
   
-  let text = `泊松模型：主队场均${a.poisson.homeLambda.toFixed(2)}球，客队场均${a.poisson.awayLambda.toFixed(2)}球。`;
+  let text = `泊松模型（含主场优势+${m.league}系数）：主队场均${a.poisson.homeLambda.toFixed(2)}球，客队场均${a.poisson.awayLambda.toFixed(2)}球。`;
   
   const te = a.trueEdge;
   const edges = [];
@@ -517,6 +561,8 @@ function aiRead(m, a) {
   } else {
     text += `市场定价合理。`;
   }
+  
+  text += `置信区间：主胜±${a.ciWidth.home}%，平局±${a.ciWidth.draw}%，客胜±${a.ciWidth.away}%。`;
   
   if (vals.length) {
     text += `价值发现：${vals.map(([k,v]) => `${k==='home'?'主胜':k==='draw'?'平局':'客胜'}赔率有${Math.round(v*100)}%溢价空间`).join('，')}。`;
@@ -630,11 +676,12 @@ function card(m) {
         <div class="poisson-item">
           <div class="p-label">主胜</div>
           <div class="p-value">${Math.round(a.poisson.hda.home*100)}%</div>
-          <div class="p-sub">场均${a.poisson.homeLambda.toFixed(2)}球</div>
+          <div class="p-sub">主场+${HOME_ADVANTAGE.toFixed(2)}球</div>
         </div>
         <div class="poisson-item">
           <div class="p-label">平局</div>
           <div class="p-value">${Math.round(a.poisson.hda.draw*100)}%</div>
+          <div class="p-sub">${m.league}</div>
         </div>
         <div class="poisson-item">
           <div class="p-label">客胜</div>
@@ -692,6 +739,38 @@ function card(m) {
         <div class="detail-row"><span class="dl">大2.5球</span><span class="dr ${over?'g':'r'}">${Math.round(a.o25*100)}%</span></div>
         <div class="detail-row"><span class="dl">凯利最优</span><span class="dr">${edgePick} ${maxKelly.toFixed(1)}%</span></div>
         <div class="detail-row"><span class="dl">模型数</span><span class="dr">${Object.values(a.prob.models).filter(Boolean).length}个</span></div>
+      </div>
+    </div>
+    <div class="conf-viz">
+      <div class="conf-viz-title">📊 概率分布（含置信区间）</div>
+      <div class="conf-bars">
+        <div class="conf-bar-row">
+          <span class="conf-bar-label">主胜</span>
+          <div class="conf-bar-track">
+            <div class="conf-bar-fill home" style="width:${Math.round(a.poisson.hda.home*100)}%">
+              <div class="conf-bar-ci" style="left:${Math.max(0,50-a.ciWidth.home/2)}%;width:${a.ciWidth.home}%"></div>
+              <span class="conf-bar-value">${Math.round(a.poisson.hda.home*100)}%±${a.ciWidth.home}%</span>
+            </div>
+          </div>
+        </div>
+        <div class="conf-bar-row">
+          <span class="conf-bar-label">平局</span>
+          <div class="conf-bar-track">
+            <div class="conf-bar-fill draw" style="width:${Math.round(a.poisson.hda.draw*100)}%">
+              <div class="conf-bar-ci" style="left:${Math.max(0,50-a.ciWidth.draw/2)}%;width:${a.ciWidth.draw}%"></div>
+              <span class="conf-bar-value">${Math.round(a.poisson.hda.draw*100)}%±${a.ciWidth.draw}%</span>
+            </div>
+          </div>
+        </div>
+        <div class="conf-bar-row">
+          <span class="conf-bar-label">客胜</span>
+          <div class="conf-bar-track">
+            <div class="conf-bar-fill away" style="width:${Math.round(a.poisson.hda.away*100)}%">
+              <div class="conf-bar-ci" style="left:${Math.max(0,50-a.ciWidth.away/2)}%;width:${a.ciWidth.away}%"></div>
+              <span class="conf-bar-value">${Math.round(a.poisson.hda.away*100)}%±${a.ciWidth.away}%</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="share"><button class="share-btn" onclick="share(${m.id})">📤 分享分析</button></div>
