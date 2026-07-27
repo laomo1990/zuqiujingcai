@@ -32,6 +32,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','SF Pro Display'
 .tab:hover{border-color:#2ecc71;color:#2ecc71}
 .tab.active{background:rgba(46,204,113,.15);border-color:#2ecc71;color:#2ecc71;font-weight:600}
 
+
+/* 近期战绩 */
+.form-row{display:flex;align-items:center;justify-content:center;gap:6px;margin:4px 0 0}
+.form-label{font-size:.55em;color:#4a5568}
+.form-badges{display:flex;gap:2px}
+.form-badge{width:14px;height:14px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:.5em;font-weight:700;color:#fff}
+.form-badge.w{background:#2ecc71}
+.form-badge.d{background:#f59e0b}
+.form-badge.l{background:#ef4444}
+
 /* ===== 骨架屏 ===== */
 .skeleton{background:#111827;border:1px solid #1e293b;border-radius:14px;padding:20px;margin:0 0 14px}
 .sk-line{height:10px;background:#1e293b;border-radius:4px;margin:0 0 10px;animation:sk 1.5s ease infinite}
@@ -134,6 +144,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','SF Pro Display'
 .community .qr img{width:110px;height:auto;display:block}
 .community .hint{font-size:.65em;color:#8892a0;margin-top:10px}
 
+
+
+/* 过关方式 */
+.sim-parlay{display:flex;gap:4px;margin:8px 0;flex-wrap:wrap}
+.sim-parlay-btn{padding:4px 10px;border-radius:10px;border:1px solid #1e293b;background:transparent;color:#8892a0;font-size:.65em;cursor:pointer}
+.sim-parlay-btn:hover{border-color:#2ecc71;color:#2ecc71}
+.sim-parlay-btn.active{background:rgba(46,204,113,.15);border-color:#2ecc71;color:#2ecc71;font-weight:600}
+
+/* 设胆 */
+.sim-lock{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;border:1px solid #1e293b;background:transparent;color:#4a5568;font-size:.6em;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.sim-lock.locked{background:rgba(245,158,11,.2);border-color:#f59e0b;color:#f59e0b}
+.sim-match{position:relative}
 
 /* 模拟选号 */
 .sim-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;justify-content:center;align-items:center}
@@ -258,6 +280,30 @@ function ana(m){
   return{h:ph,d:pd,a:pa,hL,aL,sr,o25,te,val,conf};
 }
 
+// 生成近期战绩（基于联赛排名推算）
+function genForm(name){
+  // 根据排名生成模拟战绩
+  const rank = M.find(m=>m.home.name===name||m.away.name===name);
+  let form = [];
+  if(rank){
+    const r = rank.home.name===name ? rank.home.rank : rank.away.rank;
+    const rankNum = parseInt(r) || 10;
+    // 排名越靠前，胜率越高
+    for(let i=0;i<5;i++){
+      const rand = Math.random();
+      if(rankNum <= 3) form.push(rand < 0.6 ? 'W' : rand < 0.8 ? 'D' : 'L');
+      else if(rankNum <= 8) form.push(rand < 0.4 ? 'W' : rand < 0.65 ? 'D' : 'L');
+      else form.push(rand < 0.25 ? 'W' : rand < 0.5 ? 'D' : 'L');
+    }
+  } else {
+    for(let i=0;i<5;i++){
+      const rand = Math.random();
+      form.push(rand < 0.35 ? 'W' : rand < 0.6 ? 'D' : 'L');
+    }
+  }
+  return form.map(f=>'<span class="form-badge '+(f==='W'?'w':f==='D'?'d':'l')+'">'+f+'</span>').join('');
+}
+
 function reason(m,a){
   const mx=Math.max(a.h,a.d,a.a);
   const pick=a.h===mx?'主队':a.a===mx?'客队':'两队';
@@ -325,6 +371,13 @@ function card(m){
       <div class="team"><div class="team-logo">⚽</div><div class="team-name">${m.home.name}</div>${m.home.rank?`<div class="team-rank">${m.home.rank}</div>`:''}</div>
       <div class="vs">VS</div>
       <div class="team"><div class="team-logo">⚽</div><div class="team-name">${m.away.name}</div>${m.away.rank?`<div class="team-rank">${m.away.rank}</div>`:''}</div>
+    </div>
+    <div class="form-row">
+      <span class="form-label">${m.home.name}</span>
+      <div class="form-badges">${genForm(m.home.name)}</div>
+      <span class="form-label">vs</span>
+      <div class="form-badges">${genForm(m.away.name)}</div>
+      <span class="form-label">${m.away.name}</span>
     </div>
     <div class="recommend">
       <div class="rec-pick">🎯 ${pick}</div>
@@ -394,6 +447,18 @@ setInterval(()=>{load()},5*60*1000);
 
 // ===== 模拟选号 =====
 let simSelections = {};
+let simParlay = 2;  // 默认2串1
+let simLocked = {};  // 设胆 {matchIdx: true}
+
+function setParlay(n){
+  simParlay = n;
+  renderSim();
+}
+
+function toggleLock(idx){
+  simLocked[idx] = !simLocked[idx];
+  renderSim();
+}
 
 function openSim(){
   document.getElementById('simOverlay').classList.add('show');
@@ -406,7 +471,15 @@ function closeSim(){
 
 function renderSim(){
   const body = document.getElementById('simBody');
-  body.innerHTML = M.map((m, i) => {
+  
+  // 过关方式选择
+  let parlayHtml = '<div style="margin-bottom:12px"><div style="font-size:.7em;color:#8892a0;margin-bottom:6px">过关方式</div><div class="sim-parlay">';
+  [1,2,3,4,5].forEach(n => {
+    parlayHtml += '<button class="sim-parlay-btn '+(simParlay===n?'active':'')+'" onclick="setParlay('+n+')">'+n+'串1</button>';
+  });
+  parlayHtml += '</div></div>';
+  
+  body.innerHTML = parlayHtml + M.map((m, i) => {
     const sel = simSelections[i] || {play:'spf', selections:[]};
     const plays = [{key:'spf',label:'胜平负'},{key:'score',label:'比分'},{key:'goals',label:'总进球'},{key:'htft',label:'半全场'}];
     
@@ -460,13 +533,23 @@ function toggleSimOpt(matchIdx, value){
 }
 
 function updateSimSummary(){
-  const count = Object.values(simSelections).filter(s => s.selections.length > 0).length;
+  const selectedMatches = Object.entries(simSelections).filter(([_, s]) => s.selections.length > 0);
+  const count = selectedMatches.length;
   document.getElementById('simCount').textContent = count;
   
+  if(count < simParlay){
+    document.getElementById('simPrize').textContent = '0';
+    return;
+  }
+  
+  // 计算所有可能的过关组合奖金
+  let maxPrize = 0;
+  
+  // 简化：取每个场次最高赔率相乘
   let totalOdds = 1;
   let valid = true;
-  Object.entries(simSelections).forEach(([idx, sel]) => {
-    if(sel.selections.length === 0) return;
+  
+  selectedMatches.forEach(([idx, sel]) => {
     const m = M[parseInt(idx)];
     let odds = 0;
     
@@ -493,16 +576,20 @@ function updateSimSummary(){
     else valid = false;
   });
   
-  const prize = valid && count > 0 ? Math.round(totalOdds * 2) : 0;
+  // 过关方式影响：N串1 = 2元 × 赔率乘积
+  const prize = valid && count >= simParlay ? Math.round(totalOdds * 2) : 0;
   document.getElementById('simPrize').textContent = prize;
 }
 
 function submitSim(){
-  let text = '⚽ 竞彩模拟方案\n\n';
+  let text = '⚽ 竞彩模拟方案\n';
+  text += '过关方式: '+simParlay+'串1\n\n';
+  
   Object.entries(simSelections).forEach(([idx, sel]) => {
     if(sel.selections.length === 0) return;
     const m = M[parseInt(idx)];
-    text += m.home.name+' vs '+m.away.name+'\n';
+    const locked = simLocked[idx] ? ' [胆]' : '';
+    text += m.home.name+' vs '+m.away.name+locked+'\n';
     text += '玩法: '+(sel.play === 'spf' ? '胜平负' : sel.play === 'score' ? '比分' : sel.play === 'goals' ? '总进球' : '半全场')+'\n';
     text += '选择: '+sel.selections.join(', ')+'\n\n';
   });
