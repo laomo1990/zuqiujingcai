@@ -1,7 +1,7 @@
 name: Fetch Football Data
 on:
   schedule:
-    - cron: '0 */2 * * *'  # 每2小时抓一次
+    - cron: '*/30 * * * *'  # 每30分钟抓一次
   workflow_dispatch:
 
 jobs:
