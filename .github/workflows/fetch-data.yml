@@ -1,7 +1,7 @@
 name: Fetch Football Data
 on:
   schedule:
-    - cron: '0 8,14,20 * * *'
+    - cron: '0 */2 * * *'  # 每2小时抓一次
   workflow_dispatch:
 
 jobs:
@@ -10,18 +10,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fetch match data
+      - name: Fetch and update data
         run: |
           mkdir -p data
           python3 << 'PYEOF'
-          import json
+          import json, os
           from urllib.request import urlopen, Request
           from datetime import datetime, timezone
 
-          result = {"matches": [], "updated": "", "sources": []}
-          match_id = 0
+          # 加载历史数据
+          history_file = "data/history.json"
+          results_file = "data/results.json"
+          
+          history = {}
+          if os.path.exists(history_file):
+              with open(history_file, "r") as f:
+                  history = json.load(f)
+          
+          results = {}
+          if os.path.exists(results_file):
+              with open(results_file, "r") as f:
+                  results = json.load(f)
 
-          # 竞彩API
+          # 抓取竞彩数据
+          current_matches = []
           try:
               url = "https://webapi.sporttery.cn/gateway/jc/football/getMatchCalculatorV1.qry"
               req = Request(url, headers={
@@ -30,56 +42,88 @@ jobs:
               })
               with urlopen(req, timeout=15) as resp:
                   data = json.loads(resp.read())
+                  match_id = 0
                   for day in data.get("value",{}).get("matchInfoList",[]):
                       for m in day.get("subMatchList",[]):
+                          had = m.get("had",{})
+                          h = float(had.get("h","0") or "0")
+                          d = float(had.get("d","0") or "0")
+                          a = float(had.get("a","0") or "0")
+                          if h <= 0: continue
+                          
                           match_id += 1
-                          result["matches"].append({
+                          league = m.get("leagueAbbName","") or m.get("groupName","竞彩")
+                          key = f"{m.get('matchDate','')}_{m.get('homeTeamAbbName','')}_{m.get('awayTeamAbbName','')}"
+                          
+                          # 解析CRS
+                          crs = {}
+                          for k,v in m.get("crs",{}).items():
+                              if k.startswith("s") and len(k)==6 and "f" not in k:
+                                  try: crs[k] = float(v)
+                                  except: pass
+                          
+                          # 解析让球
+                          hhad = m.get("hhad",{})
+                          handicap = {
+                              "line": hhad.get("goalLine",""),
+                              "home": float(hhad.get("h","0") or "0"),
+                              "away": float(hhad.get("a","0") or "0"),
+                              "draw": float(hhad.get("d","0") or "0")
+                          }
+                          
+                          # 解析半全场
+                          hafu = m.get("hafu",{})
+                          htft = {}
+                          for k in ["hh","hd","ha","dh","dd","da","ah","ad","aa"]:
+                              try: htft[k] = float(hafu.get(k,"0") or "0")
+                              except: htft[k] = 0
+                          
+                          match_data = {
                               "id": match_id,
-                              "league": m.get("leagueAbbr","竞彩"),
-                              "leagueKey": "jc",
-                              "time": f"{m.get('businessDate','')} {m.get('matchTime','')}",
-                              "status": "upcoming", "score": "",
-                              "home": {"name": m.get("homeTeamAbbName",""), "logo": "⚽", "form": ["W","D","W","L","W"], "rank": 0, "goalsFor": 1.5, "goalsAgainst": 0.8},
-                              "away": {"name": m.get("awayTeamAbbName",""), "logo": "⚽", "form": ["D","W","W","L","D"], "rank": 0, "goalsFor": 1.3, "goalsAgainst": 0.9},
-                              "odds": {"home": 2.0, "draw": 3.2, "away": 3.5}
+                              "key": key,
+                              "league": league,
+                              "time": f"{m.get('matchDate','')} {m.get('matchTime','')}",
+                              "home": {"name": m.get("homeTeamAbbName",""), "rank": m.get("homeRank","").strip("[]")},
+                              "away": {"name": m.get("awayTeamAbbName",""), "rank": m.get("awayRank","").strip("[]")},
+                              "odds": {"home": h, "draw": d, "away": a},
+                              "handicap": handicap,
+                              "crs": crs,
+                              "htft": htft
+                          }
+                          current_matches.append(match_data)
+                          
+                          # 记录赔率历史
+                          now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
+                          if key not in history:
+                              history[key] = []
+                          history[key].append({
+                              "time": now,
+                              "home": h, "draw": d, "away": a
                           })
-              result["sources"].append("竞彩API")
           except Exception as e:
-              print(f"竞彩API error: {e}")
+              print(f"Error: {e}")
 
-          # OpenLigaDB
-          try:
-              url = "https://api.openligadb.de/getmatchdata/wm2026"
-              req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
-              with urlopen(req, timeout=15) as resp:
-                  data = json.loads(resp.read())
-                  NM = {"Norwegen":"挪威","Frankreich":"法国","Schweden":"瑞典","Ecuador":"厄瓜多尔","Mexiko":"墨西哥","Deutschland":"德国","Brasilien":"巴西","Argentinien":"阿根廷","Spanien":"西班牙","England":"英格兰","Japan":"日本","Kroatien":"克罗地亚","Belgien":"比利时","Portugal":"葡萄牙","Niederlande":"荷兰","Marokko":"摩洛哥","USA":"美国","Kolumbien":"哥伦比亚","Uruguay":"乌拉圭","Schweiz":"瑞士","Senegal":"塞内加尔","Australien":"澳大利亚","Elfenbeinküste":"科特迪瓦","Südkorea":"韩国"}
-                  FL = {"挪威":"🇳🇴","法国":"🇫🇷","瑞典":"🇸🇪","厄瓜多尔":"🇪🇨","墨西哥":"🇲🇽","德国":"🇩🇪","巴西":"🇧🇷","阿根廷":"🇦🇷","西班牙":"🇪🇸","英格兰":"🏴","日本":"🇯🇵","克罗地亚":"🇭🇷","比利时":"🇧🇪","葡萄牙":"🇵🇹","荷兰":"🇳🇱","摩洛哥":"🇲🇦","美国":"🇺🇸","哥伦比亚":"🇨🇴","乌拉圭":"🇺🇾","瑞士":"🇨🇭","塞内加尔":"🇸🇳","澳大利亚":"🇦🇺","科特迪瓦":"🇨🇮","韩国":"🇰🇷"}
-                  for m in data:
-                      t1=NM.get(m.get("team1",{}).get("teamName",""),m.get("team1",{}).get("teamName",""))
-                      t2=NM.get(m.get("team2",{}).get("teamName",""),m.get("team2",{}).get("teamName",""))
-                      r=m.get("matchResults",[])
-                      status="upcoming" if not r else "finished"
-                      score=f"{r[0].get('pointsTeam1',0)}-{r[0].get('pointsTeam2',0)}" if r else ""
-                      match_id += 1
-                      result["matches"].append({"id":match_id,"league":"世界杯","leagueKey":"wc","time":m.get("matchDateTime","")[:16].replace("T"," "),"status":status,"score":score,"home":{"name":t1,"logo":FL.get(t1,"⚽"),"form":["W","D","W","L","W"],"rank":30,"goalsFor":1.5,"goalsAgainst":0.8},"away":{"name":t2,"logo":FL.get(t2,"⚽"),"form":["D","W","W","L","D"],"rank":35,"goalsFor":1.3,"goalsAgainst":0.9},"odds":{"home":2.0,"draw":3.2,"away":3.5}})
-              result["sources"].append("OpenLigaDB")
-          except Exception as e:
-              print(f"OpenLigaDB error: {e}")
-
-          result["updated"] = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-          result["matches"].sort(key=lambda x: x["time"])
-
+          # 保存数据
           with open("data/matches.json", "w", encoding="utf-8") as f:
-              json.dump(result, f, ensure_ascii=False, indent=2)
-
-          print(f"Total: {len(result['matches'])} matches ({', '.join(result['sources'])})")
+              json.dump({
+                  "matches": current_matches,
+                  "updated": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+                  "sources": ["中国竞彩网"]
+              }, f, ensure_ascii=False, indent=2)
+          
+          with open(history_file, "w", encoding="utf-8") as f:
+              json.dump(history, f, ensure_ascii=False, indent=2)
+          
+          with open(results_file, "w", encoding="utf-8") as f:
+              json.dump(results, f, ensure_ascii=False, indent=2)
+          
+          print(f"Matches: {len(current_matches)}, History keys: {len(history)}")
           PYEOF
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/matches.json
-          git diff --staged --quiet || git commit -m "chore: update matches $(date +%Y-%m-%d_%H:%M)"
+          git add data/
+          git diff --staged --quiet || git commit -m "chore: update data $(date +%Y-%m-%d_%H:%M)"
           git push
