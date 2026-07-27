@@ -1,7 +1,7 @@
 name: Fetch Football Data
 on:
   schedule:
-    - cron: '*/30 * * * *'  # 每30分钟抓一次
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -10,115 +10,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+
       - name: Fetch and update data
         run: |
           mkdir -p data
-          python3 << 'PYEOF'
-          import json, os
-          from urllib.request import urlopen, Request
-          from datetime import datetime, timezone
-
-          # 加载历史数据
-          history_file = "data/history.json"
-          results_file = "data/results.json"
-          
-          history = {}
-          if os.path.exists(history_file):
-              with open(history_file, "r") as f:
-                  history = json.load(f)
-          
-          results = {}
-          if os.path.exists(results_file):
-              with open(results_file, "r") as f:
-                  results = json.load(f)
-
-          # 抓取竞彩数据
-          current_matches = []
-          try:
-              url = "https://webapi.sporttery.cn/gateway/jc/football/getMatchCalculatorV1.qry"
-              req = Request(url, headers={
-                  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-                  "Referer": "https://www.lottery.gov.cn/"
-              })
-              with urlopen(req, timeout=15) as resp:
-                  data = json.loads(resp.read())
-                  match_id = 0
-                  for day in data.get("value",{}).get("matchInfoList",[]):
-                      for m in day.get("subMatchList",[]):
-                          had = m.get("had",{})
-                          h = float(had.get("h","0") or "0")
-                          d = float(had.get("d","0") or "0")
-                          a = float(had.get("a","0") or "0")
-                          if h <= 0: continue
-                          
-                          match_id += 1
-                          league = m.get("leagueAbbName","") or m.get("groupName","竞彩")
-                          key = f"{m.get('matchDate','')}_{m.get('homeTeamAbbName','')}_{m.get('awayTeamAbbName','')}"
-                          
-                          # 解析CRS
-                          crs = {}
-                          for k,v in m.get("crs",{}).items():
-                              if k.startswith("s") and len(k)==6 and "f" not in k:
-                                  try: crs[k] = float(v)
-                                  except: pass
-                          
-                          # 解析让球
-                          hhad = m.get("hhad",{})
-                          handicap = {
-                              "line": hhad.get("goalLine",""),
-                              "home": float(hhad.get("h","0") or "0"),
-                              "away": float(hhad.get("a","0") or "0"),
-                              "draw": float(hhad.get("d","0") or "0")
-                          }
-                          
-                          # 解析半全场
-                          hafu = m.get("hafu",{})
-                          htft = {}
-                          for k in ["hh","hd","ha","dh","dd","da","ah","ad","aa"]:
-                              try: htft[k] = float(hafu.get(k,"0") or "0")
-                              except: htft[k] = 0
-                          
-                          match_data = {
-                              "id": match_id,
-                              "key": key,
-                              "league": league,
-                              "time": f"{m.get('matchDate','')} {m.get('matchTime','')}",
-                              "home": {"name": m.get("homeTeamAbbName",""), "rank": m.get("homeRank","").strip("[]")},
-                              "away": {"name": m.get("awayTeamAbbName",""), "rank": m.get("awayRank","").strip("[]")},
-                              "odds": {"home": h, "draw": d, "away": a},
-                              "handicap": handicap,
-                              "crs": crs,
-                              "htft": htft
-                          }
-                          current_matches.append(match_data)
-                          
-                          # 记录赔率历史
-                          now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
-                          if key not in history:
-                              history[key] = []
-                          history[key].append({
-                              "time": now,
-                              "home": h, "draw": d, "away": a
-                          })
-          except Exception as e:
-              print(f"Error: {e}")
-
-          # 保存数据
-          with open("data/matches.json", "w", encoding="utf-8") as f:
-              json.dump({
-                  "matches": current_matches,
-                  "updated": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
-                  "sources": ["中国竞彩网"]
-              }, f, ensure_ascii=False, indent=2)
-          
-          with open(history_file, "w", encoding="utf-8") as f:
-              json.dump(history, f, ensure_ascii=False, indent=2)
-          
-          with open(results_file, "w", encoding="utf-8") as f:
-              json.dump(results, f, ensure_ascii=False, indent=2)
-          
-          print(f"Matches: {len(current_matches)}, History keys: {len(history)}")
-          PYEOF
+          python3 scripts/fetch_data.py
 
       - name: Commit and push
         run: |
