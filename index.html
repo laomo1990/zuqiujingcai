@@ -100,6 +100,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','SF Pro Display'
 .d-row .dr{color:#e8eaed;font-weight:500}
 .d-row .dr.g{color:#2ecc71}.d-row .dr.r{color:#e74c3c}
 
+/* 复盘模块 */
+.history{margin:0 0 16px}
+.history-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.history-title{font-size:.85em;font-weight:700;color:#fff}
+.history-sub{font-size:.65em;color:#4a5568}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.stats-item{text-align:center;padding:10px 6px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:10px}
+.stats-item .si-val{font-size:1.2em;font-weight:700;color:#fff}
+.stats-item .si-val.good{color:#2ecc71}.stats-item .si-val.mid{color:#f39c12}.stats-item .si-val.bad{color:#e74c3c}
+.stats-item .si-label{font-size:.55em;color:#4a5568;margin-top:2px}
+.history-list{display:flex;flex-direction:column;gap:6px}
+.history-row{display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:10px;font-size:.7em}
+.history-row .hr-date{color:#4a5568;width:55px;flex-shrink:0}
+.history-row .hr-teams{flex:1;color:#e8eaed;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.history-row .hr-score{color:#fff;font-weight:600;width:35px;text-align:center;flex-shrink:0}
+.history-row .hr-pick{width:30px;text-align:center;flex-shrink:0}
+.history-row .hr-result{display:flex;gap:4px;flex-shrink:0}
+.history-row .hr-tag{padding:1px 5px;border-radius:4px;font-size:.85em}
+.history-row .hr-tag.hit{background:rgba(46,204,113,.15);color:#2ecc71}
+.history-row .hr-tag.miss{background:rgba(231,76,60,.15);color:#e74c3c}
+
 /* 社群 */
 .community{margin:16px 0;padding:16px;background:rgba(46,204,113,.04);border:1px solid rgba(46,204,113,.08);border-radius:12px;text-align:center}
 .community h3{font-size:.85em;color:#fff;margin-bottom:4px}
@@ -128,6 +149,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','SF Pro Display'
     <div class="stat"><div class="n">-</div><div class="l">更新</div></div>
   </div>
   <div class="pills" id="pills"></div>
+  <div class="history" id="history">
+    <div class="history-header">
+      <span class="history-title">📈 最近7天复盘</span>
+      <span class="history-sub" id="historySub">-</span>
+    </div>
+    <div class="stats-grid" id="historyStats"></div>
+    <div class="history-list" id="historyList"></div>
+  </div>
   <div id="list">
     <div class="sk-card">
       <div class="sk-head"></div>
@@ -215,6 +244,51 @@ function updateRelTime(){
   if(el)el.textContent=relTime(lastUpdate);
 }
 
+// ========== 历史复盘 ==========
+let H=null;
+
+async function loadHistory(){
+  try{
+    const r=await fetch('data/history.json?t='+Date.now());
+    H=await r.json();
+    renderHistory();
+  }catch(e){
+    document.getElementById('history').style.display='none';
+  }
+}
+
+function renderHistory(){
+  if(!H||!H.summary){document.getElementById('history').style.display='none';return}
+  const s=H.summary;
+  document.getElementById('historySub').textContent=`${s.total}场比赛`;
+  
+  // 统计卡片
+  document.getElementById('historyStats').innerHTML=`
+    <div class="stats-item"><div class="si-val ${s.spf_rate>=60?'good':s.spf_rate>=50?'mid':'bad'}">${s.spf_rate}%</div><div class="si-label">胜平负</div></div>
+    <div class="stats-item"><div class="si-val ${s.score_rate>=30?'good':s.score_rate>=20?'mid':'bad'}">${s.score_rate}%</div><div class="si-label">比分</div></div>
+    <div class="stats-item"><div class="si-val ${s.goal_rate>=55?'good':s.goal_rate>=45?'mid':'bad'}">${s.goal_rate}%</div><div class="si-label">大小球</div></div>
+    <div class="stats-item"><div class="si-val ${s.roi>0?'good':'bad'}">${s.roi>0?'+':''}${s.roi}%</div><div class="si-label">收益率</div></div>
+  `;
+  
+  // 比赛列表
+  document.getElementById('historyList').innerHTML=H.matches.map(m=>{
+    const spfHit=m.result.pick==='✅';
+    const scoreHit=m.result.score==='✅';
+    const ouHit=m.result.ou==='✅';
+    return`<div class="history-row">
+      <span class="hr-date">${m.date.slice(5)}</span>
+      <span class="hr-teams">${m.home} vs ${m.away}</span>
+      <span class="hr-score">${m.home_score}-${m.away_score}</span>
+      <span class="hr-pick">${m.prediction.pick}</span>
+      <div class="hr-result">
+        <span class="hr-tag ${spfHit?'hit':'miss'}">${m.result.pick}</span>
+        <span class="hr-tag ${scoreHit?'hit':'miss'}">${m.result.score}</span>
+        <span class="hr-tag ${ouHit?'hit':'miss'}">${m.result.ou}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 // 手动刷新
 async function refreshData(){
   const btn=event.target;
@@ -239,6 +313,7 @@ async function load(){
     document.getElementById('stats').innerHTML=`<div class="stat"><div class="n">${M.length}</div><div class="l">赛事</div></div><div class="stat"><div class="n">${avg}</div><div class="l">平均进球</div></div><div class="stat"><div class="n">${d.updated?.split(' ')[1]||'-'}</div><div class="l">更新</div></div>`;
     updateRelTime();
     pills();render();
+    loadHistory();
   }catch(e){document.getElementById('list').innerHTML='<div style="text-align:center;padding:60px;color:#4a5568">📡 数据加载失败</div>'}
 }
 
