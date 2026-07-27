@@ -117,6 +117,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','SF Pro Display'
   <div class="hero">
     <h1>足球 <em>AI</em> 分析</h1>
     <p>竞彩数据 · 泊松模型 · 价值发现</p>
+  <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px">
+    <span id="updateRel" style="font-size:.65em;color:#4a5568">-</span>
+    <button onclick="refreshData()" style="padding:3px 10px;border-radius:12px;border:1px solid rgba(46,204,113,.2);background:rgba(46,204,113,.05);color:#2ecc71;font-size:.65em;cursor:pointer">🔄 刷新</button>
+  </div>
   </div>
   <div class="stats" id="stats">
     <div class="stat"><div class="n">-</div><div class="l">赛事</div></div>
@@ -193,14 +197,47 @@ function reason(m,a){
   return r+'。';
 }
 
-let M=[],F='all';
+let M=[],F='all',lastUpdate=null;
+
+// 相对时间
+function relTime(ts){
+  if(!ts)return'-';
+  const diff=Math.floor((Date.now()-ts)/1000);
+  if(diff<60)return'刚刚更新';
+  if(diff<3600)return Math.floor(diff/60)+'分钟前更新';
+  if(diff<86400)return Math.floor(diff/3600)+'小时前更新';
+  return Math.floor(diff/86400)+'天前更新';
+}
+
+// 刷新相对时间显示
+function updateRelTime(){
+  const el=document.getElementById('updateRel');
+  if(el)el.textContent=relTime(lastUpdate);
+}
+
+// 手动刷新
+async function refreshData(){
+  const btn=event.target;
+  btn.textContent='刷新中...';
+  btn.disabled=true;
+  await load();
+  btn.textContent='🔄 刷新';
+  btn.disabled=false;
+}
+
+// 自动刷新（每5分钟）
+setInterval(()=>{load()},5*60*1000);
+// 每分钟更新相对时间显示
+setInterval(updateRelTime,60*1000);
 
 async function load(){
   try{
     const r=await fetch('data/matches.json?t='+Date.now()),d=await r.json();
     M=d.matches||[];
+    lastUpdate=Date.now();
     const avg=M.length?(M.reduce((s,m)=>{const a=ana(m);return s+a.hL+a.aL},0)/M.length).toFixed(1):'-';
     document.getElementById('stats').innerHTML=`<div class="stat"><div class="n">${M.length}</div><div class="l">赛事</div></div><div class="stat"><div class="n">${avg}</div><div class="l">平均进球</div></div><div class="stat"><div class="n">${d.updated?.split(' ')[1]||'-'}</div><div class="l">更新</div></div>`;
+    updateRelTime();
     pills();render();
   }catch(e){document.getElementById('list').innerHTML='<div style="text-align:center;padding:60px;color:#4a5568">📡 数据加载失败</div>'}
 }
