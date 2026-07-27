@@ -427,18 +427,32 @@ let M = [], F = 'all';
 
 async function load() {
   try {
+    console.log('开始加载数据...');
     const r = await fetch('data/matches.json?t=' + Date.now());
+    console.log('数据响应:', r.status);
     const d = await r.json();
+    console.log('解析数据:', d.matches?.length, '场比赛');
     M = d.matches || [];
+    
+    console.log('计算统计...');
+    const avgGoals = M.length > 0 ? (M.reduce((s,m) => {
+      const a = ana(m);
+      return s + a.xg.total;
+    }, 0) / M.length).toFixed(1) : '-';
+    
     document.getElementById('stats').innerHTML = `
       <div class="stat"><div class="n">${M.length}</div><div class="l">赛事</div></div>
-      <div class="stat"><div class="n">${M.length > 0 ? (M.reduce((s,m) => s + ana(m).xg.total, 0) / M.length).toFixed(1) : '-'}</div><div class="l">平均进球</div></div>
+      <div class="stat"><div class="n">${avgGoals}</div><div class="l">平均进球</div></div>
       <div class="stat"><div class="n">${d.updated?.split(' ')[1] || '-'}</div><div class="l">更新</div></div>
     `;
+    console.log('渲染筛选...');
     pills();
+    console.log('渲染比赛...');
     render();
+    console.log('加载完成!');
   } catch(e) {
-    document.getElementById('list').innerHTML = '<div class="empty"><div class="icon">📡</div>数据加载失败</div>';
+    console.error('加载失败:', e.message, e.stack);
+    document.getElementById('list').innerHTML = '<div class="empty"><div class="icon">📡</div>数据加载失败: ' + e.message + '</div>';
   }
 }
 
