@@ -50,12 +50,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .prob-field{margin:12px 16px;padding:14px;background:linear-gradient(135deg,#0d2818 0%,#0a1f14 50%,#0d2818 100%);border-radius:12px;border:1px solid #1a3a2a;position:relative;overflow:hidden}
 .prob-field::before{content:'';position:absolute;top:0;left:50%;width:1px;height:100%;background:#1a3a2a}
 .prob-field::after{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:#1a3a2a}
-.prob-bar{display:flex;height:32px;border-radius:8px;overflow:hidden;margin-bottom:8px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.3)}
-.prob-segment{display:flex;align-items:center;justify-content:center;font-size:0.8em;font-weight:bold;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.5);position:relative;transition:width 0.5s ease}
-.prob-segment:not(:last-child)::after{content:'';position:absolute;right:0;top:10%;height:80%;width:2px;background:rgba(0,0,0,0.4);z-index:2}
-.prob-home-bg{background:linear-gradient(180deg,#3a9d5d 0%,#2ecc71 50%,#27ae60 100%)}
-.prob-draw-bg{background:linear-gradient(180deg,#d4a017 0%,#f39c12 50%,#e67e22 100%)}
-.prob-away-bg{background:linear-gradient(180deg,#c0392b 0%,#e74c3c 50%,#d63031 100%)}
+.prob-bar{display:flex;height:32px;border-radius:8px;overflow:hidden;margin-bottom:8px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.3);gap:2px}
+.prob-home-bg{background:linear-gradient(180deg,#3a9d5d 0%,#2ecc71 50%,#27ae60 100%);border-radius:6px}
+.prob-draw-bg{background:linear-gradient(180deg,#d4a017 0%,#f39c12 50%,#e67e22 100%);border-radius:6px}
+.prob-away-bg{background:linear-gradient(180deg,#c0392b 0%,#e74c3c 50%,#d63031 100%);border-radius:6px}
 .prob-labels{display:flex;justify-content:space-between;font-size:0.7em;color:#4a6a5a;font-weight:500}
 
 /* 方案卡片 */
@@ -139,7 +137,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 const canvas = document.getElementById('particles');
 const ctx = canvas.getContext('2d');
 let particles = [];
-const PARTICLE_COUNT = 40;
+const PARTICLE_COUNT = 60;
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -153,11 +151,11 @@ class Particle {
   reset() {
     this.x = Math.random() * canvas.width;
     this.y = Math.random() * canvas.height;
-    this.size = Math.random() * 3 + 1;
+    this.size = Math.random() * 4 + 2;
     this.speedX = (Math.random() - 0.5) * 0.5;
     this.speedY = (Math.random() - 0.5) * 0.5;
-    this.opacity = Math.random() * 0.3 + 0.1;
-    this.color = Math.random() > 0.7 ? '#2ecc71' : '#1a3a2a';
+    this.opacity = Math.random() * 0.4 + 0.15;
+    this.color = Math.random() > 0.6 ? '#2ecc71' : Math.random() > 0.3 ? '#1a5a3a' : '#0d3a1a';
   }
   update() {
     this.x += this.speedX;
@@ -192,12 +190,12 @@ function animateParticles() {
       const dx = particles[i].x - particles[j].x;
       const dy = particles[i].y - particles[j].y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 150) {
+      if (dist < 200) {
         ctx.beginPath();
         ctx.moveTo(particles[i].x, particles[i].y);
         ctx.lineTo(particles[j].x, particles[j].y);
-        ctx.strokeStyle = '#1a3a2a';
-        ctx.globalAlpha = (1 - dist / 150) * 0.15;
+        ctx.strokeStyle = '#2ecc71';
+        ctx.globalAlpha = (1 - dist / 200) * 0.2;
         ctx.lineWidth = 1;
         ctx.stroke();
         ctx.globalAlpha = 1;
