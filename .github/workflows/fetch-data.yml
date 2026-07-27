@@ -1,7 +1,7 @@
 name: Fetch Football Data
 on:
   schedule:
-    - cron: '0 8,14,20 * * *'  # 北京时间16:00/22:00/04:00
+    - cron: '0 8,14,20 * * *'
   workflow_dispatch:
 
 jobs:
@@ -12,127 +12,74 @@ jobs:
 
       - name: Fetch match data
         run: |
+          mkdir -p data
           python3 << 'PYEOF'
           import json
           from urllib.request import urlopen, Request
           from datetime import datetime, timezone
 
           result = {"matches": [], "updated": "", "sources": []}
+          match_id = 0
 
-          # 队名映射 (德语→中文)
-          NAME_MAP = {
-              "Bosnien-Herzegowina": "波黑", "Katar": "卡塔尔", "Marokko": "摩洛哥",
-              "Haiti": "海地", "Südafrika": "南非", "Südkorea": "韩国",
-              "Tunesien": "突尼斯", "Niederlande": "荷兰", "Paraguay": "巴拉圭",
-              "Australien": "澳大利亚", "Norwegen": "挪威", "Frankreich": "法国",
-              "Kap Verde": "佛得角", "Saudi-Arabien": "沙特", "Neuseeland": "新西兰",
-              "Belgien": "比利时", "Kroatien": "克罗地亚", "Ghana": "加纳",
-              "Kolumbien": "哥伦比亚", "Portugal": "葡萄牙", "Schottland": "苏格兰",
-              "Brasilien": "巴西", "Tschechien": "捷克", "Mexiko": "墨西哥",
-              "Ecuador": "厄瓜多尔", "Deutschland": "德国", "Curaçao": "库拉索",
-              "Elfenbeinküste": "科特迪瓦", "Japan": "日本", "Schweden": "瑞典",
-              "Türkei": "土耳其", "USA": "美国", "Senegal": "塞内加尔",
-              "Irak": "伊拉克", "Uruguay": "乌拉圭", "Spanien": "西班牙",
-              "Ägypten": "埃及", "Iran": "伊朗", "Panama": "巴拿马",
-              "England": "英格兰", "DR Kongo": "刚果金", "Usbekistan": "乌兹别克斯坦",
-              "Jordanien": "约旦", "Argentinien": "阿根廷", "Algerien": "阿尔及利亚",
-              "Österreich": "奥地利", "Schweiz": "瑞士", "Kanada": "加拿大",
-              "Italien": "意大利", "China": "中国", "Russland": "俄罗斯",
-              "Polen": "波兰", "Ukraine": "乌克兰", "Serbien": "塞尔维亚",
-              "Dänemark": "丹麦", "Wales": "威尔士", "Peru": "秘鲁",
-              "Chile": "智利", "Nigeria": "尼日利亚", "Kamerun": "喀麦隆",
-              "Marokko": "摩洛哥", "Tunesien": "突尼斯", "Ghana": "加纳",
-              "Mali": "马里", "Südafrika": "南非",
-          }
+          # 竞彩API
+          try:
+              url = "https://webapi.sporttery.cn/gateway/jc/football/getMatchCalculatorV1.qry"
+              req = Request(url, headers={
+                  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                  "Referer": "https://www.lottery.gov.cn/"
+              })
+              with urlopen(req, timeout=15) as resp:
+                  data = json.loads(resp.read())
+                  for day in data.get("value",{}).get("matchInfoList",[]):
+                      for m in day.get("subMatchList",[]):
+                          match_id += 1
+                          result["matches"].append({
+                              "id": match_id,
+                              "league": m.get("leagueAbbr","竞彩"),
+                              "leagueKey": "jc",
+                              "time": f"{m.get('businessDate','')} {m.get('matchTime','')}",
+                              "status": "upcoming", "score": "",
+                              "home": {"name": m.get("homeTeamAbbName",""), "logo": "⚽", "form": ["W","D","W","L","W"], "rank": 0, "goalsFor": 1.5, "goalsAgainst": 0.8},
+                              "away": {"name": m.get("awayTeamAbbName",""), "logo": "⚽", "form": ["D","W","W","L","D"], "rank": 0, "goalsFor": 1.3, "goalsAgainst": 0.9},
+                              "odds": {"home": 2.0, "draw": 3.2, "away": 3.5}
+                          })
+              result["sources"].append("竞彩API")
+          except Exception as e:
+              print(f"竞彩API error: {e}")
 
-          # 国旗映射
-          FLAG_MAP = {
-              "波黑":"🇧🇦","卡塔尔":"🇶🇦","摩洛哥":"🇲🇦","海地":"🇭🇹","南非":"🇿🇦","韩国":"🇰🇷",
-              "突尼斯":"🇹🇳","荷兰":"🇳🇱","巴拉圭":"🇵🇾","澳大利亚":"🇦🇺","挪威":"🇳🇴","法国":"🇫🇷",
-              "佛得角":"🇨🇻","沙特":"🇸🇦","新西兰":"🇳🇿","比利时":"🇧🇪","克罗地亚":"🇭🇷","加纳":"🇬🇭",
-              "哥伦比亚":"🇨🇴","葡萄牙":"🇵🇹","苏格兰":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","巴西":"🇧🇷","捷克":"🇨🇿","墨西哥":"🇲🇽",
-              "厄瓜多尔":"🇪🇨","德国":"🇩🇪","库拉索":"🇨🇼","科特迪瓦":"🇨🇮","日本":"🇯🇵","瑞典":"🇸🇪",
-              "土耳其":"🇹🇷","美国":"🇺🇸","塞内加尔":"🇸🇳","伊拉克":"🇮🇶","乌拉圭":"🇺🇾","西班牙":"🇪🇸",
-              "埃及":"🇪🇬","伊朗":"🇮🇷","巴拿马":"🇵🇦","英格兰":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","刚果金":"🇨🇩","乌兹别克斯坦":"🇺🇿",
-              "约旦":"🇯🇴","阿根廷":"🇦🇷","阿尔及利亚":"🇩🇿","奥地利":"🇦🇹","瑞士":"🇨🇭","加拿大":"🇨🇦",
-              "意大利":"🇮🇹","中国":"🇨🇳","俄罗斯":"🇷🇺","波兰":"🇵🇱","乌克兰":"🇺🇦","塞尔维亚":"🇷🇸",
-              "丹麦":"🇩🇰","威尔士":"🏴󠁧󠁢󠁷󠁬󠁳󠁿","秘鲁":"🇵🇪","智利":"🇨🇱","尼日利亚":"🇳🇬","喀麦隆":"🇨🇲",
-              "马里":"🇲🇱",
-          }
-
-          # 1. OpenLigaDB - 世界杯
+          # OpenLigaDB
           try:
               url = "https://api.openligadb.de/getmatchdata/wm2026"
               req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
               with urlopen(req, timeout=15) as resp:
                   data = json.loads(resp.read())
+                  NM = {"Norwegen":"挪威","Frankreich":"法国","Schweden":"瑞典","Ecuador":"厄瓜多尔","Mexiko":"墨西哥","Deutschland":"德国","Brasilien":"巴西","Argentinien":"阿根廷","Spanien":"西班牙","England":"英格兰","Japan":"日本","Kroatien":"克罗地亚","Belgien":"比利时","Portugal":"葡萄牙","Niederlande":"荷兰","Marokko":"摩洛哥","USA":"美国","Kolumbien":"哥伦比亚","Uruguay":"乌拉圭","Schweiz":"瑞士","Senegal":"塞内加尔","Australien":"澳大利亚","Elfenbeinküste":"科特迪瓦","Südkorea":"韩国"}
+                  FL = {"挪威":"🇳🇴","法国":"🇫🇷","瑞典":"🇸🇪","厄瓜多尔":"🇪🇨","墨西哥":"🇲🇽","德国":"🇩🇪","巴西":"🇧🇷","阿根廷":"🇦🇷","西班牙":"🇪🇸","英格兰":"🏴","日本":"🇯🇵","克罗地亚":"🇭🇷","比利时":"🇧🇪","葡萄牙":"🇵🇹","荷兰":"🇳🇱","摩洛哥":"🇲🇦","美国":"🇺🇸","哥伦比亚":"🇨🇴","乌拉圭":"🇺🇾","瑞士":"🇨🇭","塞内加尔":"🇸🇳","澳大利亚":"🇦🇺","科特迪瓦":"🇨🇮","韩国":"🇰🇷"}
                   for m in data:
-                      t1 = m.get("team1",{}).get("teamName","")
-                      t2 = m.get("team2",{}).get("teamName","")
-                      t1_cn = NAME_MAP.get(t1, t1)
-                      t2_cn = NAME_MAP.get(t2, t2)
-                      dt = m.get("matchDateTime","")
-                      results = m.get("matchResults",[])
-                      score = ""
-                      status = "upcoming"
-                      if results:
-                          s1 = results[0].get("pointsTeam1",0)
-                          s2 = results[0].get("pointsTeam2",0)
-                          score = f"{s1}-{s2}"
-                          status = "finished"
-
-                      result["matches"].append({
-                          "id": len(result["matches"])+1,
-                          "league": "世界杯 2026", "leagueKey": "wc",
-                          "time": dt[:16].replace("T"," "),
-                          "status": status, "score": score,
-                          "home": {"name": t1_cn, "logo": FLAG_MAP.get(t1_cn,"⚽"), "form": ["W","D","W","L","W"], "rank": 30, "goalsFor": 1.5, "goalsAgainst": 0.8},
-                          "away": {"name": t2_cn, "logo": FLAG_MAP.get(t2_cn,"⚽"), "form": ["D","W","W","L","D"], "rank": 35, "goalsFor": 1.3, "goalsAgainst": 0.9},
-                          "odds": {"home": 2.0, "draw": 3.2, "away": 3.5}
-                      })
+                      t1=NM.get(m.get("team1",{}).get("teamName",""),m.get("team1",{}).get("teamName",""))
+                      t2=NM.get(m.get("team2",{}).get("teamName",""),m.get("team2",{}).get("teamName",""))
+                      r=m.get("matchResults",[])
+                      status="upcoming" if not r else "finished"
+                      score=f"{r[0].get('pointsTeam1',0)}-{r[0].get('pointsTeam2',0)}" if r else ""
+                      match_id += 1
+                      result["matches"].append({"id":match_id,"league":"世界杯","leagueKey":"wc","time":m.get("matchDateTime","")[:16].replace("T"," "),"status":status,"score":score,"home":{"name":t1,"logo":FL.get(t1,"⚽"),"form":["W","D","W","L","W"],"rank":30,"goalsFor":1.5,"goalsAgainst":0.8},"away":{"name":t2,"logo":FL.get(t2,"⚽"),"form":["D","W","W","L","D"],"rank":35,"goalsFor":1.3,"goalsAgainst":0.9},"odds":{"home":2.0,"draw":3.2,"away":3.5}})
               result["sources"].append("OpenLigaDB")
           except Exception as e:
               print(f"OpenLigaDB error: {e}")
 
-          # 2. football-data.org - 五大联赛 (免费tier)
-          LEAGUES = {"PL": "英超", "PD": "西甲", "SA": "意甲", "BL1": "德甲", "FL1": "法甲", "CL": "欧冠"}
-          for code, name in LEAGUES.items():
-              try:
-                  url = f"https://api.football-data.org/v4/competitions/{code}/matches?status=SCHEDULED&limit=10"
-                  req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
-                  with urlopen(req, timeout=10) as resp:
-                      data = json.loads(resp.read())
-                      for m in data.get("matches",[])[:5]:
-                          ht = m.get("homeTeam",{}).get("name","")
-                          at = m.get("awayTeam",{}).get("name","")
-                          dt = m.get("utcDate","")
-                          result["matches"].append({
-                              "id": len(result["matches"])+1,
-                              "league": name, "leagueKey": code.lower(),
-                              "time": dt[:16].replace("T"," "),
-                              "status": "upcoming", "score": "",
-                              "home": {"name": ht, "logo": "⚽", "form": ["W","D","W","L","W"], "rank": 10, "goalsFor": 1.8, "goalsAgainst": 0.7},
-                              "away": {"name": at, "logo": "⚽", "form": ["D","W","L","W","W"], "rank": 15, "goalsFor": 1.5, "goalsAgainst": 0.8},
-                              "odds": {"home": 2.0, "draw": 3.3, "away": 3.5}
-                          })
-              except Exception as e:
-                  print(f"{code} error: {e}")
-
           result["updated"] = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-          print(f"Total matches: {len(result['matches'])}")
-
-          # 按时间排序
           result["matches"].sort(key=lambda x: x["time"])
 
           with open("data/matches.json", "w", encoding="utf-8") as f:
               json.dump(result, f, ensure_ascii=False, indent=2)
+
+          print(f"Total: {len(result['matches'])} matches ({', '.join(result['sources'])})")
           PYEOF
 
       - name: Commit and push
         run: |
-          mkdir -p data
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/matches.json
-          git commit -m "chore: update matches $(date +%Y-%m-%d_%H:%M)" || echo "No changes"
+          git diff --staged --quiet || git commit -m "chore: update matches $(date +%Y-%m-%d_%H:%M)"
           git push
