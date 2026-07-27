@@ -151,6 +151,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','SF Pro Display'
 .community .qr-box img{width:160px;height:160px;display:block}
 .community .hint{font-size:.7em;color:#4a5568;margin-top:12px}
 
+
+/* 泊松分析 */
+.poisson{margin:0 18px 18px;padding:14px 16px;background:rgba(46,204,113,.03);border:1px solid rgba(46,204,113,.08);border-radius:12px}
+.poisson-title{font-size:.75em;color:#2ecc71;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.poisson-title::before{content:'';width:3px;height:12px;background:#2ecc71;border-radius:2px}
+.poisson-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.poisson-item{text-align:center;padding:8px;background:rgba(255,255,255,.02);border-radius:8px;border:1px solid rgba(255,255,255,.04)}
+.poisson-item .p-label{font-size:.65em;color:#4a5568}
+.poisson-item .p-value{font-size:1.1em;font-weight:700;color:#fff;margin-top:4px}
+.poisson-item .p-sub{font-size:.6em;color:#718096;margin-top:2px}
+/* 真实边际 */
+.true-edge{margin:0 18px 18px;padding:14px 16px;background:rgba(243,156,18,.04);border:1px solid rgba(243,156,18,.1);border-radius:12px}
+.true-edge-title{font-size:.75em;color:#f39c12;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.true-edge-title::before{content:'';width:3px;height:12px;background:#f39c12;border-radius:2px}
+.true-edge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.true-edge-item{text-align:center;padding:8px;background:rgba(255,255,255,.02);border-radius:8px;border:1px solid rgba(255,255,255,.04)}
+.true-edge-item .te-label{font-size:.65em;color:#4a5568}
+.true-edge-item .te-value{font-size:1.1em;font-weight:700;color:#fff;margin-top:4px}
+.true-edge-item .te-value.positive{color:#2ecc71}.true-edge-item .te-value.negative{color:#e74c3c}
+.true-edge-item .te-sub{font-size:.6em;color:#718096;margin-top:2px}
+
 /* 底部 */
 .foot{text-align:center;padding:24px 0;color:#2d3748;font-size:.7em;line-height:1.6}
 .empty{text-align:center;padding:80px 20px;color:#4a5568}
@@ -223,6 +244,58 @@ function crsToProbs(crs) {
   for (const k in probs) probs[k] /= total;
   return probs;
 }
+
+// 泊松分布PMF
+function poissonPMF(k, lam) {
+  return (lam ** k) * Math.exp(-lam) / factorial(k);
+}
+function factorial(n) {
+  if (n <= 1) return 1;
+  let r = 1;
+  for (let i = 2; i <= n; i++) r *= i;
+  return r;
+}
+// 从CRS概率反推泊松参数
+function estimateLambda(probs, isHome) {
+  const gp = {};
+  for (const [k, p] of Object.entries(probs)) {
+    const g = isHome ? parseInt(k.slice(1,3)) : parseInt(k.slice(4,6));
+    gp[g] = (gp[g] || 0) + p;
+  }
+  let best = 1.0, bestS = Infinity;
+  for (let l = 5; l <= 35; l++) {
+    const lam = l / 10;
+    let s = 0;
+    for (const [g, op] of Object.entries(gp)) {
+      const ep = poissonPMF(parseInt(g), lam);
+      s += (op - ep) ** 2;
+    }
+    if (s < bestS) { bestS = s; best = lam; }
+  }
+  return { lambda: best, goalProbs: gp };
+}
+// 泊松模型计算概率
+function poissonModel(hL, aL) {
+  let h = 0, d = 0, a = 0;
+  for (let i = 0; i <= 6; i++) {
+    for (let j = 0; j <= 6; j++) {
+      const p = poissonPMF(i, hL) * poissonPMF(j, aL);
+      if (i > j) h += p; else if (i === j) d += p; else a += p;
+    }
+  }
+  return { home: h, draw: d, away: a };
+}
+// 泊松比分概率
+function poissonScores(hL, aL) {
+  const s = [];
+  for (let i = 0; i <= 5; i++) {
+    for (let j = 0; j <= 5; j++) {
+      s.push({ s: i + '-' + j, p: poissonPMF(i, hL) * poissonPMF(j, aL) });
+    }
+  }
+  return s.sort((a, b) => b.p - a.p);
+}
+
 
 // 3. CRS → 胜平负
 function crsToHDA(probs) {
@@ -373,6 +446,20 @@ function ana(m) {
     .map(([k, p]) => ({ s: `${+k.slice(1,3)}-${+k.slice(4,6)}`, p }))
     .sort((a, b) => b.p - a.p);
   
+  // 泊松模型
+  const homeEst = estimateLambda(crsProbs, true);
+  const awayEst = estimateLambda(crsProbs, false);
+  const poissonHDA = poissonModel(homeEst.lambda, awayEst.lambda);
+  const poissonScores_ = poissonScores(homeEst.lambda, awayEst.lambda);
+  
+  // 真实边际（泊松 vs 市场）
+  const marketProb = calibrateProbs(m.odds);
+  const trueEdge = {
+    home: (poissonHDA.home - marketProb.home) * 100,
+    draw: (poissonHDA.draw - marketProb.draw) * 100,
+    away: (poissonHDA.away - marketProb.away) * 100
+  };
+  
   // 大小球
   let o25 = 0;
   for (const [k, v] of Object.entries(crsProbs)) {
@@ -398,10 +485,12 @@ function ana(m) {
     calibrated,
     confidence,
     edge,
+    trueEdge,
     risk,
     scoreRank,
+    poisson: { hda: poissonHDA, scores: poissonScores_, homeLambda: homeEst.lambda, awayLambda: awayEst.lambda },
     o25,
-    xg: { home: hxg, away: axg, total: hxg + axg },
+    xg: { home: homeEst.lambda, away: awayEst.lambda, total: homeEst.lambda + awayEst.lambda },
     value
   };
 }
@@ -415,10 +504,19 @@ function aiRead(m, a) {
   const topScore = a.scoreRank[0];
   const vals = Object.entries(a.value).filter(([_,v]) => v > 0.05);
   
-  let text = `多模型交叉验证（CRS+让球+半全场），${m.home.name}${pickP}%±${a.confidence.ci}%概率${pick}。`;
-  text += `期望进球${a.xg.total.toFixed(1)}球，${over?'大':'小'}2.5球概率${Math.round((over?a.o25:1-a.o25)*100)}%。`;
-  text += `最可能比分${topScore.s}(${Math.round(topScore.p*100)}%)。`;
-  text += `确定性：${a.risk.text}。${vals.length ? '发现价值机会。' : '市场定价合理。'}`;
+  let text = `泊松模型：主队场均${a.poisson.homeLambda.toFixed(2)}球，客队场均${a.poisson.awayLambda.toFixed(2)}球。`;
+  
+  const te = a.trueEdge;
+  const edges = [];
+  if (Math.abs(te.home) > 2) edges.push(`主胜${te.home > 0 ? '低估' : '高估'}${Math.abs(te.home).toFixed(1)}%`);
+  if (Math.abs(te.draw) > 2) edges.push(`平局${te.draw > 0 ? '低估' : '高估'}${Math.abs(te.draw).toFixed(1)}%`);
+  if (Math.abs(te.away) > 2) edges.push(`客胜${te.away > 0 ? '低估' : '高估'}${Math.abs(te.away).toFixed(1)}%`);
+  
+  if (edges.length) {
+    text += `发现偏差：${edges.join('，')}。`;
+  } else {
+    text += `市场定价合理。`;
+  }
   
   if (vals.length) {
     text += `价值发现：${vals.map(([k,v]) => `${k==='home'?'主胜':k==='draw'?'平局':'客胜'}赔率有${Math.round(v*100)}%溢价空间`).join('，')}。`;
@@ -526,25 +624,45 @@ function card(m) {
       <span class="value">${pickP}% ± ${a.confidence.ci}%</span>
       <span class="ci">95%置信</span>
     </div>
-    <div class="edge">
-      <div class="edge-title">📊 市场偏差（AI vs 市场）</div>
-      <div class="edge-grid">
-        <div class="edge-item">
-          <div class="e-label">主胜边际</div>
-          <div class="e-value ${a.edge.home > 0 ? 'positive' : 'negative'}">${a.edge.home > 0 ? '+' : ''}${a.edge.home.toFixed(1)}%</div>
-          <div class="e-sub">${a.edge.home > 2 ? '明显低估' : a.edge.home > 0 ? '略低估' : a.edge.home > -2 ? '合理' : '高估'}</div>
+        <div class="poisson">
+      <div class="poisson-title">🎯 泊松模型（独立估算）</div>
+      <div class="poisson-grid">
+        <div class="poisson-item">
+          <div class="p-label">主胜</div>
+          <div class="p-value">${Math.round(a.poisson.hda.home*100)}%</div>
+          <div class="p-sub">场均${a.poisson.homeLambda.toFixed(2)}球</div>
         </div>
-        <div class="edge-item">
-          <div class="e-label">平局边际</div>
-          <div class="e-value ${a.edge.draw > 0 ? 'positive' : 'negative'}">${a.edge.draw > 0 ? '+' : ''}${a.edge.draw.toFixed(1)}%</div>
-          <div class="e-sub">${a.edge.draw > 2 ? '明显低估' : a.edge.draw > 0 ? '略低估' : a.edge.draw > -2 ? '合理' : '高估'}</div>
+        <div class="poisson-item">
+          <div class="p-label">平局</div>
+          <div class="p-value">${Math.round(a.poisson.hda.draw*100)}%</div>
         </div>
-        <div class="edge-item">
-          <div class="e-label">客胜边际</div>
-          <div class="e-value ${a.edge.away > 0 ? 'positive' : 'negative'}">${a.edge.away > 0 ? '+' : ''}${a.edge.away.toFixed(1)}%</div>
-          <div class="e-sub">${a.edge.away > 2 ? '明显低估' : a.edge.away > 0 ? '略低估' : a.edge.away > -2 ? '合理' : '高估'}</div>
+        <div class="poisson-item">
+          <div class="p-label">客胜</div>
+          <div class="p-value">${Math.round(a.poisson.hda.away*100)}%</div>
+          <div class="p-sub">场均${a.poisson.awayLambda.toFixed(2)}球</div>
         </div>
       </div>
+    </div>
+    <div class="true-edge">
+      <div class="true-edge-title">💰 真实边际（泊松 vs 竞彩）</div>
+      <div class="true-edge-grid">
+        <div class="true-edge-item">
+          <div class="te-label">主胜</div>
+          <div class="te-value ${a.trueEdge.home > 0 ? 'positive' : 'negative'}">${a.trueEdge.home > 0 ? '+' : ''}${a.trueEdge.home.toFixed(1)}%</div>
+          <div class="te-sub">${a.trueEdge.home > 2 ? '市场低估' : a.trueEdge.home > -2 ? '合理' : '市场高估'}</div>
+        </div>
+        <div class="true-edge-item">
+          <div class="te-label">平局</div>
+          <div class="te-value ${a.trueEdge.draw > 0 ? 'positive' : 'negative'}">${a.trueEdge.draw > 0 ? '+' : ''}${a.trueEdge.draw.toFixed(1)}%</div>
+          <div class="te-sub">${a.trueEdge.draw > 2 ? '市场低估' : a.trueEdge.draw > -2 ? '合理' : '市场高估'}</div>
+        </div>
+        <div class="true-edge-item">
+          <div class="te-label">客胜</div>
+          <div class="te-value ${a.trueEdge.away > 0 ? 'positive' : 'negative'}">${a.trueEdge.away > 0 ? '+' : ''}${a.trueEdge.away.toFixed(1)}%</div>
+          <div class="te-sub">${a.trueEdge.away > 2 ? '市场低估' : a.trueEdge.away > -2 ? '合理' : '市场高估'}</div>
+        </div>
+      </div>
+    </div>
     </div>
     <div class="certainty ${a.risk.level === 'very_high' || a.risk.level === 'high' ? 'high' : a.risk.level === 'medium' ? 'medium' : 'low'}">
       <div class="left">
