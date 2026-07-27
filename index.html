@@ -102,6 +102,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','SF Pro Display'
 
 /* 复盘模块 */
 .history{margin:0 0 16px}
+.history-toggle{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;cursor:pointer;color:#e8eaed}
+.history-toggle:hover{border-color:rgba(46,204,113,.2)}
+.ht-left{display:flex;align-items:center;gap:8px}
+.ht-title{font-size:.85em;font-weight:700}
+.ht-sub{font-size:.65em;color:#4a5568}
+.ht-arrow{font-size:.7em;color:#4a5568;transition:transform .2s}
+.ht-arrow.open{transform:rotate(180deg)}
+.history-body{margin-top:8px;display:none}
+.history-body.open{display:block}
 .history-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .history-title{font-size:.85em;font-weight:700;color:#fff}
 .history-sub{font-size:.65em;color:#4a5568}
@@ -149,14 +158,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','SF Pro Display'
     <div class="stat"><div class="n">-</div><div class="l">更新</div></div>
   </div>
   <div class="pills" id="pills"></div>
-  <div class="history" id="history">
-    <div class="history-header">
-      <span class="history-title">📈 最近7天复盘</span>
-      <span class="history-sub" id="historySub">-</span>
-    </div>
-    <div class="stats-grid" id="historyStats"></div>
-    <div class="history-list" id="historyList"></div>
-  </div>
   <div id="list">
     <div class="sk-card">
       <div class="sk-head"></div>
@@ -169,6 +170,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','SF Pro Display'
       <div class="sk-row"><div class="sk-circle"></div><div class="sk-vs"></div><div class="sk-circle"></div></div>
       <div class="sk-bar"></div>
       <div class="sk-line"></div><div class="sk-line short"></div>
+    </div>
+  </div>
+  <div class="history" id="history">
+    <button class="history-toggle" onclick="this.nextElementSibling.classList.toggle('open');this.querySelector('.ht-arrow').classList.toggle('open')">
+      <div class="ht-left">
+        <span class="ht-title">📈 最近7天复盘</span>
+        <span class="ht-sub" id="historySub">-</span>
+      </div>
+      <span class="ht-arrow">▼</span>
+    </button>
+    <div class="history-body">
+      <div class="stats-grid" id="historyStats"></div>
+      <div class="history-list" id="historyList"></div>
     </div>
   </div>
   <div class="community">
