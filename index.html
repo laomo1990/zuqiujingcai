@@ -347,7 +347,7 @@ function ana(m) {
   const calibrated = calibrateProbs(m.odds);
   const multi = multiModel(m);
   const confidence = calcConfidence(multi.models);
-  const edge = edgeAnalysis(multi, m.odds);
+  const edge = edgeCriterion(multi, m.odds);
   const risk = riskLevel(confidence, multi);
   
   // CRS数据
