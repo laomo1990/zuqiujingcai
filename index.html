@@ -316,19 +316,20 @@ function calcConfidence(models) {
 
 // 6. 凯利指数
 function edgeCriterion(prob, odds) {
-  // f* = (bp - q) / b
-  // b = 赔率-1, p = 概率, q = 1-p
-  const calcKelly = (p, o) => {
-    const b = o - 1;
-    const q = 1 - p;
-    const f = (b * p - q) / b;
-    return Math.max(0, f) * 100;  // 百分比
+  // 边际 = AI概率 - 市场隐含概率
+  const rawH = 1/odds.home, rawD = 1/odds.draw, rawA = 1/odds.away;
+  const sum = rawH + rawD + rawA;
+  const marketProb = {
+    home: rawH / sum,
+    draw: rawD / sum,
+    away: rawA / sum
   };
   
   return {
-    home: calcKelly(prob.home, odds.home),
-    draw: calcKelly(prob.draw, odds.draw),
-    away: calcKelly(prob.away, odds.away)
+    home: (prob.home - marketProb.home) * 100,
+    draw: (prob.draw - marketProb.draw) * 100,
+    away: (prob.away - marketProb.away) * 100,
+    market: marketProb
   };
 }
 
