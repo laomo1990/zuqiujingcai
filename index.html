@@ -409,13 +409,13 @@ function aiRead(m, a) {
   const pickP = Math.round(mx * 100);
   const over = a.o25 > 0.5;
   const topScore = a.scoreRank[0];
+  const vals = Object.entries(a.value).filter(([_,v]) => v > 0.05);
   
   let text = `多模型交叉验证（CRS+让球+半全场），${m.home.name}${pickP}%±${a.confidence.ci}%概率${pick}。`;
   text += `期望进球${a.xg.total.toFixed(1)}球，${over?'大':'小'}2.5球概率${Math.round((over?a.o25:1-a.o25)*100)}%。`;
   text += `最可能比分${topScore.s}(${Math.round(topScore.p*100)}%)。`;
   text += `风险评级：${a.risk==='low'?'低':a.risk==='medium'?'中':'高'}。${vals.length ? '发现价值机会。' : '市场定价合理。'}`;
   
-  const vals = Object.entries(a.value).filter(([_,v]) => v > 0.05);
   if (vals.length) {
     text += `价值发现：${vals.map(([k,v]) => `${k==='home'?'主胜':k==='draw'?'平局':'客胜'}赔率有${Math.round(v*100)}%溢价空间`).join('，')}。`;
   }
