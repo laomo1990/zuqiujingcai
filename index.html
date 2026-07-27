@@ -178,11 +178,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','SF Pro Display'
 
 <script>
 // 粒子
-const C=document.getElementById('fx'),X=C.getContext('2d');let P=[];
-function rz(){C.width=innerWidth;C.height=innerHeight}
+let C, X, P=[];
+try {
+  C=document.getElementById('fx');
+  if(C) X=C.getContext('2d');
+} catch(e) { console.warn('Canvas init failed:', e); }
+function rz(){if(C){C.width=innerWidth;C.height=innerHeight}}
 class Pt{constructor(){this.r()}r(){this.x=Math.random()*C.width;this.y=Math.random()*C.height;this.s=Math.random()*3+1.5;this.vx=(Math.random()-.5)*.4;this.vy=(Math.random()-.5)*.4;this.o=Math.random()*.25+.1;this.c=['#2ecc71','#1a5a3a','#0d3a1a'][Math.random()*3|0]}u(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>C.width)this.vx*=-1;if(this.y<0||this.y>C.height)this.vy*=-1}d(){X.beginPath();X.arc(this.x,this.y,this.s,0,6.28);X.fillStyle=this.c;X.globalAlpha=this.o;X.fill();X.globalAlpha=1}}
 function init(){rz();P=[];for(let i=0;i<50;i++)P.push(new Pt())}
-function anim(){X.clearRect(0,0,C.width,C.height);for(let i=0;i<P.length;i++){for(let j=i+1;j<P.length;j++){const dx=P[i].x-P[j].x,dy=P[i].y-P[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<180){X.beginPath();X.moveTo(P[i].x,P[i].y);X.lineTo(P[j].x,P[j].y);X.strokeStyle='#2ecc71';X.globalAlpha=(1-d/180)*.15;X.lineWidth=1;X.stroke();X.globalAlpha=1}}}P.forEach(p=>{p.u();p.d()});requestAnimationFrame(anim)}
+function anim(){
+  if(!C||!X){requestAnimationFrame(anim);return}
+  try{
+    X.clearRect(0,0,C.width,C.height);
+    for(let i=0;i<P.length;i++){for(let j=i+1;j<P.length;j++){const dx=P[i].x-P[j].x,dy=P[i].y-P[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<180){X.beginPath();X.moveTo(P[i].x,P[i].y);X.lineTo(P[j].x,P[j].y);X.strokeStyle='#2ecc71';X.globalAlpha=(1-d/180)*.15;X.lineWidth=1;X.stroke();X.globalAlpha=1}}}
+    P.forEach(p=>{p.u();p.d()});
+  } catch(e) { console.warn('Particle animation error:', e); }
+  requestAnimationFrame(anim);
+}
 addEventListener('resize',rz);init();anim();
 
 // ========== 核心分析引擎 ==========
