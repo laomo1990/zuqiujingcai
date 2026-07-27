@@ -77,15 +77,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','SF Pro Display'
 .confidence .value{font-size:.85em;font-weight:600;color:#00d2ff}
 .confidence .ci{font-size:.7em;color:#718096}
 
-/* 凯利指数 */
-.kelly{margin:0 18px 18px;padding:12px 16px;background:rgba(243,156,18,.04);border:1px solid rgba(243,156,18,.1);border-radius:12px}
-.kelly-title{font-size:.75em;color:#f39c12;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.kelly-title::before{content:'';width:3px;height:12px;background:#f39c12;border-radius:2px}
-.kelly-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.kelly-item{text-align:center}
-.kelly-item .k-label{font-size:.65em;color:#4a5568}
-.kelly-item .k-value{font-size:1em;font-weight:700;color:#fff;margin-top:2px}
-.kelly-item .k-value.good{color:#2ecc71}.kelly-item .k-value.bad{color:#e74c3c}
+/* 边际分析 */
+.edge{margin:0 18px 18px;padding:14px 16px;background:rgba(243,156,18,.04);border:1px solid rgba(243,156,18,.1);border-radius:12px}
+.edge-title{font-size:.75em;color:#f39c12;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.edge-title::before{content:'';width:3px;height:12px;background:#f39c12;border-radius:2px}
+.edge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.edge-item{text-align:center;padding:8px;background:rgba(255,255,255,.02);border-radius:8px;border:1px solid rgba(255,255,255,.04)}
+.edge-item .e-label{font-size:.65em;color:#4a5568}
+.edge-item .e-value{font-size:1.1em;font-weight:700;color:#fff;margin-top:4px}
+.edge-item .e-value.positive{color:#2ecc71}.edge-item .e-value.negative{color:#e74c3c}
+.edge-item .e-sub{font-size:.6em;color:#718096;margin-top:2px}
 
 /* 风险评级 */
 .risk{margin:0 18px 18px;padding:12px 16px;border-radius:12px;display:flex;align-items:center;gap:10px}
@@ -314,7 +315,7 @@ function calcConfidence(models) {
 }
 
 // 6. 凯利指数
-function kellyCriterion(prob, odds) {
+function edgeCriterion(prob, odds) {
   // f* = (bp - q) / b
   // b = 赔率-1, p = 概率, q = 1-p
   const calcKelly = (p, o) => {
@@ -346,7 +347,7 @@ function ana(m) {
   const calibrated = calibrateProbs(m.odds);
   const multi = multiModel(m);
   const confidence = calcConfidence(multi.models);
-  const kelly = kellyCriterion(multi, m.odds);
+  const edge = edgeAnalysis(multi, m.odds);
   const risk = riskLevel(confidence, multi);
   
   // CRS数据
@@ -379,7 +380,7 @@ function ana(m) {
     prob: multi,
     calibrated,
     confidence,
-    kelly,
+    edge,
     risk,
     scoreRank,
     o25,
@@ -399,7 +400,7 @@ function aiRead(m, a) {
   let text = `多模型交叉验证（CRS+让球+半全场），${m.home.name}${pickP}%±${a.confidence.ci}%概率${pick}。`;
   text += `期望进球${a.xg.total.toFixed(1)}球，${over?'大':'小'}2.5球概率${Math.round((over?a.o25:1-a.o25)*100)}%。`;
   text += `最可能比分${topScore.s}(${Math.round(topScore.p*100)}%)。`;
-  text += `风险评级：${a.risk==='low'?'低':a.risk==='medium'?'中':'高'}。`;
+  text += `风险评级：${a.risk==='low'?'低':a.risk==='medium'?'中':'高'}。${vals.length ? '发现价值机会。' : '市场定价合理。'}`;
   
   const vals = Object.entries(a.value).filter(([_,v]) => v > 0.05);
   if (vals.length) {
@@ -458,8 +459,8 @@ function card(m) {
   const riskIcon = a.risk === 'low' ? '🟢' : a.risk === 'medium' ? '🟡' : '🔴';
   
   // 凯利指数最大值
-  const maxKelly = Math.max(a.kelly.home, a.kelly.draw, a.kelly.away);
-  const kellyPick = a.kelly.home === maxKelly ? '主胜' : a.kelly.away === maxKelly ? '客胜' : '平局';
+  const maxKelly = Math.max(a.edge.home, a.edge.draw, a.edge.away);
+  const edgePick = a.edge.home === maxKelly ? '主胜' : a.edge.away === maxKelly ? '客胜' : '平局';
 
   return `
   <div class="card">
@@ -496,12 +497,24 @@ function card(m) {
       <span class="value">${pickP}% ± ${a.confidence.ci}%</span>
       <span class="ci">95%置信</span>
     </div>
-    <div class="kelly">
-      <div class="kelly-title">凯利指数（最优投注比例）</div>
-      <div class="kelly-grid">
-        <div class="kelly-item"><div class="k-label">主胜</div><div class="k-value ${a.kelly.home > 0 ? 'good' : 'bad'}">${a.kelly.home.toFixed(1)}%</div></div>
-        <div class="kelly-item"><div class="k-label">平局</div><div class="k-value ${a.kelly.draw > 0 ? 'good' : 'bad'}">${a.kelly.draw.toFixed(1)}%</div></div>
-        <div class="kelly-item"><div class="k-label">客胜</div><div class="k-value ${a.kelly.away > 0 ? 'good' : 'bad'}">${a.kelly.away.toFixed(1)}%</div></div>
+    <div class="edge">
+      <div class="edge-title">📊 边际分析</div>
+      <div class="edge-grid">
+        <div class="edge-item">
+          <div class="e-label">主胜边际</div>
+          <div class="e-value ${a.edge.home > 0 ? 'positive' : 'negative'}">${a.edge.home > 0 ? '+' : ''}${a.edge.home.toFixed(1)}%</div>
+          <div class="e-sub">${a.edge.home > 0 ? '有价值' : '无价值'}</div>
+        </div>
+        <div class="edge-item">
+          <div class="e-label">平局边际</div>
+          <div class="e-value ${a.edge.draw > 0 ? 'positive' : 'negative'}">${a.edge.draw > 0 ? '+' : ''}${a.edge.draw.toFixed(1)}%</div>
+          <div class="e-sub">${a.edge.draw > 0 ? '有价值' : '无价值'}</div>
+        </div>
+        <div class="edge-item">
+          <div class="e-label">客胜边际</div>
+          <div class="e-value ${a.edge.away > 0 ? 'positive' : 'negative'}">${a.edge.away > 0 ? '+' : ''}${a.edge.away.toFixed(1)}%</div>
+          <div class="e-sub">${a.edge.away > 0 ? '有价值' : '无价值'}</div>
+        </div>
       </div>
     </div>
     <div class="risk ${riskClass}">
@@ -526,7 +539,7 @@ function card(m) {
         <div class="detail-row"><span class="dl">校准后客胜</span><span class="dr">${Math.round(a.calibrated.away*100)}%</span></div>
         <div class="detail-row"><span class="dl">预计进球</span><span class="dr">${a.xg.total.toFixed(1)}</span></div>
         <div class="detail-row"><span class="dl">大2.5球</span><span class="dr ${over?'g':'r'}">${Math.round(a.o25*100)}%</span></div>
-        <div class="detail-row"><span class="dl">凯利最优</span><span class="dr">${kellyPick} ${maxKelly.toFixed(1)}%</span></div>
+        <div class="detail-row"><span class="dl">凯利最优</span><span class="dr">${edgePick} ${maxKelly.toFixed(1)}%</span></div>
         <div class="detail-row"><span class="dl">模型数</span><span class="dr">${Object.values(a.prob.models).filter(Boolean).length}个</span></div>
       </div>
     </div>
