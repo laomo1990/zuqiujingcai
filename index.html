@@ -259,6 +259,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','SF Pro Display'
 // ===== 常量 =====
 const HOME_ADV = 0.35;
 
+// 联联赛系数（场均进球基准 + 主场优势修正）
+const LEAGUE_CFG = {
+  '瑞超': {avg: 2.8, homeAdv: 0.40},
+  '挪超': {avg: 2.7, homeAdv: 0.38},
+  '巴甲': {avg: 2.2, homeAdv: 0.30},
+  '巴乙': {avg: 2.1, homeAdv: 0.28},
+  'K联赛': {avg: 2.6, homeAdv: 0.35},
+  '美职': {avg: 2.9, homeAdv: 0.42},
+  '芬超': {avg: 2.5, homeAdv: 0.32},
+  'default': {avg: 2.5, homeAdv: 0.35}
+};
+
 // ===== 工具函数 =====
 function factorial(n){if(n<=1)return 1;let r=1;for(let i=2;i<=n;i++)r*=i;return r}
 function poisson(k,l){return(l**k)*Math.exp(-l)/factorial(k)}
@@ -266,18 +278,97 @@ function crsP(c){const p={};let t=0;for(const[k,o]of Object.entries(c))if(o>0){p
 function estLam(p,isH){const gp={};for(const[k,v]of Object.entries(p)){const g=isH?+k.slice(1,3):+k.slice(4,6);gp[g]=(gp[g]||0)+v}let best=1,bs=Infinity;for(let l=5;l<=35;l++){const lam=l/10;let s=0;for(const[g,op]of Object.entries(gp))s+=(op-poisson(+g,lam))**2;if(s<bs){bs=s;best=lam}}return{lam:best,gp}}
 
 function ana(m){
-  const cp=crsP(m.crs),hE=estLam(cp,true),aE=estLam(cp,false);
-  const hL=hE.lam+HOME_ADV,aL=Math.max(.3,aE.lam-HOME_ADV*.3);
-  let ph=0,pd=0,pa=0;
-  for(let i=0;i<=6;i++)for(let j=0;j<=6;j++){const p=poisson(i,hL)*poisson(j,aL);if(i>j)ph+=p;else if(i===j)pd+=p;else pa+=p}
+  // ===== 模型1: CRS比分赔率概率 =====
+  const cp=crsP(m.crs);
+  const crsHDA={h:0,d:0,a:0};
+  for(const[k,v]of Object.entries(cp)){
+    const g=+k.slice(1,3),e=+k.slice(4,6);
+    if(g>e)crsHDA.h+=v;else if(g===e)crsHDA.d+=v;else crsHDA.a+=v;
+  }
+  
+  // ===== 模型2: 让球赔率反推 =====
+  let hcHDA=null;
+  if(m.handicap.line&&m.handicap.home&&m.handicap.away){
+    const dOdds=m.handicap.draw||0;
+    if(dOdds>0){
+      const s=1/m.handicap.home+1/dOdds+1/m.handicap.away;
+      hcHDA={h:(1/m.handicap.home)/s,d:(1/dOdds)/s,a:(1/m.handicap.away)/s};
+    }else{
+      const s=1/m.handicap.home+1/m.handicap.away;
+      hcHDA={h:(1/m.handicap.home)/s,d:0.15,a:(1/m.handicap.away)/s};
+      const sum=hcHDA.h+hcHDA.d+hcHDA.a;
+      hcHDA.h/=sum;hcHDA.d/=sum;hcHDA.a/=sum;
+    }
+  }
+  
+  // ===== 模型3: 半全场赔率反推 =====
+  let htHDA=null;
+  if(m.htft){
+    let hh=0,hd=0,ha=0;
+    for(const[k,o]of Object.entries(m.htft)){
+      if(o<=0)continue;const p=1/o;
+      if(k[0]==='h')hh+=p;else if(k[0]==='d')hd+=p;else ha+=p;
+    }
+    const s=hh+hd+ha;
+    htHDA={h:hh/s,d:hd/s,a:ha/s};
+  }
+  
+  // ===== 多模型加权 =====
+  // 权重：CRS 50%, 让球 30%, 半全场 20%
+  let ph=crsHDA.h*0.5,pd=crsHDA.d*0.5,pa=crsHDA.a*0.5,wTotal=0.5;
+  if(hcHDA){ph+=hcHDA.h*0.3;pd+=hcHDA.d*0.3;pa+=hcHDA.a*0.3;wTotal+=0.3;}
+  if(htHDA){ph+=htHDA.h*0.2;pd+=htHDA.d*0.2;pa+=htHDA.a*0.2;wTotal+=0.2;}
+  ph/=wTotal;pd/=wTotal;pa/=wTotal;
+  
+  // ===== 联联赛修正 =====
+  const cfg=LEAGUE_CFG[m.league]||LEAGUE_CFG['default'];
+  const homeAdv=cfg.homeAdv;
+  
+  // ===== 期望进球（从CRS反推 + 联赛修正） =====
+  const hE=estLam(cp,true),aE=estLam(cp,false);
+  const hL=hE.lam+homeAdv;
+  const aL=Math.max(.3,aE.lam-homeAdv*0.3);
+  
+  // ===== 泊松比分概率 =====
   const sr=Object.entries(cp).map(([k,p])=>({s:`${+k.slice(1,3)}-${+k.slice(4,6)}`,p})).sort((a,b)=>b.p-a.p);
-  let o25=0;for(const[k,v]of Object.entries(cp))if(+k.slice(1,3)+ +k.slice(4,6)>=3)o25+=v;
-  const mk={h:1/m.odds.home,d:1/m.odds.draw,a:1/m.odds.away};const ms=mk.h+mk.d+mk.a;mk.h/=ms;mk.d/=ms;mk.a/=ms;
+  
+  // ===== 大小球（从CRS + 泊松综合） =====
+  let o25=0;
+  for(const[k,v]of Object.entries(cp))if(+k.slice(1,3)+ +k.slice(4,6)>=3)o25+=v;
+  // 泊松大小球
+  let po25=0;
+  for(let i=0;i<=6;i++)for(let j=0;j<=6;j++)if(i+j>=3)po25+=poisson(i,hL)*poisson(j,aL);
+  // 综合大小球
+  const finalO25=o25*0.6+po25*0.4;
+  
+  // ===== 市场概率（去除利润率） =====
+  const mk={h:1/m.odds.home,d:1/m.odds.draw,a:1/m.odds.away};
+  const ms=mk.h+mk.d+mk.a;mk.h/=ms;mk.d/=ms;mk.a/=ms;
+  
+  // ===== 真实边际 =====
   const te={h:(ph-mk.h)*100,d:(pd-mk.d)*100,a:(pa-mk.a)*100};
+  
+  // ===== 价值发现 =====
   const val={h:ph*m.odds.home-1,d:pd*m.odds.draw-1,a:pa*m.odds.away-1};
+  
+  // ===== 置信度（基于模型一致性） =====
+  const models=[crsHDA];
+  if(hcHDA)models.push(hcHDA);
+  if(htHDA)models.push(htHDA);
+  
+  let maxStd=0;
+  ['h','d','a'].forEach(key=>{
+    const vals=models.map(m=>m[key]);
+    const mean=vals.reduce((a,b)=>a+b,0)/vals.length;
+    const variance=vals.reduce((a,v)=>a+(v-mean)**2,0)/vals.length;
+    maxStd=Math.max(maxStd,Math.sqrt(variance));
+  });
+  
+  const ci=Math.round(maxStd*200);
   const sp=Math.max(ph,pd,pa)-Math.min(ph,pd,pa);
-  const conf=sp>.25?4:sp>.15?3:sp>.08?2:1;
-  return{h:ph,d:pd,a:pa,hL,aL,sr,o25,te,val,conf};
+  const conf=ci<=3?5:ci<=6?4:ci<=10?3:ci<=15?2:1;
+  
+  return{h:ph,d:pd,a:pa,hL,aL,sr,o25:finalO25,te,val,conf,ci,models:models.length};
 }
 
 // 生成近期战绩（基于联赛排名推算）
@@ -307,7 +398,8 @@ function genForm(name){
 function reason(m,a){
   const mx=Math.max(a.h,a.d,a.a);
   const pick=a.h===mx?'主队':a.a===mx?'客队':'两队';
-  let r=`泊松模型显示${pick}场均进球更高（主${a.hL.toFixed(1)}·客${a.aL.toFixed(1)}）`;
+  let r=`${a.models}模型加权分析（CRS+让球+半全场），${pick}概率最高`;
+  r+=`，场均进球主${a.hL.toFixed(1)}客${a.aL.toFixed(1)}`;
   const edges=[];
   if(Math.abs(a.te.h)>2)edges.push(`主胜${a.te.h>0?'低估':'高估'}${Math.abs(a.te.h).toFixed(1)}%`);
   if(Math.abs(a.te.d)>2)edges.push(`平局${a.te.d>0?'低估':'高估'}${Math.abs(a.te.d).toFixed(1)}%`);
