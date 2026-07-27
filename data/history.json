@@ -1,0 +1,303 @@
+{
+  "updated": "2026-07-27 15:08 UTC",
+  "summary": {
+    "total": 12,
+    "spf_hit": 8,
+    "spf_rate": 67,
+    "score_hit": 3,
+    "score_rate": 25,
+    "goal_hit": 7,
+    "goal_rate": 58,
+    "roi": 5.2
+  },
+  "matches": [
+    {
+      "date": "2026-07-26",
+      "league": "瑞超",
+      "home": "马尔默",
+      "away": "哈马比",
+      "home_score": 2,
+      "away_score": 1,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 58,
+        "score": "2-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "✅",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.65,
+        "draw": 3.8,
+        "away": 4.2
+      }
+    },
+    {
+      "date": "2026-07-26",
+      "league": "挪超",
+      "home": "博德闪耀",
+      "away": "莫尔德",
+      "home_score": 3,
+      "away_score": 2,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 52,
+        "score": "2-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.8,
+        "draw": 3.6,
+        "away": 3.9
+      }
+    },
+    {
+      "date": "2026-07-25",
+      "league": "巴甲",
+      "home": "弗拉门戈",
+      "away": "帕尔梅拉斯",
+      "home_score": 1,
+      "away_score": 1,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 48,
+        "score": "1-0",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 2.1,
+        "draw": 3.2,
+        "away": 3.1
+      }
+    },
+    {
+      "date": "2026-07-25",
+      "league": "瑞超",
+      "home": "赫根",
+      "away": "索尔纳",
+      "home_score": 2,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 51,
+        "score": "2-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 1.75,
+        "draw": 3.75,
+        "away": 3.43
+      }
+    },
+    {
+      "date": "2026-07-24",
+      "league": "挪超",
+      "home": "罗森博格",
+      "away": "腓特烈",
+      "home_score": 1,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 56,
+        "score": "1-0",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "✅",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.57,
+        "draw": 3.75,
+        "away": 4.45
+      }
+    },
+    {
+      "date": "2026-07-24",
+      "league": "巴甲",
+      "home": "格雷米奥",
+      "away": "弗鲁米嫩",
+      "home_score": 0,
+      "away_score": 1,
+      "prediction": {
+        "pick": "平局",
+        "prob": 32,
+        "score": "1-1",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 2.3,
+        "draw": 3.1,
+        "away": 2.8
+      }
+    },
+    {
+      "date": "2026-07-23",
+      "league": "瑞超",
+      "home": "AIK索尔纳",
+      "away": "佐加顿斯",
+      "home_score": 2,
+      "away_score": 2,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 45,
+        "score": "1-0",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 2.2,
+        "draw": 3.25,
+        "away": 2.9
+      }
+    },
+    {
+      "date": "2026-07-23",
+      "league": "挪超",
+      "home": "维京",
+      "away": "海于格松",
+      "home_score": 3,
+      "away_score": 1,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 62,
+        "score": "2-0",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.5,
+        "draw": 4.0,
+        "away": 5.0
+      }
+    },
+    {
+      "date": "2026-07-22",
+      "league": "巴甲",
+      "home": "圣保罗",
+      "away": "科林蒂安",
+      "home_score": 1,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 55,
+        "score": "1-0",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "✅",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.7,
+        "draw": 3.5,
+        "away": 4.1
+      }
+    },
+    {
+      "date": "2026-07-22",
+      "league": "瑞超",
+      "home": "哈肯",
+      "away": "埃尔夫斯堡",
+      "home_score": 2,
+      "away_score": 3,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 50,
+        "score": "2-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.9,
+        "draw": 3.4,
+        "away": 3.5
+      }
+    },
+    {
+      "date": "2026-07-21",
+      "league": "挪超",
+      "home": "利勒斯特罗姆",
+      "away": "斯特罗姆",
+      "home_score": 1,
+      "away_score": 1,
+      "prediction": {
+        "pick": "平局",
+        "prob": 28,
+        "score": "1-1",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "✅",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 2.5,
+        "draw": 3.0,
+        "away": 2.6
+      }
+    },
+    {
+      "date": "2026-07-21",
+      "league": "巴甲",
+      "home": "巴拉纳竞技",
+      "away": "米内罗竞技",
+      "home_score": 0,
+      "away_score": 2,
+      "prediction": {
+        "pick": "客胜",
+        "prob": 38,
+        "score": "0-1",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 2.4,
+        "draw": 3.15,
+        "away": 2.65
+      }
+    }
+  ]
+}
