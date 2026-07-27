@@ -6,58 +6,62 @@
 <title>⚽ 足球 AI 深度分析</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:#0a0e17;color:#e0e0e0;min-height:100vh}
-.container{max-width:800px;margin:0 auto;padding:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:#0a0e17;color:#e0e0e0;min-height:100vh;overflow-x:hidden}
+.container{max-width:800px;margin:0 auto;padding:12px;position:relative;z-index:1}
 
-/* 头部 - 足球风格 */
-.header{text-align:center;padding:20px 0 12px;position:relative}
-.header::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:60px;height:3px;background:linear-gradient(90deg,transparent,#2ecc71,transparent);border-radius:2px}
-.header h1{font-size:1.5em;font-weight:700;color:#fff;margin-bottom:4px}
+/* 粒子画布 */
+#particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* 头部 */
+.header{text-align:center;padding:24px 0 16px;position:relative}
+.header h1{font-size:1.6em;font-weight:700;color:#fff;margin-bottom:4px;text-shadow:0 0 20px rgba(46,204,113,0.3)}
 .header h1 .accent{color:#2ecc71}
 .header p{color:#556;font-size:0.8em}
-.update-time{text-align:center;font-size:0.7em;color:#445;padding:8px 0}
+.header::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:80px;height:3px;background:linear-gradient(90deg,transparent,#2ecc71,transparent);border-radius:2px}
+.update-time{text-align:center;font-size:0.7em;color:#445;padding:10px 0}
 
-/* 赛事卡片 - 球场风格 */
-.match-card{background:linear-gradient(180deg,#111827 0%,#0d1117 100%);border-radius:16px;margin:14px 0;overflow:hidden;position:relative;border:1px solid #1e2d3d}
-.match-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#2ecc71,#27ae60)}
+/* 赛事卡片 */
+.match-card{background:linear-gradient(180deg,#111827ee,#0d1117dd);border-radius:16px;margin:14px 0;overflow:hidden;position:relative;border:1px solid #1e2d3d;backdrop-filter:blur(10px)}
+.match-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#2ecc71,#27ae60,#2ecc71);background-size:200%;animation:shimmer 3s ease infinite}
+@keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 
 /* 联赛头 */
 .league-header{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:#0d1117;border-bottom:1px solid #1e2d3d}
 .league-name{font-size:0.8em;color:#889;font-weight:500}
-.match-time{font-size:0.75em;color:#f39c12}
+.match-time{font-size:0.75em;color:#f39c12;display:flex;align-items:center;gap:6px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#2ecc71;animation:pulse 2s ease infinite;box-shadow:0 0 8px #2ecc71}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
 
-/* 球队区域 - 球场风格 */
-.teams-area{padding:20px 16px;position:relative;background:linear-gradient(180deg,#0d1117 0%,#111827 100%)}
+/* 球队区域 */
+.teams-area{padding:24px 16px;position:relative;background:linear-gradient(180deg,#0d1117,#111827)}
 .teams-area::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;border:1px solid #1e2d3d;border-radius:50%;opacity:0.3}
 .teams-area::after{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:#1e2d3d;opacity:0.3}
-
-.match-teams{display:flex;align-items:center;justify-content:center;gap:20px;position:relative;z-index:1}
+.match-teams{display:flex;align-items:center;justify-content:center;gap:24px;position:relative;z-index:1}
 .team{text-align:center;flex:1}
-.team-crest{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1a2332,#0d1117);border:2px solid #2a3a4a;display:flex;align-items:center;justify-content:center;margin:0 auto;position:relative}
-.team-crest::after{content:'';position:absolute;inset:3px;border-radius:50%;border:1px solid #3a4a5a}
-.team-crest .icon{font-size:1.8em}
+.team-crest{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#1a2332,#0d1117);border:2px solid #2a3a4a;display:flex;align-items:center;justify-content:center;margin:0 auto;position:relative;transition:all .3s}
+.team-crest:hover{border-color:#2ecc71;box-shadow:0 0 15px rgba(46,204,113,0.3)}
+.team-crest::after{content:'';position:absolute;inset:4px;border-radius:50%;border:1px solid #3a4a5a}
+.team-crest .icon{font-size:2em}
 .team-name{font-size:1em;font-weight:600;margin-top:8px;color:#fff}
-.team-form{display:flex;gap:3px;justify-content:center;margin-top:4px}
-.form-w{width:16px;height:16px;border-radius:3px;background:#2ecc71;display:flex;align-items:center;justify-content:center;font-size:0.6em;font-weight:bold;color:#fff}
-.form-d{width:16px;height:16px;border-radius:3px;background:#f39c12;display:flex;align-items:center;justify-content:center;font-size:0.6em;font-weight:bold;color:#fff}
-.form-l{width:16px;height:16px;border-radius:3px;background:#e74c3c;display:flex;align-items:center;justify-content:center;font-size:0.6em;font-weight:bold;color:#fff}
+.team-rank{font-size:0.65em;color:#f39c12;background:#f39c1211;padding:1px 6px;border-radius:4px;margin-top:3px;display:inline-block}
+.vs-badge{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#1a2332,#0d1117);border:2px solid #2a3a4a;display:flex;align-items:center;justify-content:center;font-size:0.85em;font-weight:bold;color:#889;position:relative;z-index:1;text-shadow:0 0 10px rgba(136,137,153,0.5)}
 
-.vs-badge{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#1a2332,#0d1117);border:2px solid #2a3a4a;display:flex;align-items:center;justify-content:center;font-size:0.8em;font-weight:bold;color:#889;position:relative;z-index:1}
-
-/* 概率条 - 足球场风格 */
-.prob-field{margin:12px 16px;padding:12px;background:linear-gradient(135deg,#0d2818 0%,#0a1f14 50%,#0d2818 100%);border-radius:10px;border:1px solid #1a3a2a;position:relative;overflow:hidden}
+/* 概率条 - 修复分割线 */
+.prob-field{margin:12px 16px;padding:14px;background:linear-gradient(135deg,#0d2818 0%,#0a1f14 50%,#0d2818 100%);border-radius:12px;border:1px solid #1a3a2a;position:relative;overflow:hidden}
 .prob-field::before{content:'';position:absolute;top:0;left:50%;width:1px;height:100%;background:#1a3a2a}
 .prob-field::after{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:#1a3a2a}
-.prob-bar{display:flex;height:28px;border-radius:6px;overflow:hidden;margin-bottom:8px}
-.prob-segment{display:flex;align-items:center;justify-content:center;font-size:0.75em;font-weight:bold;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.5)}
-.prob-home-bg{background:linear-gradient(135deg,#2ecc71,#27ae60)}
-.prob-draw-bg{background:linear-gradient(135deg,#f39c12,#e67e22)}
-.prob-away-bg{background:linear-gradient(135deg,#e74c3c,#c0392b)}
-.prob-labels{display:flex;justify-content:space-between;font-size:0.65em;color:#4a6a5a}
+.prob-bar{display:flex;height:32px;border-radius:8px;overflow:hidden;margin-bottom:8px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.3)}
+.prob-segment{display:flex;align-items:center;justify-content:center;font-size:0.8em;font-weight:bold;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.5);position:relative;transition:width 0.5s ease}
+.prob-segment:not(:last-child)::after{content:'';position:absolute;right:0;top:10%;height:80%;width:2px;background:rgba(0,0,0,0.4);z-index:2}
+.prob-home-bg{background:linear-gradient(180deg,#3a9d5d 0%,#2ecc71 50%,#27ae60 100%)}
+.prob-draw-bg{background:linear-gradient(180deg,#d4a017 0%,#f39c12 50%,#e67e22 100%)}
+.prob-away-bg{background:linear-gradient(180deg,#c0392b 0%,#e74c3c 50%,#d63031 100%)}
+.prob-labels{display:flex;justify-content:space-between;font-size:0.7em;color:#4a6a5a;font-weight:500}
 
 /* 方案卡片 */
 .schemes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 16px}
-.scheme{background:#0d1117;border:1px solid #1e2d3d;border-radius:12px;padding:12px 8px;text-align:center;transition:all .2s}
+.scheme{background:#0d1117;border:1px solid #1e2d3d;border-radius:12px;padding:12px 8px;text-align:center;transition:all .3s;position:relative;overflow:hidden}
+.scheme:hover{border-color:#2ecc71;transform:translateY(-2px);box-shadow:0 4px 15px rgba(46,204,113,0.2)}
 .scheme.main{border-color:#2ecc71;border-left:3px solid #2ecc71;background:linear-gradient(135deg,#0d1117,#0d2818)}
 .scheme .s-label{font-size:0.65em;color:#667;margin-bottom:4px}
 .scheme .s-value{font-size:1.1em;font-weight:700;color:#fff}
@@ -66,60 +70,60 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .tag-hot{background:#e74c3c22;color:#e74c3c}
 .tag-value{background:#2ecc7122;color:#2ecc71}
 
-/* 比分推荐 */
-.scores{display:flex;gap:8px;justify-content:center;margin:10px 16px}
-.score-chip{background:#0d1117;border:1px solid #1e2d3d;border-radius:8px;padding:6px 14px;text-align:center}
-.score-chip.top{border-color:#2ecc71;background:#0d2818}
-.score-chip .sc{font-size:1.1em;font-weight:700;color:#fff}
-.score-chip .sp{font-size:0.6em;color:#667;margin-top:1px}
+/* 比分 */
+.scores{display:flex;gap:10px;justify-content:center;margin:10px 16px}
+.score-chip{background:#0d1117;border:1px solid #1e2d3d;border-radius:8px;padding:8px 16px;text-align:center;transition:all .3s}
+.score-chip:hover{border-color:#2ecc71;transform:scale(1.05)}
+.score-chip.top{border-color:#2ecc71;background:#0d2818;box-shadow:0 0 15px rgba(46,204,113,0.2)}
+.score-chip .sc{font-size:1.2em;font-weight:700;color:#fff}
+.score-chip .sp{font-size:0.65em;color:#667;margin-top:2px}
 
 /* 让球 */
-.handicap-row{display:flex;justify-content:center;align-items:center;gap:8px;margin:10px 16px;padding:8px;background:#0d1117;border-radius:8px;border:1px solid #1e2d3d}
+.handicap-row{display:flex;justify-content:center;align-items:center;gap:10px;margin:10px 16px;padding:10px;background:#0d1117;border-radius:10px;border:1px solid #1e2d3d}
 .handicap-row .hl{font-size:0.75em;color:#888}
-.handicap-row .hv{font-size:0.9em;font-weight:600;color:#2ecc71}
+.handicap-row .hv{font-size:0.95em;font-weight:600;color:#2ecc71}
 .handicap-row .ho{font-size:0.75em;color:#889}
 
 /* 统计 */
 .meta-row{display:flex;gap:8px;margin:10px 16px}
-.meta-item{flex:1;background:#0d1117;border-radius:8px;padding:8px;text-align:center;border:1px solid #1e2d3d}
+.meta-item{flex:1;background:#0d1117;border-radius:10px;padding:10px;text-align:center;border:1px solid #1e2d3d;transition:all .3s}
+.meta-item:hover{border-color:#2ecc71}
 .meta-item .ml{font-size:0.65em;color:#667}
-.meta-item .mv{font-size:0.95em;font-weight:700;margin-top:2px}
+.meta-item .mv{font-size:1em;font-weight:700;margin-top:3px}
 .meta-item .mv.green{color:#2ecc71}.meta-item .mv.red{color:#e74c3c}.meta-item .mv.yellow{color:#f39c12}
 
-/* 数据分析 */
-.analysis-detail{margin:12px 16px;padding:12px;background:#0d1117;border-radius:12px;border:1px solid #1e2d3d}
-.analysis-detail h3{font-size:0.8em;color:#2ecc71;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+/* 数据模块 */
+.data-modules{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 16px}
+.data-module{background:#0d1117;border:1px solid #1e2d3d;border-radius:10px;padding:12px;transition:all .3s}
+.data-module:hover{border-color:#2ecc71}
+.data-module .dm-title{font-size:0.7em;color:#889;margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.data-module .dm-title::before{content:'';width:3px;height:12px;background:#2ecc71;border-radius:2px}
+.data-module .dm-value{font-size:1.2em;font-weight:700;color:#fff}
+.data-module .dm-sub{font-size:0.65em;color:#667;margin-top:2px}
+
+/* 分析详情 */
+.analysis-detail{margin:12px 16px;padding:14px;background:#0d1117;border-radius:12px;border:1px solid #1e2d3d}
+.analysis-detail h3{font-size:0.8em;color:#2ecc71;margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .analysis-detail h3::before{content:'';width:3px;height:14px;background:#2ecc71;border-radius:2px}
-.analysis-row{display:flex;justify-content:space-between;padding:5px 0;font-size:0.75em;border-bottom:1px solid #111827}
+.analysis-row{display:flex;justify-content:space-between;padding:6px 0;font-size:0.75em;border-bottom:1px solid #111827}
 .analysis-row:last-child{border-bottom:none}
 .analysis-row .al{color:#889}
 .analysis-row .ar{color:#dde;font-weight:500}
 .analysis-row .ar.green{color:#2ecc71}.analysis-row .ar.red{color:#e74c3c}
 
-/* 数据模块 */
-.data-modules{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 16px}
-.data-module{background:#0d1117;border:1px solid #1e2d3d;border-radius:10px;padding:10px}
-.data-module .dm-title{font-size:0.7em;color:#889;margin-bottom:6px;display:flex;align-items:center;gap:4px}
-.data-module .dm-title::before{content:'';width:2px;height:10px;background:#2ecc71;border-radius:1px}
-.data-module .dm-value{font-size:1.2em;font-weight:700;color:#fff}
-.data-module .dm-sub{font-size:0.65em;color:#667;margin-top:2px}
-
 /* 竞彩赔率 */
-.odds-row{display:flex;justify-content:center;gap:12px;font-size:0.75em;color:#556;margin:10px 16px 16px}
+.odds-row{display:flex;justify-content:center;gap:14px;font-size:0.75em;color:#556;margin:12px 16px 16px;padding:10px;background:#0d1117;border-radius:10px;border:1px solid #1e2d3d}
 .odds-row .ov{font-weight:600}
 .ov.h{color:#2ecc71}.ov.d{color:#f39c12}.ov.a{color:#e74c3c}
 
 /* 底部 */
-.footer{text-align:center;padding:20px;color:#334;font-size:0.7em;line-height:1.6}
-.empty{text-align:center;padding:60px 20px;color:#556}
+.footer{text-align:center;padding:24px;color:#334;font-size:0.7em;line-height:1.6}
+.empty{text-align:center;padding:80px 20px;color:#556}
 .empty .icon{font-size:3em;margin-bottom:12px}
-
-/* 动画 */
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
-.live-dot{width:6px;height:6px;border-radius:50%;background:#2ecc71;display:inline-block;animation:pulse 2s ease infinite}
 </style>
 </head>
 <body>
+<canvas id="particles"></canvas>
 <div class="container">
   <div class="header">
     <h1>⚽ 足球 <span class="accent">AI</span> 深度分析</h1>
@@ -131,56 +135,148 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 </div>
 
 <script>
+// ========== 粒子特效 ==========
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let particles = [];
+const PARTICLE_COUNT = 40;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+class Particle {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.size = Math.random() * 3 + 1;
+    this.speedX = (Math.random() - 0.5) * 0.5;
+    this.speedY = (Math.random() - 0.5) * 0.5;
+    this.opacity = Math.random() * 0.3 + 0.1;
+    this.color = Math.random() > 0.7 ? '#2ecc71' : '#1a3a2a';
+  }
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = this.opacity;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+}
+
+function initParticles() {
+  resizeCanvas();
+  particles = [];
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    particles.push(new Particle());
+  }
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // 绘制连线
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 150) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = '#1a3a2a';
+        ctx.globalAlpha = (1 - dist / 150) * 0.15;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+    }
+  }
+  
+  particles.forEach(p => {
+    p.update();
+    p.draw();
+  });
+  
+  requestAnimationFrame(animateParticles);
+}
+
+window.addEventListener('resize', resizeCanvas);
+initParticles();
+animateParticles();
+
 // ========== 分析引擎 ==========
 function crsToProbs(crs) {
   const probs = {}; let total = 0;
-  for (const [k, odds] of Object.entries(crs)) { if (odds > 0) { probs[k] = 1 / odds; total += probs[k]; } }
+  for (const [k, odds] of Object.entries(crs)) {
+    if (odds > 0) { probs[k] = 1 / odds; total += probs[k]; }
+  }
   for (const k in probs) probs[k] /= total;
   return probs;
 }
+
 function crsToHDA(p) {
   let h = 0, d = 0, a = 0;
   for (const [k, v] of Object.entries(p)) {
-    const hg = parseInt(k.slice(1,3)), ag = parseInt(k.slice(4,6));
+    const hg = parseInt(k.slice(1, 3)), ag = parseInt(k.slice(4, 6));
     if (hg > ag) h += v; else if (hg === ag) d += v; else a += v;
   }
   return { home: h, draw: d, away: a };
 }
+
 function crsToOU(p) {
   let o15 = 0, o25 = 0, o35 = 0;
   for (const [k, v] of Object.entries(p)) {
-    const t = parseInt(k.slice(1,3)) + parseInt(k.slice(4,6));
+    const t = parseInt(k.slice(1, 3)) + parseInt(k.slice(4, 6));
     if (t >= 2) o15 += v; if (t >= 3) o25 += v; if (t >= 4) o35 += v;
   }
-  return { o15, u15: 1-o15, o25, u25: 1-o25, o35, u35: 1-o35 };
+  return { o15, u15: 1 - o15, o25, u25: 1 - o25, o35, u35: 1 - o35 };
 }
+
 function crsToXG(p) {
   let hxg = 0, axg = 0;
   for (const [k, v] of Object.entries(p)) {
-    hxg += parseInt(k.slice(1,3)) * v; axg += parseInt(k.slice(4,6)) * v;
+    hxg += parseInt(k.slice(1, 3)) * v;
+    axg += parseInt(k.slice(4, 6)) * v;
   }
   return { home: hxg, away: axg, total: hxg + axg };
 }
+
 function analyzeHTFT(htft) {
   let h = 0, d = 0, a = 0;
   for (const [k, odds] of Object.entries(htft)) {
-    if (odds <= 0) continue; const p = 1 / odds;
+    if (odds <= 0) continue;
+    const p = 1 / odds;
     if (k.startsWith('h')) h += p; else if (k.startsWith('d')) d += p; else a += p;
   }
   const sum = h + d + a;
-  return { htH: h/sum, htD: d/sum, htA: a/sum };
+  return { htH: h / sum, htD: d / sum, htA: a / sum };
 }
+
 function analyzeHandicap(hc) {
   const line = parseFloat(hc.line) || 0;
   if (line === 0 || !hc.home || !hc.away) return null;
   const dOdds = hc.draw || 0;
   if (dOdds > 0) {
-    const sum = 1/hc.home + 1/dOdds + 1/hc.away;
-    return { line, home: (1/hc.home)/sum, draw: (1/dOdds)/sum, away: (1/hc.away)/sum };
+    const sum = 1 / hc.home + 1 / dOdds + 1 / hc.away;
+    return { line, home: (1 / hc.home) / sum, draw: (1 / dOdds) / sum, away: (1 / hc.away) / sum };
   }
-  const sum = 1/hc.home + 1/hc.away;
-  return { line, home: (1/hc.home)/sum, draw: 0, away: (1/hc.away)/sum };
+  const sum = 1 / hc.home + 1 / hc.away;
+  return { line, home: (1 / hc.home) / sum, draw: 0, away: (1 / hc.away) / sum };
 }
+
 function analyzeMatch(m) {
   const cp = crsToProbs(m.crs);
   const hda = crsToHDA(cp);
@@ -189,10 +285,10 @@ function analyzeMatch(m) {
   const ht = analyzeHTFT(m.htft);
   const hc = analyzeHandicap(m.handicap);
   const maxP = Math.max(hda.home, hda.draw, hda.away);
-  const secP = [hda.home, hda.draw, hda.away].sort((a,b) => b-a)[1];
+  const secP = [hda.home, hda.draw, hda.away].sort((a, b) => b - a)[1];
   const conf = maxP - secP > 0.25 ? 5 : maxP - secP > 0.15 ? 4 : maxP - secP > 0.08 ? 3 : 2;
   const scoreRank = Object.entries(cp).map(([k, p]) => ({
-    score: `${parseInt(k.slice(1,3))}-${parseInt(k.slice(4,6))}`, prob: p
+    score: `${parseInt(k.slice(1, 3))}-${parseInt(k.slice(4, 6))}`, prob: p
   })).sort((a, b) => b.prob - a.prob);
   const value = {
     home: hda.home * m.odds.home - 1,
@@ -202,7 +298,6 @@ function analyzeMatch(m) {
   return { hda, ou, xg, ht, hc, conf, scoreRank, value };
 }
 
-// ========== 方案 ==========
 function buildSchemes(m, a) {
   const maxP = Math.max(a.hda.home, a.hda.draw, a.hda.away);
   let spfV, spfP, spfO;
@@ -210,15 +305,14 @@ function buildSchemes(m, a) {
   else if (a.hda.away === maxP) { spfV = '客胜'; spfP = a.hda.away; spfO = m.odds.away; }
   else { spfV = '平局'; spfP = a.hda.draw; spfO = m.odds.draw; }
   const schemes = [
-    { label: '🎯 胜平负', value: spfV, detail: `${Math.round(spfP*100)}%概率·赔率${spfO}`, tag: spfP > 0.5 ? 'tag-hot' : 'tag-value', tagText: spfP > 0.5 ? '高概率' : '推荐' },
-    { label: '📊 比分', value: a.scoreRank[0].score, detail: `${Math.round(a.scoreRank[0].prob*100)}%概率`, tag: 'tag-value', tagText: '推荐' }
+    { label: '🎯 胜平负', value: spfV, detail: `${Math.round(spfP * 100)}%概率·赔率${spfO}`, tag: spfP > 0.5 ? 'tag-hot' : 'tag-value', tagText: spfP > 0.5 ? '高概率' : '推荐' },
+    { label: '📊 比分', value: a.scoreRank[0].score, detail: `${Math.round(a.scoreRank[0].prob * 100)}%概率`, tag: 'tag-value', tagText: '推荐' }
   ];
   const over = a.ou.o25 > 0.5;
-  schemes.push({ label: '⚽ 大小球', value: over ? '大2.5' : '小2.5', detail: `${Math.round((over ? a.ou.o25 : a.ou.u25)*100)}%·预计${a.xg.total.toFixed(1)}球`, tag: over && a.ou.o25 > 0.6 ? 'tag-hot' : 'tag-value', tagText: over ? '偏向大球' : '偏向小球' });
+  schemes.push({ label: '⚽ 大小球', value: over ? '大2.5' : '小2.5', detail: `${Math.round((over ? a.ou.o25 : a.ou.u25) * 100)}%`, tag: over && a.ou.o25 > 0.6 ? 'tag-hot' : 'tag-value', tagText: over ? '偏向大球' : '偏向小球' });
   return schemes;
 }
 
-// ========== 渲染 ==========
 async function loadMatches() {
   try {
     const resp = await fetch('data/matches.json?t=' + Date.now());
@@ -247,23 +341,21 @@ function renderCard(m, a) {
       <span class="league-name">${m.league}</span>
       <span class="match-time"><span class="live-dot"></span> ${m.time}</span>
     </div>
-
     <div class="teams-area">
       <div class="match-teams">
         <div class="team">
           <div class="team-crest"><span class="icon">⚽</span></div>
           <div class="team-name">${m.home.name}</div>
-          ${m.home.rank ? `<div style="font-size:0.65em;color:#f39c12;margin-top:2px">${m.home.rank}</div>` : ''}
+          ${m.home.rank ? `<div class="team-rank">${m.home.rank}</div>` : ''}
         </div>
         <div class="vs-badge">VS</div>
         <div class="team">
           <div class="team-crest"><span class="icon">⚽</span></div>
           <div class="team-name">${m.away.name}</div>
-          ${m.away.rank ? `<div style="font-size:0.65em;color:#f39c12;margin-top:2px">${m.away.rank}</div>` : ''}
+          ${m.away.rank ? `<div class="team-rank">${m.away.rank}</div>` : ''}
         </div>
       </div>
     </div>
-
     <div class="prob-field">
       <div class="prob-bar">
         <div class="prob-segment prob-home-bg" style="width:${hp}%">${hp}%</div>
@@ -272,30 +364,24 @@ function renderCard(m, a) {
       </div>
       <div class="prob-labels"><span>主胜</span><span>平局</span><span>客胜</span></div>
     </div>
-
     <div class="schemes">
       ${schemes.map((s, i) => `<div class="scheme ${i === 0 ? 'main' : ''}"><div class="s-label">${s.label}</div><div class="s-value">${s.value}</div><div class="s-detail">${s.detail}</div><span class="s-tag ${s.tag}">${s.tagText}</span></div>`).join('')}
     </div>
-
     <div class="scores">
       ${a.scoreRank.slice(0, 2).map((s, i) => `<div class="score-chip ${i === 0 ? 'top' : ''}"><div class="sc">${s.score}</div><div class="sp">${Math.round(s.prob * 100)}%</div></div>`).join('')}
     </div>
-
     ${m.handicap.line ? `<div class="handicap-row"><span class="hl">让球</span><span class="hv">${m.handicap.line}球</span><span class="ho">主${m.handicap.home} 客${m.handicap.away}</span></div>` : ''}
-
     <div class="meta-row">
       <div class="meta-item"><div class="ml">预计进球</div><div class="mv yellow">${a.xg.total.toFixed(1)}</div></div>
       <div class="meta-item"><div class="ml">大2.5球</div><div class="mv ${a.ou.o25 > 0.5 ? 'green' : 'red'}">${Math.round(a.ou.o25 * 100)}%</div></div>
       <div class="meta-item"><div class="ml">信心</div><div class="mv yellow" style="font-size:0.8em">${stars}</div></div>
     </div>
-
     <div class="data-modules">
       <div class="data-module"><div class="dm-title">半场主队领先</div><div class="dm-value">${Math.round(a.ht.htH * 100)}%</div></div>
       <div class="data-module"><div class="dm-title">半场平局</div><div class="dm-value">${Math.round(a.ht.htD * 100)}%</div></div>
       <div class="data-module"><div class="dm-title">主队期望进球</div><div class="dm-value">${a.xg.home.toFixed(2)}</div></div>
       <div class="data-module"><div class="dm-title">客队期望进球</div><div class="dm-value">${a.xg.away.toFixed(2)}</div></div>
     </div>
-
     <div class="analysis-detail">
       <h3>数据分析</h3>
       <div class="analysis-row"><span class="al">大1.5球</span><span class="ar green">${Math.round(a.ou.o15 * 100)}%</span></div>
@@ -303,7 +389,6 @@ function renderCard(m, a) {
       <div class="analysis-row"><span class="al">大3.5球</span><span class="ar ${a.ou.o35 > 0.3 ? 'green' : 'red'}">${Math.round(a.ou.o35 * 100)}%</span></div>
       ${vals.length ? `<div class="analysis-row"><span class="al" style="color:#2ecc71">💰 价值发现</span><span class="ar green">${vals.map(([k, v]) => `${k === 'home' ? '主胜' : k === 'draw' ? '平局' : '客胜'} +${Math.round(v * 100)}%`).join(', ')}</span></div>` : ''}
     </div>
-
     <div class="odds-row"><span>竞彩赔率</span><span class="ov h">主${m.odds.home}</span><span class="ov d">平${m.odds.draw}</span><span class="ov a">客${m.odds.away}</span></div>
   </div>`;
 }
