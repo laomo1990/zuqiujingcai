@@ -455,7 +455,7 @@ function card(m){
   const pick=a.h===mx?'主胜':a.a===mx?'客胜':'平局';
   const pickP=Math.round(mx*100);
   const pickO=a.h===mx?m.odds.home:a.a===mx?m.odds.away:m.odds.draw;
-  const stars='★'.repeat(a.conf)+'☆'.repeat(4-a.conf);
+  const stars='★'.repeat(a.conf)+'☆'.repeat(Math.max(0,5-a.conf));
   const vals=Object.entries(a.val).filter(([_,v])=>v>.03);
   const over=a.o25>.5;
 
