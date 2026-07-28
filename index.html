@@ -274,14 +274,15 @@ const LEAGUE_CFG = {
 // ===== 工具函数 =====
 function factorial(n){if(n<=1)return 1;let r=1;for(let i=2;i<=n;i++)r*=i;return r}
 function poisson(k,l){return(l**k)*Math.exp(-l)/factorial(k)}
-function crsP(c){const p={};let t=0;for(const[k,o]of Object.entries(c))if(o>0){p[k]=1/o;t+=p[k]}for(const k in p)p[k]/=t;return p}
-function estLam(p,isH){const gp={};for(const[k,v]of Object.entries(p)){const g=isH?+k.slice(1,3):+k.slice(4,6);gp[g]=(gp[g]||0)+v}let best=1,bs=Infinity;for(let l=5;l<=35;l++){const lam=l/10;let s=0;for(const[g,op]of Object.entries(gp))s+=(op-poisson(+g,lam))**2;if(s<bs){bs=s;best=lam}}return{lam:best,gp}}
+function crsP(c){if(!c||!Object.keys(c).length)return{};const p={};let t=0;for(const[k,o]of Object.entries(c))if(o>0){p[k]=1/o;t+=p[k]}if(t===0)return{};for(const k in p)p[k]/=t;return p}
+function estLam(p,isH){if(!p||!Object.keys(p).length)return{lam:1.2,gp:{}};const gp={};for(const[k,v]of Object.entries(p)){const g=isH?+k.slice(1,3):+k.slice(4,6);gp[g]=(gp[g]||0)+v}let best=1.2,bs=Infinity;for(let l=5;l<=35;l++){const lam=l/10;let s=0;for(const[g,op]of Object.entries(gp))s+=(op-poisson(+g,lam))**2;if(s<bs){bs=s;best=lam}}return{lam:best,gp}}
 
 function ana(m){
   // ===== 模型1: CRS比分赔率概率 =====
   const cp=crsP(m.crs);
-  const crsHDA={h:0,d:0,a:0};
-  for(const[k,v]of Object.entries(cp)){
+  const hasCrs=Object.keys(cp).length>0;
+  const crsHDA=hasCrs?{h:0,d:0,a:0}:{h:0.45,d:0.25,a:0.3};
+  if(hasCrs)for(const[k,v]of Object.entries(cp)){
     const g=+k.slice(1,3),e=+k.slice(4,6);
     if(g>e)crsHDA.h+=v;else if(g===e)crsHDA.d+=v;else crsHDA.a+=v;
   }
@@ -330,11 +331,11 @@ function ana(m){
   const aL=Math.max(.3,aE.lam-homeAdv*0.3);
   
   // ===== 泊松比分概率 =====
-  const sr=Object.entries(cp).map(([k,p])=>({s:`${+k.slice(1,3)}-${+k.slice(4,6)}`,p})).sort((a,b)=>b.p-a.p);
+  const sr=hasCrs?Object.entries(cp).map(([k,p])=>({s:`${+k.slice(1,3)}-${+k.slice(4,6)}`,p})).sort((a,b)=>b.p-a.p):[{s:'1-0',p:0.12},{s:'2-1',p:0.10},{s:'1-1',p:0.10}];
   
   // ===== 大小球（从CRS + 泊松综合） =====
-  let o25=0;
-  for(const[k,v]of Object.entries(cp))if(+k.slice(1,3)+ +k.slice(4,6)>=3)o25+=v;
+  let o25=hasCrs?0:0.5;
+  if(hasCrs)for(const[k,v]of Object.entries(cp))if(+k.slice(1,3)+ +k.slice(4,6)>=3)o25+=v;
   // 泊松大小球
   let po25=0;
   for(let i=0;i<=6;i++)for(let j=0;j<=6;j++)if(i+j>=3)po25+=poisson(i,hL)*poisson(j,aL);
