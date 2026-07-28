@@ -136,7 +136,7 @@ def main():
         g = sum(1 for m in history["matches"] if m["result"]["ou"] == "✅")
         history["summary"] = {"total":total,"spf_hit":s,"spf_rate":round(s/total*100),"score_hit":c,"score_rate":round(c/total*100),"goal_hit":g,"goal_rate":round(g/total*100),"roi":round((s*0.8-(total-s))/total*100,1)}
     history["updated"] = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    save_json(MATCHES_FILE, {"matches": matches, "updated": history["updated"], "sources": ["中国竞彩网"]})
+    if matches or not os.path.exists(MATCHES_FILE): save_json(MATCHES_FILE, {"matches": matches, "updated": history["updated"], "sources": ["中国竞彩网"]})
     save_json(PREDICTIONS_FILE, preds)
     save_json(HISTORY_FILE, history)
     print(f"完成! 新增赛果:{new_count}场, 历史:{total}场, 命中率:{history['summary']['spf_rate']}%")
