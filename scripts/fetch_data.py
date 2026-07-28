@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""足球数据抓取脚本"""
+"""足球数据抓取脚本 - 改进版"""
 
 import json, os, re, math
 from urllib.request import urlopen, Request
@@ -77,10 +77,7 @@ def fetch_current_matches():
 def fetch_results():
     results = []
     try:
-        # 澳客网最多支持5天查询
-        end_date = "2026-07-27"
-        start_date = "2026-07-23"
-        url = f"https://www.okooo.cn/jingcai/kaijiang/?LotteryType=SportteryWDL&StartDate={start_date}&EndDate={end_date}"
+        url = "https://www.okooo.cn/jingcai/kaijiang/?LotteryType=SportteryWDL&StartDate=2026-07-23&EndDate=2026-07-27"
         req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
         with urlopen(req, timeout=15) as resp:
             html = resp.read().decode("gb2312", errors="ignore")
@@ -142,12 +139,22 @@ def update_history(history, results, predictions):
     for r in results:
         key = f"{r['date']}_{r['home']}_{r['away']}"
         if any(h.get("key") == key for h in history["matches"]): continue
+        
+        # 尝试匹配预测（模糊匹配）
         pred = None
         for p in predictions:
+            # 精确匹配
             if p["home"] == r["home"] and p["away"] == r["away"]:
                 pred = p
                 break
+            # 模糊匹配（包含关系）
+            if (r["home"] in p["home"] or p["home"] in r["home"]) and \
+               (r["away"] in p["away"] or p["away"] in r["away"]):
+                pred = p
+                break
+        
         if not pred: continue
+        
         spf_hit = pred["pick"] == r["result"]
         ft_score = r["ft_score"]
         score_hit = pred["score"] == ft_score
@@ -155,7 +162,9 @@ def update_history(history, results, predictions):
         if pred["ou"] == "大2.5": ou_hit = ft_goals > 2
         elif pred["ou"] == "小2.5": ou_hit = ft_goals <= 2
         else: ou_hit = False
+        
         new_matches.append({"key": key, "date": r["date"], "league": r["league"], "home": r["home"], "away": r["away"], "home_score": int(ft_score.split("-")[0]), "away_score": int(ft_score.split("-")[1]), "prediction": {"pick": pred["pick"], "prob": pred["prob"], "score": pred["score"], "ou": pred["ou"]}, "result": {"pick": "✅" if spf_hit else "❌", "score": "✅" if score_hit else "❌", "ou": "✅" if ou_hit else "❌"}, "odds": pred["odds"]})
+    
     history["matches"] = new_matches + history["matches"]
     total = len(history["matches"])
     if total > 0:
@@ -168,13 +177,27 @@ def update_history(history, results, predictions):
 
 def main():
     history = load_json(HISTORY_FILE, {"updated": "", "summary": {"total": 0, "spf_hit": 0, "spf_rate": 0, "score_hit": 0, "score_rate": 0, "goal_hit": 0, "goal_rate": 0, "roi": 0}, "matches": []})
+    
+    # 加载之前的预测
+    old_predictions = load_json(PREDICTIONS_FILE, [])
+    
     current_matches = fetch_current_matches()
     results = fetch_results()
-    predictions = generate_predictions(current_matches)
+    
+    # 生成新预测，如果没有新赛事则保留旧预测
+    new_predictions = generate_predictions(current_matches)
+    if not new_predictions and old_predictions:
+        print(f"无新赛事，保留{len(old_predictions)}条旧预测")
+        predictions = old_predictions
+    else:
+        predictions = new_predictions
+    
     history = update_history(history, results, predictions)
+    
     save_json(MATCHES_FILE, {"matches": current_matches, "updated": history["updated"], "sources": ["中国竞彩网"]})
     save_json(PREDICTIONS_FILE, predictions)
     save_json(HISTORY_FILE, history)
+    
     print(f"完成! 赛事: {len(current_matches)}场, 历史: {history['summary']['total']}场, 命中率: {history['summary']['spf_rate']}%")
 
 if __name__ == "__main__":
