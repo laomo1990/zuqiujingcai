@@ -1,16 +1,66 @@
 {
-  "updated": "2026-07-28 00:25 UTC",
+  "updated": "2026-07-28 01:46 UTC",
   "summary": {
-    "total": 12,
-    "spf_hit": 8,
-    "spf_rate": 67,
+    "total": 14,
+    "spf_hit": 9,
+    "spf_rate": 64,
     "score_hit": 4,
-    "score_rate": 33,
+    "score_rate": 29,
     "goal_hit": 9,
-    "goal_rate": 75,
-    "roi": 20.0
+    "goal_rate": 64,
+    "roi": 15.7
   },
   "matches": [
+    {
+      "key": "07-28_罗森博格_费特斯塔",
+      "date": "07-28",
+      "league": "挪超",
+      "home": "罗森博格",
+      "away": "费特斯塔",
+      "home_score": 4,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 56,
+        "score": "1-0",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 1.57,
+        "draw": 3.75,
+        "away": 4.45
+      }
+    },
+    {
+      "key": "07-28_赫根_索尔纳",
+      "date": "07-28",
+      "league": "瑞超",
+      "home": "赫根",
+      "away": "索尔纳",
+      "home_score": 0,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 51,
+        "score": "2-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 1.75,
+        "draw": 3.75,
+        "away": 3.43
+      }
+    },
     {
       "date": "2026-07-26",
       "league": "瑞超",
