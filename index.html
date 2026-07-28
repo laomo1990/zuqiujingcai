@@ -415,31 +415,25 @@ let M=[],F='all',H=null;
 // ===== 加载数据 =====
 async function load(){
   try{
-    console.log('开始加载...');
-    const[r,h]=await Promise.all([
-      fetch('data/matches.json?t='+Date.now()),
-      fetch('data/history.json?t='+Date.now()).catch(()=>({json:()=>null}))
-    ]);
-    console.log('fetch完成');
+    const r=await fetch('data/matches.json?t='+Date.now());
     const d=await r.json();
-    console.log('matches解析完成:', d.matches?.length, '场');
     M=d.matches||[];
-    H=await h.json().catch(()=>null);
-    console.log('history解析完成:', H?.summary?.total, '场');
     document.getElementById('updateTime').textContent=d.updated||'-';
-    const avg=M.length?(M.reduce((s,m)=>{const a=ana(m);return s+a.hL+a.aL},0)/M.length).toFixed(1):'-';
-    document.getElementById('stats').innerHTML=`<div class="stat"><div class="num">${M.length}</div><div class="label">赛事</div></div><div class="stat"><div class="num">${avg}</div><div class="label">平均进球</div></div><div class="stat"><div class="num">${d.updated?.split(' ')[1]||'-'}</div><div class="label">更新</div></div>`;
-    console.log('渲染tabs...');
-    renderTabs();
-    console.log('渲染matches...');
-    renderMatches();
-    console.log('渲染history...');
-    renderHistory();
-    console.log('加载完成!');
-  }catch(e){
-    console.error('加载失败:', e.message, e.stack);
-    document.getElementById('matches').innerHTML='<div style="text-align:center;padding:60px;color:#8892a0">📡 数据加载失败: '+e.message+'</div>';
-  }
+  }catch(e){console.log('matches加载失败:',e.message);M=[];}
+  
+  try{
+    const h=await fetch('data/history.json?t='+Date.now());
+    H=await h.json();
+  }catch(e){console.log('history加载失败:',e.message);H=null;}
+  
+  try{
+    const avg=M.length?(M.reduce((s,m)=>{try{return s+ana(m).hL+ana(m).aL}catch(e){return s}},0)/M.length).toFixed(1):'-';
+    document.getElementById('stats').innerHTML='<div class="stat"><div class="num">'+M.length+'</div><div class="label">赛事</div></div><div class="stat"><div class="num">'+avg+'</div><div class="label">平均进球</div></div><div class="stat"><div class="num">'+(M.length?'在线':'-')+'</div><div class="label">状态</div></div>';
+  }catch(e){console.log('stats渲染失败:',e.message);}
+  
+  try{renderTabs();}catch(e){console.log('tabs失败:',e.message);}
+  try{renderMatches();}catch(e){console.log('matches失败:',e.message);}
+  try{renderHistory();}catch(e){console.log('history失败:',e.message);}
 }
 
 // ===== 渲染 =====
