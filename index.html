@@ -594,18 +594,18 @@ function renderSim(){
         const key = h+'-'+a;
         const crsKey = 's'+String(h).padStart(2,'0')+'s'+String(a).padStart(2,'0');
         const odds = m.crs[crsKey] || '-';
-        return'<div class="sim-opt '+(sel.selections.includes(key)?'selected':'')+'" onclick="toggleSimOpt('+i+',\' '+key+'\')"><div class="opt-label">'+key+'</div><div class="opt-odds">'+odds+'</div></div>';
+        return'<div class="sim-opt '+(sel.selections.includes(key)?'selected':'')+'" onclick="toggleSimOpt('+i+',\''+key+'\')"><div class="opt-label">'+key+'</div><div class="opt-odds">'+odds+'</div></div>';
       }).join('')+'</div>';
     } else if(sel.play === 'goals'){
       const goals = ['0球','1球','2球','3球','4球','5球','6球','7+球'];
       optionsHtml = '<div class="sim-options goals">'+goals.map(g=>{
-        return'<div class="sim-opt '+(sel.selections.includes(g)?'selected':'')+'" onclick="toggleSimOpt('+i+',\' '+g+'\')"><div class="opt-label">'+g+'</div></div>';
+        return'<div class="sim-opt '+(sel.selections.includes(g)?'selected':'')+'" onclick="toggleSimOpt('+i+',\''+g+'\')"><div class="opt-label">'+g+'</div></div>';
       }).join('')+'</div>';
     } else if(sel.play === 'htft'){
       const htft = [{k:'HH',l:'主/主'},{k:'HD',l:'主/平'},{k:'HA',l:'主/客'},{k:'DH',l:'平/主'},{k:'DD',l:'平/平'},{k:'DA',l:'平/客'},{k:'AH',l:'客/主'},{k:'AD',l:'客/平'},{k:'AA',l:'客/客'}];
       optionsHtml = '<div class="sim-options htft">'+htft.map(({k,l})=>{
         const odds = m.htft[k] || '-';
-        return'<div class="sim-opt '+(sel.selections.includes(k)?'selected':'')+'" onclick="toggleSimOpt('+i+',\' '+k+'\')"><div class="opt-label">'+l+'</div><div class="opt-odds">'+odds+'</div></div>';
+        return'<div class="sim-opt '+(sel.selections.includes(k)?'selected':'')+'" onclick="toggleSimOpt('+i+',\''+k+'\')"><div class="opt-label">'+l+'</div><div class="opt-odds">'+odds+'</div></div>';
       }).join('')+'</div>';
     }
     
