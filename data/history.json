@@ -1,14 +1,14 @@
 {
-  "updated": "2026-07-28 05:06 UTC",
+  "updated": "2026-07-29 04:51 UTC",
   "summary": {
     "total": 14,
-    "spf_hit": 12,
-    "spf_rate": 86,
-    "score_hit": 5,
-    "score_rate": 36,
-    "goal_hit": 10,
-    "goal_rate": 71,
-    "roi": 42.5
+    "spf_hit": 13,
+    "spf_rate": 93,
+    "score_hit": 8,
+    "score_rate": 57,
+    "goal_hit": 12,
+    "goal_rate": 86,
+    "roi": 67.1
   },
   "matches": [
     {
