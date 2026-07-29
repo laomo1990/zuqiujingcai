@@ -524,8 +524,17 @@ function renderHistory(){
     <div class="h-stat"><div class="val ${s.goal_rate>=55?'good':s.goal_rate>=45?'mid':'bad'}">${s.goal_rate}%</div><div class="label">大小球</div></div>
     <div class="h-stat"><div class="val ${s.roi>0?'good':'bad'}">${s.roi>0?'+':''}${s.roi}%</div><div class="label">收益率</div></div>
   `;
-  document.getElementById('hList').innerHTML=H.matches.map(m=>`
-    <div class="h-row">
+  document.getElementById('hList').innerHTML=H.matches.map(m=>{
+    if(!m.prediction){
+      return `<div class="h-row">
+        <span class="h-date">${m.date.slice(5)}</span>
+        <span class="h-teams">${m.home} vs ${m.away}</span>
+        <span class="h-score">${m.home_score}-${m.away_score}</span>
+        <span class="h-pick" style="color:#666">-</span>
+        <div class="h-tags"><span class="h-tag" style="color:#555">待补</span></div>
+      </div>`;
+    }
+    return `<div class="h-row">
       <span class="h-date">${m.date.slice(5)}</span>
       <span class="h-teams">${m.home} vs ${m.away}</span>
       <span class="h-score">${m.home_score}-${m.away_score}</span>
@@ -535,8 +544,8 @@ function renderHistory(){
         <span class="h-tag ${m.result.score==='✅'?'hit':'miss'}">${m.result.score}</span>
         <span class="h-tag ${m.result.ou==='✅'?'hit':'miss'}">${m.result.ou}</span>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 // ===== 自动刷新 =====
