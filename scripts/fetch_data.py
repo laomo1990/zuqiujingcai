@@ -50,8 +50,12 @@ def fetch_okooo_results():
             elif code == "1": result = "平局"
             elif code == "0": result = "客胜"
             else: continue
+            # 日期补全年份
+            raw_date = clean[2].split(" ")[0]
+            if len(raw_date) <= 5:  # "07-28" format
+                raw_date = f"{datetime.now().year}-{raw_date}"
             results.append({
-                "date": clean[2].split(" ")[0],
+                "date": raw_date,
                 "league": clean[1],
                 "home": clean[3],
                 "away": clean[4],
@@ -142,6 +146,16 @@ def make_prediction(m):
         "ts": datetime.now(timezone.utc).isoformat()
     }
 
+# 队名别名映射
+TEAM_ALIASES = {
+    "费特斯塔": "腓特烈",
+    "腓特烈": "费特斯塔",
+    "弗拉门戈": "法林明高",
+    "法林明高": "弗拉门戈",
+    "格风暴": "格拉茨风暴",
+    "格拉茨风暴": "格风暴",
+}
+
 def match_names(name1, name2):
     """模糊匹配队名"""
     if not name1 or not name2: return False
@@ -151,6 +165,11 @@ def match_names(name1, name2):
     clean = lambda s: s.replace("FC", "").replace("队", "").strip()
     c1, c2 = clean(name1), clean(name2)
     if c1 in c2 or c2 in c1: return True
+    # 别名匹配
+    alias1 = TEAM_ALIASES.get(name1, "")
+    alias2 = TEAM_ALIASES.get(name2, "")
+    if alias1 and (alias1 in name2 or name2 in alias1): return True
+    if alias2 and (alias2 in name1 or name1 in alias2): return True
     return False
 
 def main():
@@ -187,8 +206,13 @@ def main():
     matched_keys = []
     for r in results:
         rkey = f"{r['date']}_{r['home']}_{r['away']}"
-        # 跳过已在历史中的
-        if any(h.get("key") == rkey for h in history["matches"]):
+        # 跳过已在历史中的（用模糊匹配）
+        already_exists = False
+        for h in history["matches"]:
+            if r["date"] == h.get("date","") and match_names(r["home"], h.get("home","")) and match_names(r["away"], h.get("away","")):
+                already_exists = True
+                break
+        if already_exists:
             continue
 
         # 从pending中查找匹配的预测
