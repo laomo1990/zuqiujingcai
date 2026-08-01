@@ -109,7 +109,7 @@ def fetch_sporttery():
                     "htft": ht
                 })
     except Exception as e:
-        print(f"竞彩API错误: {e}")
+        print(f"竞彩API错误: {e}（将使用pending中的预测）")
     return matches
 
 def make_prediction(m):
@@ -267,12 +267,13 @@ def main():
     if stale:
         print(f"清理过期预测: {len(stale)}场")
 
-    # 更新统计
-    total = len(history["matches"])
+    # 更新统计（只计算有预测的比赛）
+    predicted = [m for m in history["matches"] if m.get("result") and m["result"].get("pick")]
+    total = len(predicted)
     if total > 0:
-        s = sum(1 for m in history["matches"] if m["result"]["pick"] == "✅")
-        c = sum(1 for m in history["matches"] if m["result"]["score"] == "✅")
-        g = sum(1 for m in history["matches"] if m["result"]["ou"] == "✅")
+        s = sum(1 for m in predicted if m["result"]["pick"] == "✅")
+        c = sum(1 for m in predicted if m["result"]["score"] == "✅")
+        g = sum(1 for m in predicted if m["result"]["ou"] == "✅")
         history["summary"] = {
             "total": total,
             "spf_hit": s, "spf_rate": round(s/total*100),
@@ -290,7 +291,9 @@ def main():
     save_json(HISTORY_FILE, history)
     save_json(PENDING_FILE, pending)
 
-    print(f"完成! 新增复盘:{new_count}场, 历史:{total}场, 命中率:{history['summary']['spf_rate']}%, 待匹配:{len(pending)}场")
+    rate = history.get('summary', {}).get('spf_rate', 0)
+    all_count = len(history["matches"])
+    print(f"完成! 新增复盘:{new_count}场, 历史:{all_count}场(有预测{total}场), 命中率:{rate}%, 待匹配:{len(pending)}场")
 
 if __name__ == "__main__":
     main()
