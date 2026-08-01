@@ -120,11 +120,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','SF Pro Display'
 .history-arrow.open{transform:rotate(180deg)}
 .history-body{margin-top:8px;display:none}
 .history-body.show{display:block}
-.history-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
-.h-stat{text-align:center;padding:12px 8px;background:#111827;border:1px solid #1e293b;border-radius:10px}
-.h-stat .val{font-size:1.2em;font-weight:700;color:#fff}
+.history-stats{display:flex;gap:10px;margin-bottom:14px;align-items:stretch}
+.h-stat-main{flex:0 0 90px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d3320,#111827);border:1px solid rgba(46,204,113,.3);border-radius:14px;padding:14px 8px;position:relative;overflow:hidden}
+.h-stat-main::before{content:'';position:absolute;top:-20px;right:-20px;width:60px;height:60px;background:rgba(46,204,113,.08);border-radius:50%}
+.h-stat-main .big-val{font-size:2em;font-weight:800;color:#2ecc71;line-height:1}
+.h-stat-main .big-label{font-size:.6em;color:#8892a0;margin-top:4px}
+.h-stat-side{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.h-stat{text-align:center;padding:10px 6px;background:#111827;border:1px solid #1e293b;border-radius:10px;display:flex;flex-direction:column;justify-content:center}
+.h-stat .val{font-size:1.1em;font-weight:700;color:#fff}
 .h-stat .val.good{color:#2ecc71}.h-stat .val.mid{color:#f59e0b}.h-stat .val.bad{color:#ef4444}
-.h-stat .label{font-size:.6em;color:#8892a0;margin-top:4px}
+.h-stat .label{font-size:.55em;color:#8892a0;margin-top:2px}
+.h-stat .sub{font-size:.5em;color:#555;margin-top:1px}
 .history-list{display:flex;flex-direction:column;gap:8px}
 .h-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#111827;border:1px solid #1e293b;border-radius:10px;font-size:.75em}
 .h-date{color:#8892a0;width:50px;flex-shrink:0}
@@ -533,11 +539,44 @@ function renderHistory(){
   const s=H.summary;
   document.getElementById('hSub').textContent=`近7天 · ${s.total}场`;
   document.getElementById('hSub').style.color='#2ecc71';
+  // 计算连红
+  let streak=0,streakType='';
+  for(const m of H.matches){
+    if(!m.result)break;
+    const hits=(m.result.pick==='✅'?1:0);
+    if(streak===0){streak=hits;streakType=hits?'红':'黑';}
+    else if(hits===1&&streakType==='红')streak++;
+    else if(hits===0&&streakType==='黑')streak++;
+    else break;
+  }
+  
   document.getElementById('hStats').innerHTML=`
-    <div class="h-stat"><div class="val ${s.spf_rate>=60?'good':s.spf_rate>=50?'mid':'bad'}">${s.spf_rate}%</div><div class="label">胜平负</div></div>
-    <div class="h-stat"><div class="val ${s.score_rate>=30?'good':s.score_rate>=20?'mid':'bad'}">${s.score_rate}%</div><div class="label">比分</div></div>
-    <div class="h-stat"><div class="val ${s.goal_rate>=55?'good':s.goal_rate>=45?'mid':'bad'}">${s.goal_rate}%</div><div class="label">大小球</div></div>
-    <div class="h-stat"><div class="val ${s.roi>0?'good':'bad'}">${s.roi>0?'+':''}${s.roi}%</div><div class="label">收益率</div></div>
+    <div class="h-stat-main">
+      <div class="big-val">${s.spf_rate}%</div>
+      <div class="big-label">胜平负</div>
+    </div>
+    <div class="h-stat-side">
+      <div class="h-stat">
+        <div class="val ${s.score_rate>=30?'good':s.score_rate>=20?'mid':'bad'}">${s.score_rate}%</div>
+        <div class="label">比分命中</div>
+        <div class="sub">${s.score_hit}/${s.total}</div>
+      </div>
+      <div class="h-stat">
+        <div class="val ${s.goal_rate>=55?'good':s.goal_rate>=45?'mid':'bad'}">${s.goal_rate}%</div>
+        <div class="label">大小球</div>
+        <div class="sub">${s.goal_hit}/${s.total}</div>
+      </div>
+      <div class="h-stat">
+        <div class="val ${s.roi>0?'good':'bad'}">${s.roi>0?'+':''}${s.roi}%</div>
+        <div class="label">收益率</div>
+        <div class="sub">${s.spf_hit}/${s.total}</div>
+      </div>
+      <div class="h-stat">
+        <div class="val" style="color:${streakType==='红'?'#2ecc71':'#ef4444'}">${streak}${streakType}</div>
+        <div class="label">当前连${streakType}</div>
+        <div class="sub">&nbsp;</div>
+      </div>
+    </div>
   `;
   // 按日期分组
   const grouped={};
