@@ -1,11 +1,11 @@
 {
-  "updated": "2026-08-01 05:54 UTC",
+  "updated": "2026-08-01 08:56 UTC",
   "summary": {
     "total": 18,
     "spf_hit": 14,
     "spf_rate": 78,
-    "score_hit": 7,
-    "score_rate": 39,
+    "score_hit": 6,
+    "score_rate": 33,
     "goal_hit": 12,
     "goal_rate": 67,
     "roi": 40.0
@@ -327,7 +327,7 @@
       },
       "result": {
         "pick": "✅",
-        "score": "✅",
+        "score": "❌",
         "ou": "✅"
       },
       "odds": {
