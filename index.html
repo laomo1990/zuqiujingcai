@@ -532,7 +532,7 @@ function renderHistory(){
     grouped[m.date].push(m);
   });
   const weekdays=['周日','周一','周二','周三','周四','周五','周六'];
-  let html='';
+  let html='<div style="display:flex;gap:10px;padding:4px 12px;font-size:.6em;color:#8892a0"><span style="flex:1">赛事</span><span style="width:35px;text-align:center">比分</span><span style="width:30px;text-align:center">推荐</span><span>方向</span><span>比分</span><span>大小</span></div>';
   Object.keys(grouped).sort().reverse().forEach(date=>{
     const d=new Date(date+'T00:00:00');
     const wd=weekdays[d.getDay()];
@@ -547,7 +547,7 @@ function renderHistory(){
         <span class="h-score">${m.home_score}-${m.away_score}</span>
         <span class="h-pick">${p.pick}</span>
         <div class="h-tags">
-          <span class="h-tag ${r.pick==='✅'?'hit':'miss'}">胜负${r.pick}</span>
+          <span class="h-tag ${r.pick==='✅'?'hit':'miss'}">方向${r.pick}</span>
           <span class="h-tag ${r.score==='✅'?'hit':'miss'}">比分${r.score}</span>
           <span class="h-tag ${r.ou==='✅'?'hit':'miss'}">大小${r.ou}</span>
         </div>
