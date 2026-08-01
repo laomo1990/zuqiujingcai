@@ -314,12 +314,30 @@ function ana(m){
     htHDA={h:hh/s,d:hd/s,a:ha/s};
   }
   
+  // ===== 模型4: 市场隐含概率 =====
+  const mk={h:1/m.odds.home,d:1/m.odds.draw,a:1/m.odds.away};
+  const ms=mk.h+mk.d+mk.a;mk.h/=ms;mk.d/=ms;mk.a/=ms;
+  
   // ===== 多模型加权 =====
-  // 权重：CRS 50%, 让球 30%, 半全场 20%
-  let ph=crsHDA.h*0.5,pd=crsHDA.d*0.5,pa=crsHDA.a*0.5,wTotal=0.5;
-  if(hcHDA){ph+=hcHDA.h*0.3;pd+=hcHDA.d*0.3;pa+=hcHDA.a*0.3;wTotal+=0.3;}
-  if(htHDA){ph+=htHDA.h*0.2;pd+=htHDA.d*0.2;pa+=htHDA.a*0.2;wTotal+=0.2;}
-  ph/=wTotal;pd/=wTotal;pa/=wTotal;
+  // 权重: 泊松30%, CRS 35%, 市场35%
+  let ph=crsHDA.h*0.30+crsHDA.h*0.35+mk.h*0.35;
+  let pd=crsHDA.d*0.30+crsHDA.d*0.35+mk.d*0.35;
+  let pa=crsHDA.a*0.30+crsHDA.a*0.35+mk.a*0.35;
+  
+  // 平局增强: 市场平局概率>25%时额外加权
+  if(mk.d>0.25){pd+=(mk.d-0.25)*0.5;ph-=(mk.d-0.25)*0.25;pa-=(mk.d-0.25)*0.25;}
+  
+  // 让球盘口平局信号: 盘口越接近0越可能是平局
+  const hcLine=Math.abs(parseFloat(m.handicap.line)||0);
+  const hcBoost=Math.max(0,(0.75-hcLine)*0.15);
+  pd+=hcBoost;ph-=hcBoost*0.5;pa-=hcBoost*0.5;
+  
+  // 让球模型加权
+  if(hcHDA){ph+=hcHDA.h*0.15;pd+=hcHDA.d*0.15;pa+=hcHDA.a*0.15;}
+  if(htHDA){ph+=htHDA.h*0.10;pd+=htHDA.d*0.10;pa+=htHDA.a*0.10;}
+  
+  // 归一化
+  const wTotal=ph+pd+pa;ph/=wTotal;pd/=wTotal;pa/=wTotal;
   
   // ===== 联联赛修正 =====
   const cfg=LEAGUE_CFG[m.league]||LEAGUE_CFG['default'];
@@ -342,11 +360,7 @@ function ana(m){
   // 综合大小球
   const finalO25=o25*0.6+po25*0.4;
   
-  // ===== 市场概率（去除利润率） =====
-  const mk={h:1/m.odds.home,d:1/m.odds.draw,a:1/m.odds.away};
-  const ms=mk.h+mk.d+mk.a;mk.h/=ms;mk.d/=ms;mk.a/=ms;
-  
-  // ===== 真实边际 =====
+  // ===== 真实边际（mk已在前面计算） =====
   const te={h:(ph-mk.h)*100,d:(pd-mk.d)*100,a:(pa-mk.a)*100};
   
   // ===== 价值发现 =====
