@@ -1,16 +1,116 @@
 {
-  "updated": "2026-08-01 11:48 UTC",
+  "updated": "2026-08-01 14:19 UTC",
   "summary": {
-    "total": 18,
-    "spf_hit": 14,
-    "spf_rate": 78,
+    "total": 22,
+    "spf_hit": 15,
+    "spf_rate": 68,
     "score_hit": 6,
-    "score_rate": 33,
-    "goal_hit": 12,
-    "goal_rate": 67,
-    "roi": 40.0
+    "score_rate": 27,
+    "goal_hit": 14,
+    "goal_rate": 64,
+    "roi": 22.7
   },
   "matches": [
+    {
+      "key": "2026-08-01_TPS图尔_玛丽港",
+      "date": "2026-08-01",
+      "league": "芬超",
+      "home": "TPS图尔",
+      "away": "玛丽港",
+      "home_score": 3,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 69,
+        "score": "2-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.39,
+        "draw": 4.3,
+        "away": 5.7
+      }
+    },
+    {
+      "key": "2026-08-01_浦项制铁_金泉尚武",
+      "date": "2026-08-01",
+      "league": "K联赛",
+      "home": "浦项制铁",
+      "away": "金泉尚武",
+      "home_score": 0,
+      "away_score": 1,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 55,
+        "score": "1-1",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 2.0,
+        "draw": 3.08,
+        "away": 3.28
+      }
+    },
+    {
+      "key": "2026-08-01_全北现代_首尔FC",
+      "date": "2026-08-01",
+      "league": "K联赛",
+      "home": "全北现代",
+      "away": "首尔FC",
+      "home_score": 0,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 46,
+        "score": "1-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 2.6,
+        "draw": 3.05,
+        "away": 2.4
+      }
+    },
+    {
+      "key": "2026-08-01_江原FC_富川FC",
+      "date": "2026-08-01",
+      "league": "K联赛",
+      "home": "江原FC",
+      "away": "富川FC",
+      "home_score": 0,
+      "away_score": 3,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 72,
+        "score": "2-0",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 1.41,
+        "draw": 3.75,
+        "away": 6.5
+      }
+    },
     {
       "key": "2026-07-30_维多利亚_帕梅拉斯",
       "date": "2026-07-30",
