@@ -1,14 +1,14 @@
 {
-  "updated": "2026-08-01 14:19 UTC",
+  "updated": "2026-08-01 15:15 UTC",
   "summary": {
     "total": 22,
-    "spf_hit": 15,
-    "spf_rate": 68,
+    "spf_hit": 18,
+    "spf_rate": 82,
     "score_hit": 6,
     "score_rate": 27,
     "goal_hit": 14,
     "goal_rate": 64,
-    "roi": 22.7
+    "roi": 47.3
   },
   "matches": [
     {
@@ -21,7 +21,7 @@
       "away_score": 0,
       "prediction": {
         "pick": "主胜",
-        "prob": 69,
+        "prob": 65,
         "score": "2-1",
         "ou": "大2.5"
       },
@@ -46,7 +46,7 @@
       "away_score": 1,
       "prediction": {
         "pick": "主胜",
-        "prob": 55,
+        "prob": 46,
         "score": "1-1",
         "ou": "小2.5"
       },
@@ -70,13 +70,13 @@
       "home_score": 0,
       "away_score": 0,
       "prediction": {
-        "pick": "主胜",
-        "prob": 46,
+        "pick": "平局",
+        "prob": 38,
         "score": "1-1",
         "ou": "大2.5"
       },
       "result": {
-        "pick": "❌",
+        "pick": "✅",
         "score": "❌",
         "ou": "❌"
       },
@@ -96,7 +96,7 @@
       "away_score": 3,
       "prediction": {
         "pick": "主胜",
-        "prob": 72,
+        "prob": 66,
         "score": "2-0",
         "ou": "小2.5"
       },
@@ -145,13 +145,13 @@
       "home_score": 0,
       "away_score": 0,
       "prediction": {
-        "pick": "主胜",
-        "prob": 64,
+        "pick": "平局",
+        "prob": 36,
         "score": "1-0",
         "ou": "大2.5"
       },
       "result": {
-        "pick": "❌",
+        "pick": "✅",
         "score": "❌",
         "ou": "❌"
       },
@@ -220,13 +220,13 @@
       "home_score": 0,
       "away_score": 3,
       "prediction": {
-        "pick": "主胜",
-        "prob": 62,
+        "pick": "客胜",
+        "prob": 42,
         "score": "2-1",
         "ou": "大2.5"
       },
       "result": {
-        "pick": "❌",
+        "pick": "✅",
         "score": "❌",
         "ou": "✅"
       },
@@ -271,7 +271,7 @@
       "away_score": 0,
       "prediction": {
         "pick": "主胜",
-        "prob": 68,
+        "prob": 72,
         "score": "2-0",
         "ou": "大2.5"
       },
@@ -320,13 +320,13 @@
       "home_score": 1,
       "away_score": 2,
       "prediction": {
-        "pick": "客胜",
-        "prob": 42,
+        "pick": "主胜",
+        "prob": 58,
         "score": "0-1",
         "ou": "小2.5"
       },
       "result": {
-        "pick": "✅",
+        "pick": "❌",
         "score": "❌",
         "ou": "❌"
       },
@@ -346,7 +346,7 @@
       "away_score": 1,
       "prediction": {
         "pick": "平局",
-        "prob": 32,
+        "prob": 38,
         "score": "1-1",
         "ou": "小2.5"
       },
@@ -371,7 +371,7 @@
       "away_score": 1,
       "prediction": {
         "pick": "平局",
-        "prob": 30,
+        "prob": 35,
         "score": "1-1",
         "ou": "小2.5"
       },
@@ -396,7 +396,7 @@
       "away_score": 1,
       "prediction": {
         "pick": "平局",
-        "prob": 28,
+        "prob": 40,
         "score": "1-1",
         "ou": "小2.5"
       },
@@ -495,13 +495,13 @@
       "home_score": 1,
       "away_score": 1,
       "prediction": {
-        "pick": "主胜",
-        "prob": 48,
+        "pick": "平局",
+        "prob": 35,
         "score": "1-0",
         "ou": "小2.5"
       },
       "result": {
-        "pick": "❌",
+        "pick": "✅",
         "score": "❌",
         "ou": "✅"
       },
@@ -521,7 +521,7 @@
       "away_score": 0,
       "prediction": {
         "pick": "主胜",
-        "prob": 51,
+        "prob": 65,
         "score": "2-0",
         "ou": "大2.5"
       },
@@ -546,7 +546,7 @@
       "away_score": 0,
       "prediction": {
         "pick": "主胜",
-        "prob": 56,
+        "prob": 72,
         "score": "1-0",
         "ou": "小2.5"
       },
