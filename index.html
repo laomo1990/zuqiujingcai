@@ -517,35 +517,44 @@ function toggleHistory(btn){
 function renderHistory(){
   if(!H||!H.summary){document.getElementById('history').style.display='none';return}
   const s=H.summary;
-  document.getElementById('hSub').textContent=`${s.total}场`;
+  document.getElementById('hSub').textContent=`近7天 · ${s.total}场`;
+  document.getElementById('hSub').style.color='#2ecc71';
   document.getElementById('hStats').innerHTML=`
     <div class="h-stat"><div class="val ${s.spf_rate>=60?'good':s.spf_rate>=50?'mid':'bad'}">${s.spf_rate}%</div><div class="label">胜平负</div></div>
     <div class="h-stat"><div class="val ${s.score_rate>=30?'good':s.score_rate>=20?'mid':'bad'}">${s.score_rate}%</div><div class="label">比分</div></div>
     <div class="h-stat"><div class="val ${s.goal_rate>=55?'good':s.goal_rate>=45?'mid':'bad'}">${s.goal_rate}%</div><div class="label">大小球</div></div>
     <div class="h-stat"><div class="val ${s.roi>0?'good':'bad'}">${s.roi>0?'+':''}${s.roi}%</div><div class="label">收益率</div></div>
   `;
-  document.getElementById('hList').innerHTML=H.matches.map(m=>{
-    if(!m.prediction){
-      return `<div class="h-row">
-        <span class="h-date">${m.date.slice(5)}</span>
-        <span class="h-teams">${m.home} vs ${m.away}</span>
+  // 按日期分组
+  const grouped={};
+  H.matches.filter(m=>m.prediction).forEach(m=>{
+    if(!grouped[m.date])grouped[m.date]=[];
+    grouped[m.date].push(m);
+  });
+  const weekdays=['周日','周一','周二','周三','周四','周五','周六'];
+  let html='';
+  Object.keys(grouped).sort().reverse().forEach(date=>{
+    const d=new Date(date+'T00:00:00');
+    const wd=weekdays[d.getDay()];
+    html+=`<div style="font-size:.65em;color:#8892a0;margin:12px 0 6px;padding-left:4px">${date.slice(5)} ${wd}</div>`;
+    grouped[date].forEach(m=>{
+      const p=m.prediction, r=m.result;
+      const hit3=r.pick==='✅'&&r.score==='✅'&&r.ou==='✅';
+      const hit2=(r.pick==='✅'?1:0)+(r.score==='✅'?1:0)+(r.ou==='✅'?1:0)>=2;
+      const bg=hit3?'rgba(46,204,113,.06)':hit2?'':'';
+      html+=`<div class="h-row" style="${hit3?'border-color:rgba(46,204,113,.25)':''}">
+        <span class="h-teams" style="flex:1">${m.home} vs ${m.away}</span>
         <span class="h-score">${m.home_score}-${m.away_score}</span>
-        <span class="h-pick" style="color:#666">-</span>
-        <div class="h-tags"><span class="h-tag" style="color:#555">待补</span></div>
+        <span class="h-pick">${p.pick}</span>
+        <div class="h-tags">
+          <span class="h-tag ${r.pick==='✅'?'hit':'miss'}">胜负${r.pick}</span>
+          <span class="h-tag ${r.score==='✅'?'hit':'miss'}">比分${r.score}</span>
+          <span class="h-tag ${r.ou==='✅'?'hit':'miss'}">大小${r.ou}</span>
+        </div>
       </div>`;
-    }
-    return `<div class="h-row">
-      <span class="h-date">${m.date.slice(5)}</span>
-      <span class="h-teams">${m.home} vs ${m.away}</span>
-      <span class="h-score">${m.home_score}-${m.away_score}</span>
-      <span class="h-pick">${m.prediction.pick}</span>
-      <div class="h-tags">
-        <span class="h-tag ${m.result.pick==='✅'?'hit':'miss'}">${m.result.pick}</span>
-        <span class="h-tag ${m.result.score==='✅'?'hit':'miss'}">${m.result.score}</span>
-        <span class="h-tag ${m.result.ou==='✅'?'hit':'miss'}">${m.result.ou}</span>
-      </div>
-    </div>`;
-  }).join('');
+    });
+  });
+  document.getElementById('hList').innerHTML=html;
 }
 
 // ===== 自动刷新 =====
