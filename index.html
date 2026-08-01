@@ -585,7 +585,7 @@ function renderTabs(){
 }
 
 function renderMatches(){
-  const ms=F==='all'?M:M.filter(m=>m.league===F);
+  const ms=(F==='all'?M:M.filter(m=>m.league===F)).slice().sort((a,b)=>new Date(b.time)-new Date(a.time));
   if(!ms.length){document.getElementById('matches').innerHTML='<div style="text-align:center;padding:60px;color:#8892a0">📅 暂无赛事</div>';return}
   document.getElementById('matches').innerHTML=ms.map(card).join('');
 }
