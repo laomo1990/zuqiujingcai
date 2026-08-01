@@ -1,16 +1,66 @@
 {
-  "updated": "2026-08-01 15:42 UTC",
+  "updated": "2026-08-01 20:13 UTC",
   "summary": {
-    "total": 23,
-    "spf_hit": 18,
-    "spf_rate": 78,
+    "total": 25,
+    "spf_hit": 20,
+    "spf_rate": 80,
     "score_hit": 6,
-    "score_rate": 26,
+    "score_rate": 24,
     "goal_hit": 14,
-    "goal_rate": 61,
-    "roi": 40.9
+    "goal_rate": 56,
+    "roi": 44.0
   },
   "matches": [
+    {
+      "key": "2026-08-01_拉赫蒂_雅罗",
+      "date": "2026-08-01",
+      "league": "芬超",
+      "home": "拉赫蒂",
+      "away": "雅罗",
+      "home_score": 2,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 63,
+        "score": "2-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 1.42,
+        "draw": 4.2,
+        "away": 5.35
+      }
+    },
+    {
+      "key": "2026-08-01_腓特烈_桑纳菲",
+      "date": "2026-08-01",
+      "league": "挪超",
+      "home": "腓特烈",
+      "away": "桑纳菲",
+      "home_score": 1,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 52,
+        "score": "1-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 2.15,
+        "draw": 3.35,
+        "away": 2.74
+      }
+    },
     {
       "key": "2026-08-01_赫根_卡尔马",
       "date": "2026-08-01",
