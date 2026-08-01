@@ -1,16 +1,166 @@
 {
-  "updated": "2026-07-29 05:38 UTC",
+  "updated": "2026-08-01 05:54 UTC",
   "summary": {
-    "total": 14,
-    "spf_hit": 13,
-    "spf_rate": 93,
+    "total": 20,
+    "spf_hit": 16,
+    "spf_rate": 80,
     "score_hit": 8,
-    "score_rate": 57,
-    "goal_hit": 12,
-    "goal_rate": 86,
-    "roi": 67.1
+    "score_rate": 40,
+    "goal_hit": 14,
+    "goal_rate": 70,
+    "roi": 44.0
   },
   "matches": [
+    {
+      "key": "2026-07-30_维多利亚_帕梅拉斯",
+      "date": "2026-07-30",
+      "league": "巴西甲",
+      "home": "维多利亚",
+      "away": "帕梅拉斯",
+      "home_score": 0,
+      "away_score": 4,
+      "prediction": {
+        "pick": "客胜",
+        "prob": 38,
+        "score": "0-1",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 3.82,
+        "draw": 3.2,
+        "away": 1.8
+      }
+    },
+    {
+      "key": "2026-07-30_弗鲁米嫩_巴伊亚",
+      "date": "2026-07-30",
+      "league": "巴西甲",
+      "home": "弗鲁米嫩",
+      "away": "巴伊亚",
+      "home_score": 0,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 64,
+        "score": "1-0",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 1.63,
+        "draw": 3.5,
+        "away": 4.35
+      }
+    },
+    {
+      "key": "2026-07-30_巴西国际_弗拉门戈",
+      "date": "2026-07-30",
+      "league": "巴西甲",
+      "home": "巴西国际",
+      "away": "弗拉门戈",
+      "home_score": 1,
+      "away_score": 1,
+      "prediction": {
+        "pick": "客胜",
+        "prob": 39,
+        "score": "0-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 3.8,
+        "draw": 3.32,
+        "away": 1.77
+      }
+    },
+    {
+      "key": "2026-07-30_米拉索尔_里莫",
+      "date": "2026-07-30",
+      "league": "巴西甲",
+      "home": "米拉索尔",
+      "away": "里莫",
+      "home_score": 2,
+      "away_score": 1,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 66,
+        "score": "1-0",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.55,
+        "draw": 3.65,
+        "away": 4.75
+      }
+    },
+    {
+      "key": "2026-07-30_波兹南_奥胡斯",
+      "date": "2026-07-30",
+      "league": "欧冠",
+      "home": "波兹南",
+      "away": "奥胡斯",
+      "home_score": 0,
+      "away_score": 3,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 62,
+        "score": "2-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.57,
+        "draw": 3.85,
+        "away": 4.3
+      }
+    },
+    {
+      "key": "2026-07-29_阿拉木图_奥莫尼亚",
+      "date": "2026-07-29",
+      "league": "欧冠",
+      "home": "阿拉木图",
+      "away": "奥莫尼亚",
+      "home_score": 1,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 53,
+        "score": "1-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 2.0,
+        "draw": 3.1,
+        "away": 3.26
+      }
+    },
     {
       "key": "2026-07-29_哈茨_格风暴",
       "date": "2026-07-29",
