@@ -1,16 +1,41 @@
 {
-  "updated": "2026-08-01 15:15 UTC",
+  "updated": "2026-08-01 15:42 UTC",
   "summary": {
-    "total": 22,
+    "total": 23,
     "spf_hit": 18,
-    "spf_rate": 82,
+    "spf_rate": 78,
     "score_hit": 6,
-    "score_rate": 27,
+    "score_rate": 26,
     "goal_hit": 14,
-    "goal_rate": 64,
-    "roi": 47.3
+    "goal_rate": 61,
+    "roi": 40.9
   },
   "matches": [
+    {
+      "key": "2026-08-01_赫根_卡尔马",
+      "date": "2026-08-01",
+      "league": "瑞典超",
+      "home": "赫根",
+      "away": "卡尔马",
+      "home_score": 1,
+      "away_score": 1,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 61,
+        "score": "2-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 1.64,
+        "draw": 3.8,
+        "away": 3.9
+      }
+    },
     {
       "key": "2026-08-01_TPS图尔_玛丽港",
       "date": "2026-08-01",
