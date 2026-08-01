@@ -113,19 +113,65 @@ def fetch_sporttery():
     return matches
 
 def make_prediction(m):
-    """为单场比赛生成预测"""
+    """为单场比赛生成预测（多模型加权+平局增强）"""
     if not m["crs"]: return None
     cp = crs_to_probs(m["crs"])
+    
+    # ===== 模型1: 泊松分布 =====
     hxg = sum(int(k[1:3]) * v for k, v in cp.items())
     axg = sum(int(k[4:6]) * v for k, v in cp.items())
     hL = hxg + 0.35; aL = max(0.3, axg - 0.1)
-    ph = pd = pa = 0
+    ph1 = pd1 = pa1 = 0
     for i in range(7):
         for j in range(7):
             p = poisson_pmf(i, hL) * poisson_pmf(j, aL)
-            if i > j: ph += p
-            elif i == j: pd += p
-            else: pa += p
+            if i > j: ph1 += p
+            elif i == j: pd1 += p
+            else: pa1 += p
+    
+    # ===== 模型2: CRS直接概率 =====
+    crs_h = sum(v for k, v in cp.items() if int(k[1:3]) > int(k[4:6]))
+    crs_d = sum(v for k, v in cp.items() if int(k[1:3]) == int(k[4:6]))
+    crs_a = sum(v for k, v in cp.items() if int(k[1:3]) < int(k[4:6]))
+    
+    # ===== 模型3: 市场隐含概率 =====
+    odds = m.get("odds", {})
+    if odds.get("home", 0) > 0 and odds.get("draw", 0) > 0 and odds.get("away", 0) > 0:
+        mk_h = 1/odds["home"]
+        mk_d = 1/odds["draw"]
+        mk_a = 1/odds["away"]
+        mk_sum = mk_h + mk_d + mk_a
+        mk_h /= mk_sum; mk_d /= mk_sum; mk_a /= mk_sum
+    else:
+        mk_h = mk_d = mk_a = 0.33
+    
+    # ===== 模型4: 让球盘口平局信号 =====
+    handicap = m.get("handicap", {})
+    hc_line = abs(float(handicap.get("line", "0") or "0"))
+    # 盘口越接近0，越可能是平局
+    hc_draw_boost = max(0, (0.75 - hc_line) * 0.15)  # line=0时+0.11, line=0.5时+0.04
+    
+    # ===== 多模型加权 =====
+    # 权重: 泊松30%, CRS 35%, 市场35%
+    ph = ph1*0.30 + crs_h*0.35 + mk_h*0.35
+    pd = pd1*0.30 + crs_d*0.35 + mk_d*0.35
+    pa = pa1*0.30 + crs_a*0.35 + mk_a*0.35
+    
+    # 平局增强: 市场平局概率>25%时额外加权
+    if mk_d > 0.25:
+        pd += (mk_d - 0.25) * 0.5  # 平局概率越高，加权越多
+        ph -= (mk_d - 0.25) * 0.25
+        pa -= (mk_d - 0.25) * 0.25
+    
+    # 盘口平局信号
+    pd += hc_draw_boost
+    ph -= hc_draw_boost * 0.5
+    pa -= hc_draw_boost * 0.5
+    
+    # 归一化
+    total = ph + pd + pa
+    ph /= total; pd /= total; pa /= total
+    
     mx = max(ph, pd, pa)
     pick = "主胜" if ph == mx else ("客胜" if pa == mx else "平局")
     scores = sorted(cp.items(), key=lambda x: -x[1])
