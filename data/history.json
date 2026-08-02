@@ -1,16 +1,166 @@
 {
-  "updated": "2026-08-02 11:45 UTC",
+  "updated": "2026-08-02 15:47 UTC",
   "summary": {
-    "total": 34,
-    "spf_hit": 24,
-    "spf_rate": 71,
-    "score_hit": 7,
-    "score_rate": 21,
-    "goal_hit": 18,
-    "goal_rate": 53,
-    "roi": 27.1
+    "total": 40,
+    "spf_hit": 28,
+    "spf_rate": 70,
+    "score_hit": 8,
+    "score_rate": 20,
+    "goal_hit": 20,
+    "goal_rate": 50,
+    "roi": 26.0
   },
   "matches": [
+    {
+      "key": "2026-08-02_瓦萨_国际图尔",
+      "date": "2026-08-02",
+      "league": "芬超",
+      "home": "瓦萨",
+      "away": "国际图尔",
+      "home_score": 0,
+      "away_score": 1,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 40,
+        "score": "1-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 2.42,
+        "draw": 3.15,
+        "away": 2.52
+      }
+    },
+    {
+      "key": "2026-08-02_哥德堡_代格福什",
+      "date": "2026-08-02",
+      "league": "瑞典超",
+      "home": "哥德堡",
+      "away": "代格福什",
+      "home_score": 2,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 56,
+        "score": "1-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 1.7,
+        "draw": 3.55,
+        "away": 3.85
+      }
+    },
+    {
+      "key": "2026-08-02_布鲁马波_马尔默",
+      "date": "2026-08-02",
+      "league": "瑞典超",
+      "home": "布鲁马波",
+      "away": "马尔默",
+      "home_score": 1,
+      "away_score": 2,
+      "prediction": {
+        "pick": "客胜",
+        "prob": 41,
+        "score": "1-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 2.81,
+        "draw": 3.5,
+        "away": 2.05
+      }
+    },
+    {
+      "key": "2026-08-02_大田市民_光州FC",
+      "date": "2026-08-02",
+      "league": "K联赛",
+      "home": "大田市民",
+      "away": "光州FC",
+      "home_score": 2,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 66,
+        "score": "2-0",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "✅",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 1.4,
+        "draw": 3.9,
+        "away": 6.3
+      }
+    },
+    {
+      "key": "2026-08-02_济州SK_仁川联",
+      "date": "2026-08-02",
+      "league": "K联赛",
+      "home": "济州SK",
+      "away": "仁川联",
+      "home_score": 3,
+      "away_score": 3,
+      "prediction": {
+        "pick": "客胜",
+        "prob": 37,
+        "score": "1-1",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 3.11,
+        "draw": 2.9,
+        "away": 2.16
+      }
+    },
+    {
+      "key": "2026-08-02_蔚山现代_安养FC",
+      "date": "2026-08-02",
+      "league": "K联赛",
+      "home": "蔚山现代",
+      "away": "安养FC",
+      "home_score": 3,
+      "away_score": 1,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 50,
+        "score": "1-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.86,
+        "draw": 3.45,
+        "away": 3.32
+      }
+    },
     {
       "key": "2026-08-02_波特兰_西雅图",
       "date": "2026-08-02",
