@@ -1,16 +1,241 @@
 {
-  "updated": "2026-08-01 20:13 UTC",
+  "updated": "2026-08-02 11:45 UTC",
   "summary": {
-    "total": 25,
-    "spf_hit": 20,
-    "spf_rate": 80,
-    "score_hit": 6,
-    "score_rate": 24,
-    "goal_hit": 14,
-    "goal_rate": 56,
-    "roi": 44.0
+    "total": 34,
+    "spf_hit": 24,
+    "spf_rate": 71,
+    "score_hit": 7,
+    "score_rate": 21,
+    "goal_hit": 18,
+    "goal_rate": 53,
+    "roi": 27.1
   },
   "matches": [
+    {
+      "key": "2026-08-02_波特兰_西雅图",
+      "date": "2026-08-02",
+      "league": "美职",
+      "home": "波特兰",
+      "away": "西雅图",
+      "home_score": 2,
+      "away_score": 1,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 48,
+        "score": "1-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.94,
+        "draw": 3.7,
+        "away": 2.91
+      }
+    },
+    {
+      "key": "2026-08-02_洛城银河_达拉斯",
+      "date": "2026-08-02",
+      "league": "美职",
+      "home": "洛城银河",
+      "away": "达拉斯",
+      "home_score": 0,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 45,
+        "score": "1-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 2.21,
+        "draw": 3.35,
+        "away": 2.64
+      }
+    },
+    {
+      "key": "2026-08-02_圣路易城_盐湖城",
+      "date": "2026-08-02",
+      "league": "美职",
+      "home": "圣路易城",
+      "away": "盐湖城",
+      "home_score": 1,
+      "away_score": 1,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 49,
+        "score": "2-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 1.88,
+        "draw": 3.75,
+        "away": 3.02
+      }
+    },
+    {
+      "key": "2026-08-02_芝加哥_夏洛特FC",
+      "date": "2026-08-02",
+      "league": "美职",
+      "home": "芝加哥",
+      "away": "夏洛特FC",
+      "home_score": 2,
+      "away_score": 1,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 65,
+        "score": "2-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "✅",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.37,
+        "draw": 4.5,
+        "away": 5.65
+      }
+    },
+    {
+      "key": "2026-08-02_桑托斯_里莫",
+      "date": "2026-08-02",
+      "league": "巴西杯",
+      "home": "桑托斯",
+      "away": "里莫",
+      "home_score": 0,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 66,
+        "score": "2-0",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 1.41,
+        "draw": 3.9,
+        "away": 6.1
+      }
+    },
+    {
+      "key": "2026-08-02_温哥华_洛杉矶FC",
+      "date": "2026-08-02",
+      "league": "美职",
+      "home": "温哥华",
+      "away": "洛杉矶FC",
+      "home_score": 1,
+      "away_score": 1,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 51,
+        "score": "2-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 1.91,
+        "draw": 3.65,
+        "away": 3.02
+      }
+    },
+    {
+      "key": "2026-08-02_迈国际_哥伦布",
+      "date": "2026-08-02",
+      "league": "美职",
+      "home": "迈国际",
+      "away": "哥伦布",
+      "home_score": 2,
+      "away_score": 2,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 64,
+        "score": "2-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.4,
+        "draw": 4.6,
+        "away": 5.05
+      }
+    },
+    {
+      "key": "2026-08-02_赫尔火花_库奥皮奥",
+      "date": "2026-08-02",
+      "league": "芬超",
+      "home": "赫尔火花",
+      "away": "库奥皮奥",
+      "home_score": 0,
+      "away_score": 1,
+      "prediction": {
+        "pick": "客胜",
+        "prob": 44,
+        "score": "1-2",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 3.17,
+        "draw": 3.6,
+        "away": 1.87
+      }
+    },
+    {
+      "key": "2026-08-02_斯达_维京",
+      "date": "2026-08-02",
+      "league": "挪超",
+      "home": "斯达",
+      "away": "维京",
+      "home_score": 0,
+      "away_score": 3,
+      "prediction": {
+        "pick": "客胜",
+        "prob": 61,
+        "score": "1-2",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 5.65,
+        "draw": 4.62,
+        "away": 1.36
+      }
+    },
     {
       "key": "2026-08-01_拉赫蒂_雅罗",
       "date": "2026-08-01",
