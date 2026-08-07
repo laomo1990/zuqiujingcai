@@ -1,16 +1,66 @@
 {
-  "updated": "2026-08-06 01:15 UTC",
+  "updated": "2026-08-07 01:43 UTC",
   "summary": {
-    "total": 59,
-    "spf_hit": 49,
-    "spf_rate": 83,
+    "total": 61,
+    "spf_hit": 50,
+    "spf_rate": 82,
     "score_hit": 24,
-    "score_rate": 41,
+    "score_rate": 39,
     "goal_hit": 46,
-    "goal_rate": 78,
-    "roi": 49.5
+    "goal_rate": 75,
+    "roi": 47.5
   },
   "matches": [
+    {
+      "key": "2026-08-07_维多利亚_巴竞技",
+      "date": "2026-08-07",
+      "league": "巴西杯",
+      "home": "维多利亚",
+      "away": "巴竞技",
+      "home_score": 4,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 45,
+        "score": "1-1",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 2.1,
+        "draw": 3.2,
+        "away": 2.95
+      }
+    },
+    {
+      "key": "2026-08-06_弗鲁米嫩_达伽马",
+      "date": "2026-08-06",
+      "league": "巴西杯",
+      "home": "弗鲁米嫩",
+      "away": "达伽马",
+      "home_score": 1,
+      "away_score": 3,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 49,
+        "score": "1-0",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 1.9,
+        "draw": 2.9,
+        "away": 3.88
+      }
+    },
     {
       "key": "2026-08-06_费内巴切_格风暴",
       "date": "2026-08-06",
