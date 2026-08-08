@@ -23,9 +23,10 @@
       },
       "prediction": {
         "pick": "客胜",
-        "prob": 60,
-        "score": "0-1",
-        "ou": "小2.5"
+        "prob": 59,
+        "score": "1-2",
+        "ou": "大2.5",
+        "ou_prob": 71
       }
     },
     {
@@ -51,9 +52,10 @@
       },
       "prediction": {
         "pick": "客胜",
-        "prob": 36,
+        "prob": 38,
         "score": "0-1",
-        "ou": "小2.5"
+        "ou": "大2.5",
+        "ou_prob": 53
       }
     },
     {
@@ -79,9 +81,10 @@
       },
       "prediction": {
         "pick": "客胜",
-        "prob": 37,
+        "prob": 39,
         "score": "1-2",
-        "ou": "小2.5"
+        "ou": "大2.5",
+        "ou_prob": 61
       }
     },
     {
@@ -107,9 +110,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 63,
-        "score": "3-0",
-        "ou": "小2.5"
+        "prob": 61,
+        "score": "1-0",
+        "ou": "大2.5",
+        "ou_prob": 59
       }
     },
     {
@@ -135,9 +139,10 @@
       },
       "prediction": {
         "pick": "客胜",
-        "prob": 34,
-        "score": "0-1",
-        "ou": "小2.5"
+        "prob": 36,
+        "score": "0-2",
+        "ou": "大2.5",
+        "ou_prob": 53
       }
     },
     {
@@ -163,9 +168,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 66,
+        "prob": 67,
         "score": "2-1",
-        "ou": "小2.5"
+        "ou": "大2.5",
+        "ou_prob": 71
       }
     },
     {
@@ -192,8 +198,9 @@
       "prediction": {
         "pick": "主胜",
         "prob": 62,
-        "score": "1-0",
-        "ou": "小2.5"
+        "score": "2-1",
+        "ou": "大2.5",
+        "ou_prob": 66
       }
     },
     {
@@ -219,9 +226,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 39,
-        "score": "1-0",
-        "ou": "小2.5"
+        "prob": 42,
+        "score": "2-0",
+        "ou": "小2.5",
+        "ou_prob": 52
       }
     },
     {
@@ -247,9 +255,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 35,
-        "score": "3-1",
-        "ou": "小2.5"
+        "prob": 38,
+        "score": "2-1",
+        "ou": "大2.5",
+        "ou_prob": 55
       }
     },
     {
@@ -276,8 +285,9 @@
       "prediction": {
         "pick": "客胜",
         "prob": 50,
-        "score": "0-1",
-        "ou": "小2.5"
+        "score": "0-2",
+        "ou": "大2.5",
+        "ou_prob": 57
       }
     },
     {
@@ -304,8 +314,9 @@
       "prediction": {
         "pick": "主胜",
         "prob": 58,
-        "score": "2-0",
-        "ou": "小2.5"
+        "score": "2-1",
+        "ou": "大2.5",
+        "ou_prob": 61
       }
     },
     {
@@ -331,9 +342,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 46,
-        "score": "3-0",
-        "ou": "小2.5"
+        "prob": 48,
+        "score": "2-1",
+        "ou": "大2.5",
+        "ou_prob": 50
       }
     },
     {
@@ -359,9 +371,10 @@
       },
       "prediction": {
         "pick": "客胜",
-        "prob": 35,
+        "prob": 37,
         "score": "0-2",
-        "ou": "小2.5"
+        "ou": "大2.5",
+        "ou_prob": 52
       }
     },
     {
@@ -387,9 +400,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 48,
-        "score": "1-0",
-        "ou": "小2.5"
+        "prob": 49,
+        "score": "2-1",
+        "ou": "小2.5",
+        "ou_prob": 54
       }
     },
     {
@@ -415,9 +429,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 48,
-        "score": "1-0",
-        "ou": "小2.5"
+        "prob": 49,
+        "score": "2-1",
+        "ou": "小2.5",
+        "ou_prob": 51
       }
     },
     {
@@ -443,9 +458,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 64,
+        "prob": 62,
         "score": "1-0",
-        "ou": "小2.5"
+        "ou": "大2.5",
+        "ou_prob": 65
       }
     },
     {
@@ -470,10 +486,11 @@
         "line": 0.0
       },
       "prediction": {
-        "pick": "平局",
-        "prob": 36,
-        "score": "1-1",
-        "ou": "小2.5"
+        "pick": "主胜",
+        "prob": 38,
+        "score": "2-0",
+        "ou": "小2.5",
+        "ou_prob": 53
       }
     },
     {
@@ -499,9 +516,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 35,
-        "score": "1-0",
-        "ou": "小2.5"
+        "prob": 38,
+        "score": "2-1",
+        "ou": "小2.5",
+        "ou_prob": 50
       }
     },
     {
@@ -527,9 +545,10 @@
       },
       "prediction": {
         "pick": "客胜",
-        "prob": 35,
-        "score": "1-2",
-        "ou": "小2.5"
+        "prob": 36,
+        "score": "0-1",
+        "ou": "小2.5",
+        "ou_prob": 53
       }
     },
     {
@@ -555,9 +574,10 @@
       },
       "prediction": {
         "pick": "客胜",
-        "prob": 36,
-        "score": "0-2",
-        "ou": "小2.5"
+        "prob": 38,
+        "score": "1-2",
+        "ou": "小2.5",
+        "ou_prob": 51
       }
     },
     {
@@ -583,9 +603,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 35,
-        "score": "1-0",
-        "ou": "小2.5"
+        "prob": 38,
+        "score": "2-0",
+        "ou": "大2.5",
+        "ou_prob": 52
       }
     },
     {
@@ -611,9 +632,10 @@
       },
       "prediction": {
         "pick": "客胜",
-        "prob": 54,
+        "prob": 53,
         "score": "1-2",
-        "ou": "小2.5"
+        "ou": "大2.5",
+        "ou_prob": 63
       }
     },
     {
@@ -639,9 +661,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 52,
-        "score": "1-0",
-        "ou": "小2.5"
+        "prob": 53,
+        "score": "2-1",
+        "ou": "大2.5",
+        "ou_prob": 62
       }
     },
     {
@@ -667,9 +690,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 41,
+        "prob": 43,
         "score": "2-0",
-        "ou": "小2.5"
+        "ou": "大2.5",
+        "ou_prob": 60
       }
     },
     {
@@ -696,8 +720,9 @@
       "prediction": {
         "pick": "主胜",
         "prob": 58,
-        "score": "3-0",
-        "ou": "小2.5"
+        "score": "2-1",
+        "ou": "大2.5",
+        "ou_prob": 69
       }
     },
     {
@@ -724,8 +749,9 @@
       "prediction": {
         "pick": "主胜",
         "prob": 63,
-        "score": "3-1",
-        "ou": "小2.5"
+        "score": "1-0",
+        "ou": "大2.5",
+        "ou_prob": 63
       }
     },
     {
@@ -751,9 +777,10 @@
       },
       "prediction": {
         "pick": "客胜",
-        "prob": 59,
-        "score": "0-1",
-        "ou": "小2.5"
+        "prob": 57,
+        "score": "1-2",
+        "ou": "大2.5",
+        "ou_prob": 64
       }
     },
     {
@@ -779,9 +806,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 37,
-        "score": "1-0",
-        "ou": "小2.5"
+        "prob": 40,
+        "score": "2-1",
+        "ou": "大2.5",
+        "ou_prob": 55
       }
     },
     {
@@ -807,9 +835,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 40,
-        "score": "3-0",
-        "ou": "小2.5"
+        "prob": 42,
+        "score": "1-0",
+        "ou": "大2.5",
+        "ou_prob": 62
       }
     },
     {
@@ -835,9 +864,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 51,
+        "prob": 52,
         "score": "2-1",
-        "ou": "小2.5"
+        "ou": "大2.5",
+        "ou_prob": 53
       }
     },
     {
@@ -863,9 +893,10 @@
       },
       "prediction": {
         "pick": "客胜",
-        "prob": 57,
+        "prob": 56,
         "score": "0-1",
-        "ou": "小2.5"
+        "ou": "大2.5",
+        "ou_prob": 57
       }
     },
     {
@@ -891,9 +922,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 35,
-        "score": "2-1",
-        "ou": "小2.5"
+        "prob": 38,
+        "score": "1-0",
+        "ou": "大2.5",
+        "ou_prob": 59
       }
     },
     {
@@ -919,9 +951,10 @@
       },
       "prediction": {
         "pick": "客胜",
-        "prob": 40,
-        "score": "0-2",
-        "ou": "小2.5"
+        "prob": 41,
+        "score": "0-1",
+        "ou": "大2.5",
+        "ou_prob": 63
       }
     },
     {
@@ -947,9 +980,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 44,
-        "score": "1-0",
-        "ou": "小2.5"
+        "prob": 46,
+        "score": "2-1",
+        "ou": "大2.5",
+        "ou_prob": 63
       }
     },
     {
@@ -975,9 +1009,10 @@
       },
       "prediction": {
         "pick": "客胜",
-        "prob": 43,
-        "score": "1-2",
-        "ou": "小2.5"
+        "prob": 44,
+        "score": "0-1",
+        "ou": "大2.5",
+        "ou_prob": 59
       }
     },
     {
@@ -1003,9 +1038,10 @@
       },
       "prediction": {
         "pick": "客胜",
-        "prob": 52,
-        "score": "0-1",
-        "ou": "小2.5"
+        "prob": 51,
+        "score": "0-2",
+        "ou": "大2.5",
+        "ou_prob": 65
       }
     },
     {
@@ -1031,9 +1067,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 48,
+        "prob": 49,
         "score": "1-0",
-        "ou": "小2.5"
+        "ou": "小2.5",
+        "ou_prob": 51
       }
     },
     {
@@ -1061,7 +1098,8 @@
         "pick": "客胜",
         "prob": 50,
         "score": "0-1",
-        "ou": "小2.5"
+        "ou": "小2.5",
+        "ou_prob": 50
       }
     },
     {
@@ -1087,9 +1125,10 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 40,
-        "score": "2-0",
-        "ou": "小2.5"
+        "prob": 43,
+        "score": "1-0",
+        "ou": "小2.5",
+        "ou_prob": 53
       }
     },
     {
@@ -1115,13 +1154,14 @@
       },
       "prediction": {
         "pick": "主胜",
-        "prob": 73,
-        "score": "1-0",
-        "ou": "小2.5"
+        "prob": 72,
+        "score": "2-0",
+        "ou": "大2.5",
+        "ou_prob": 62
       }
     }
   ],
-  "updated": "2026-08-08 11:47 UTC",
+  "updated": "2026-08-08 11:51 UTC",
   "sources": [
     "sporttery.cn"
   ]
