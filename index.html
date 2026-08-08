@@ -408,12 +408,16 @@ function ana(m){
   const mk={h:1/m.odds.home,d:1/m.odds.draw,a:1/m.odds.away};
   const ms=mk.h+mk.d+mk.a;mk.h/=ms;mk.d/=ms;mk.a/=ms;
   
+  // ===== 联赛配置（必须在Poisson之前） =====
+  const cfg=LEAGUE_CFG[m.league]||LEAGUE_CFG['default'];
+  const homeAdv=cfg.homeAdv;
+  
   // ===== 多模型加权 =====
   // 权重: Poisson 25%, CRS 35%, Market 25%, 让球 10%, 半全场 5%
   // Poisson 胜平负 (从期望进球计算)
   const pHDA={h:0,d:0,a:0};
   {const hXg=Math.max(.3,1.2+0.8*mk.h),aXg=Math.max(.2,1.0+0.7*mk.a);
-   const hAdj=hXg+(cfg?cfg.homeAdv:0.12),aAdj=Math.max(.3,aXg-(cfg?cfg.homeAdv:0.12)*.3);
+   const hAdj=hXg+homeAdv,aAdj=Math.max(.3,aXg-homeAdv*.3);
    for(let i=0;i<=6;i++)for(let j=0;j<=6;j++){const p=poisson(i,hAdj)*poisson(j,aAdj);
      if(i>j)pHDA.h+=p;else if(i===j)pHDA.d+=p;else pHDA.a+=p;}
    const pt=pHDA.h+pHDA.d+pHDA.a;pHDA.h/=pt;pHDA.d/=pt;pHDA.a/=pt;}
@@ -436,9 +440,6 @@ function ana(m){
   // 归一化
   const wTotal=ph+pd+pa;ph/=wTotal;pd/=wTotal;pa/=wTotal;
   
-  // ===== 联联赛修正 =====
-  const cfg=LEAGUE_CFG[m.league]||LEAGUE_CFG['default'];
-  const homeAdv=cfg.homeAdv;
   
   // ===== 期望进球（从CRS反推 + 联赛修正） =====
   const hE=estLam(cp,true),aE=estLam(cp,false);
