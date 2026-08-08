@@ -409,10 +409,17 @@ function ana(m){
   const ms=mk.h+mk.d+mk.a;mk.h/=ms;mk.d/=ms;mk.a/=ms;
   
   // ===== 多模型加权 =====
-  // 权重: 泊松30%, CRS 35%, 市场35%
-  let ph=crsHDA.h*0.30+crsHDA.h*0.35+mk.h*0.35;
-  let pd=crsHDA.d*0.30+crsHDA.d*0.35+mk.d*0.35;
-  let pa=crsHDA.a*0.30+crsHDA.a*0.35+mk.a*0.35;
+  // 权重: Poisson 25%, CRS 35%, Market 25%, 让球 10%, 半全场 5%
+  // Poisson 胜平负 (从期望进球计算)
+  const pHDA={h:0,d:0,a:0};
+  {const hXg=Math.max(.3,1.2+0.8*mk.h),aXg=Math.max(.2,1.0+0.7*mk.a);
+   const hAdj=hXg+(cfg?cfg.homeAdv:0.12),aAdj=Math.max(.3,aXg-(cfg?cfg.homeAdv:0.12)*.3);
+   for(let i=0;i<=6;i++)for(let j=0;j<=6;j++){const p=poisson(i,hAdj)*poisson(j,aAdj);
+     if(i>j)pHDA.h+=p;else if(i===j)pHDA.d+=p;else pHDA.a+=p;}
+   const pt=pHDA.h+pHDA.d+pHDA.a;pHDA.h/=pt;pHDA.d/=pt;pHDA.a/=pt;}
+  let ph=pHDA.h*0.25+crsHDA.h*0.35+mk.h*0.25;
+  let pd=pHDA.d*0.25+crsHDA.d*0.35+mk.d*0.25;
+  let pa=pHDA.a*0.25+crsHDA.a*0.35+mk.a*0.25;
   
   // 平局增强: 市场平局概率>25%时额外加权
   if(mk.d>0.25){pd+=(mk.d-0.25)*0.5;ph-=(mk.d-0.25)*0.25;pa-=(mk.d-0.25)*0.25;}
@@ -438,8 +445,11 @@ function ana(m){
   const hL=hE.lam+homeAdv;
   const aL=Math.max(.3,aE.lam-homeAdv*0.3);
   
-  // ===== 泊松比分概率 =====
-  const sr=hasCrs?Object.entries(cp).map(([k,p])=>({s:`${+k.slice(1,3)}-${+k.slice(4,6)}`,p})).sort((a,b)=>b.p-a.p):[{s:'1-0',p:0.12},{s:'2-1',p:0.10},{s:'1-1',p:0.10}];
+  // ===== 比分概率 (过滤方向) =====
+  const _mx=ph>=pd&&ph>=pa?'h':pa>=pd?'a':'d';
+  const srAll=hasCrs?Object.entries(cp).map(([k,p])=>({s:`${+k.slice(1,3)}-${+k.slice(4,6)}`,p,hg:+k.slice(1,3),ag:+k.slice(4,6)})).sort((a,b)=>b.p-a.p):[{s:'1-0',p:0.12,hg:1,ag:0},{s:'2-1',p:0.10,hg:2,ag:1},{s:'1-1',p:0.10,hg:1,ag:1}];
+  const sr=srAll.filter(x=>_mx==='h'?x.hg>x.ag:_mx==='a'?x.ag>x.hg:x.hg===x.ag).slice(0,3);
+  if(!sr.length)sr.push(srAll[0]||{s:'1-0',p:.1});
   
   // ===== 大小球（从CRS + 泊松综合） =====
   let o25=hasCrs?0:0.5;
@@ -501,16 +511,14 @@ function genForm(name){
 }
 
 function reason(m,a){
-  const mx=Math.max(a.h,a.d,a.a);
-  const pick=a.h===mx?'主队':a.a===mx?'客队':'两队';
-  let r=`${a.models}模型加权分析（CRS+让球+半全场），${pick}概率最高`;
-  r+=`，场均进球主${a.hL.toFixed(1)}客${a.aL.toFixed(1)}`;
-  const edges=[];
-  if(Math.abs(a.te.h)>2)edges.push(`主胜${a.te.h>0?'低估':'高估'}${Math.abs(a.te.h).toFixed(1)}%`);
-  if(Math.abs(a.te.d)>2)edges.push(`平局${a.te.d>0?'低估':'高估'}${Math.abs(a.te.d).toFixed(1)}%`);
-  if(Math.abs(a.te.a)>2)edges.push(`客胜${a.te.a>0?'低估':'高估'}${Math.abs(a.te.a).toFixed(1)}%`);
-  if(edges.length)r+=`，${edges.join('，')}`;
-  return r+'。';
+  const pred=m.prediction;
+  const pick=pred?pred.pick:(a.h>=a.d&&a.h>=a.a?'主胜':a.a>=a.d?'客胜':'平局');
+  const prob=pred?pred.prob:Math.round(Math.max(a.h,a.d,a.a)*100);
+  const models=a.models||1;
+  const score=pred?pred.score:a.sr[0]?a.sr[0].s:'1-0';
+  const ou=pred?pred.ou:(a.o25>.5?'大2.5':'小2.5');
+  const ouP=pred&&pred.ou_prob?pred.ou_prob:Math.round(a.o25*100);
+  return models+'模型加权分析（CRS+Poisson+赔率），'+pick+'概率最高'+prob+'%，推荐比分'+score+'，'+ou+'('+ouP+'%)。';
 }
 
 // ===== 新增：倒计时功能 =====
@@ -592,11 +600,21 @@ function renderMatches(){
 
 function card(m){
   const a=ana(m);
+  // 如果后端有 prediction 且比前端更可信, 优先使用
+  const pred=m.prediction;
   const hp=Math.round(a.h*100),dp=Math.round(a.d*100),ap=Math.round(a.a*100);
   const mx=Math.max(a.h,a.d,a.a);
-  const pick=a.h===mx?'主胜':a.a===mx?'客胜':'平局';
-  const pickP=Math.round(mx*100);
-  const pickO=a.h===mx?m.odds.home:a.a===mx?m.odds.away:m.odds.draw;
+  let pick=a.h===mx?'主胜':a.a===mx?'客胜':'平局';
+  let pickP=Math.round(mx*100);
+  let pickO=a.h===mx?m.odds.home:a.a===mx?m.odds.away:m.odds.draw;
+  let bestScore=a.sr[0]||{s:'1-0',p:.1};
+  let ou=a.o25>.5;
+  // 后端预测覆盖
+  if(pred&&pred.pick){
+    pick=pred.pick;pickP=pred.prob;pickO=pick==='主胜'?m.odds.home:pick==='客胜'?m.odds.away:m.odds.draw;
+    if(pred.score)bestScore={s:pred.score,p:pred.prob/100};
+    if(pred.ou)ou=pred.ou.includes('大');
+  }
   const stars='★'.repeat(a.conf)+'☆'.repeat(Math.max(0,5-a.conf));
   const vals=Object.entries(a.val).filter(([_,v])=>v>.03);
   const over=a.o25>.5;
@@ -639,15 +657,15 @@ function card(m){
     </div>
     <div class="reason"><div class="reason-text">💡 ${reason(m,a)}</div></div>
     <div class="scores">
-      <div class="score"><div class="score-num">${a.sr[0].s}</div><div class="score-pct">${Math.round(a.sr[0].p*100)}%</div></div>
-      <div class="score"><div class="score-num">${a.sr[1].s}</div><div class="score-pct">${Math.round(a.sr[1].p*100)}%</div></div>
+      <div class="score"><div class="score-num">${bestScore.s}</div><div class="score-pct">${Math.round(bestScore.p*100)}%</div></div>
+      ${a.sr[1]?`<div class="score"><div class="score-num">${a.sr[1].s}</div><div class="score-pct">${Math.round(a.sr[1].p*100)}%</div></div>`:''}
     </div>
     ${vals.length?`<div class="value"><span class="value-icon">💰</span><span class="value-text">价值：<span class="value-hl">${vals.map(([k,v])=>`${k==='h'?'主胜':k==='d'?'平局':'客胜'} +${Math.round(v*100)}%`).join('，')}</span></span></div>`:''}
     <div class="detail">
       <button class="detail-btn" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')"><span>📊 详细数据</span> <span class="arrow-icon">▼</span></button>
       <div class="detail-body">
         <div class="d-row"><span class="d-label">预计进球</span><span class="d-value">${(a.hL+a.aL).toFixed(1)}</span></div>
-        <div class="d-row"><span class="d-label">大2.5球</span><span class="d-value ${over?'green':'red'}">${Math.round(a.o25*100)}%</span></div>
+        <div class="d-row"><span class="d-label">大2.5球</span><span class="d-value ${(pred&&pred.ou?pred.ou.includes('大'):over)?'green':'red'}">${pred&&pred.ou_prob?pred.ou_prob:Math.round(a.o25*100)}%</span></div>
         <div class="d-row"><span class="d-label">主胜边际</span><span class="d-value ${a.te.h>0?'green':'red'}">${a.te.h>0?'+':''}${a.te.h.toFixed(1)}%</span></div>
         <div class="d-row"><span class="d-label">平局边际</span><span class="d-value ${a.te.d>0?'green':'red'}">${a.te.d>0?'+':''}${a.te.d.toFixed(1)}%</span></div>
         <div class="d-row"><span class="d-label">客胜边际</span><span class="d-value ${a.te.a>0?'green':'red'}">${a.te.a>0?'+':''}${a.te.a.toFixed(1)}%</span></div>
