@@ -452,7 +452,7 @@ function ana(m){
   const sr=srDir.filter(x=>finalO25>.5?(x.hg+x.ag>=3):(x.hg+x.ag<=2)).slice(0,3);
   if(!sr.length){const fb=srDir[0]||srAll[0]||{s:'1-0',p:.1};sr.push(fb);}
   // 同步大小球: 如果推荐比分和o25矛盾, 修正o25
-  if(sr[0]){const st=sr[0].hg+sr[0].ag;if(st>=3&&!ou)ou=true;if(st<=2&&ou)ou=false;}
+
   
   // ===== 大小球（从CRS + 泊松综合） =====
   let o25=hasCrs?0:0.5;
