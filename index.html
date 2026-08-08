@@ -448,20 +448,17 @@ function ana(m){
   // ===== 比分概率 (过滤方向) =====
   const _mx=ph>=pd&&ph>=pa?'h':pa>=pd?'a':'d';
   const srAll=hasCrs?Object.entries(cp).map(([k,p])=>({s:`${+k.slice(1,3)}-${+k.slice(4,6)}`,p,hg:+k.slice(1,3),ag:+k.slice(4,6)})).sort((a,b)=>b.p-a.p):[{s:'1-0',p:0.12,hg:1,ag:0},{s:'2-1',p:0.10,hg:2,ag:1},{s:'1-1',p:0.10,hg:1,ag:1}];
-  const srDir=srAll.filter(x=>_mx==='h'?x.hg>x.ag:_mx==='a'?x.ag>x.hg:x.hg===x.ag);
-  const sr=srDir.filter(x=>finalO25>.5?(x.hg+x.ag>=3):(x.hg+x.ag<=2)).slice(0,3);
-  if(!sr.length){const fb=srDir[0]||srAll[0]||{s:'1-0',p:.1};sr.push(fb);}
-  // 同步大小球: 如果推荐比分和o25矛盾, 修正o25
-
-  
   // ===== 大小球（从CRS + 泊松综合） =====
   let o25=hasCrs?0:0.5;
   if(hasCrs)for(const[k,v]of Object.entries(cp))if(+k.slice(1,3)+ +k.slice(4,6)>=3)o25+=v;
-  // 泊松大小球
   let po25=0;
   for(let i=0;i<=6;i++)for(let j=0;j<=6;j++)if(i+j>=3)po25+=poisson(i,hL)*poisson(j,aL);
-  // 综合大小球
   const finalO25=o25*0.6+po25*0.4;
+  
+  // ===== 比分概率 (过滤方向+大小球) =====
+  const srDir=srAll.filter(x=>_mx==='h'?x.hg>x.ag:_mx==='a'?x.ag>x.hg:x.hg===x.ag);
+  const sr=srDir.filter(x=>finalO25>.5?(x.hg+x.ag>=3):(x.hg+x.ag<=2)).slice(0,3);
+  if(!sr.length){const fb=srDir[0]||srAll[0]||{s:'1-0',p:.1};sr.push(fb);}
   
   // ===== 真实边际（mk已在前面计算） =====
   const te={h:(ph-mk.h)*100,d:(pd-mk.d)*100,a:(pa-mk.a)*100};
