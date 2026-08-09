@@ -1,16 +1,66 @@
 {
-  "updated": "2026-08-09 10:03 UTC",
+  "updated": "2026-08-09 12:15 UTC",
   "summary": {
-    "total": 61,
+    "total": 63,
     "spf_hit": 50,
-    "spf_rate": 82,
-    "score_hit": 24,
-    "score_rate": 39,
-    "goal_hit": 46,
+    "spf_rate": 79,
+    "score_hit": 25,
+    "score_rate": 40,
+    "goal_hit": 47,
     "goal_rate": 75,
-    "roi": 47.5
+    "roi": 42.9
   },
   "matches": [
+    {
+      "key": "2026-08-09_长崎航海_京都",
+      "date": "2026-08-09",
+      "league": "J联赛",
+      "home": "长崎航海",
+      "away": "京都",
+      "home_score": 2,
+      "away_score": 1,
+      "prediction": {
+        "pick": "客胜",
+        "prob": 38,
+        "score": "1-1",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 2.88,
+        "draw": 3.1,
+        "away": 2.18
+      }
+    },
+    {
+      "key": "2026-08-09_东京绿茵_川崎前锋",
+      "date": "2026-08-09",
+      "league": "J联赛",
+      "home": "东京绿茵",
+      "away": "川崎前锋",
+      "home_score": 1,
+      "away_score": 1,
+      "prediction": {
+        "pick": "客胜",
+        "prob": 38,
+        "score": "1-1",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "✅",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 3.15,
+        "draw": 3.02,
+        "away": 2.08
+      }
+    },
     {
       "key": "2026-08-07_维多利亚_巴竞技",
       "date": "2026-08-07",
