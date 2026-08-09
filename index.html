@@ -503,14 +503,36 @@ function genForm(name){
 function reason(m,a){
   const mx=Math.max(a.h,a.d,a.a);
   const pick=a.h===mx?'主队':a.a===mx?'客队':'两队';
-  let r=`${a.models}模型加权分析（CRS+让球+半全场），${pick}概率最高`;
-  r+=`，场均进球主${a.hL.toFixed(1)}客${a.aL.toFixed(1)}`;
-  const edges=[];
-  if(Math.abs(a.te.h)>2)edges.push(`主胜${a.te.h>0?'低估':'高估'}${Math.abs(a.te.h).toFixed(1)}%`);
-  if(Math.abs(a.te.d)>2)edges.push(`平局${a.te.d>0?'低估':'高估'}${Math.abs(a.te.d).toFixed(1)}%`);
-  if(Math.abs(a.te.a)>2)edges.push(`客胜${a.te.a>0?'低估':'高估'}${Math.abs(a.te.a).toFixed(1)}%`);
-  if(edges.length)r+=`，${edges.join('，')}`;
-  return r+'。';
+  const conf='★'.repeat(a.conf)+'☆'.repeat(5-a.conf);
+  let r=`7维推演 ${conf} · ${pick}概率最高`;
+  
+  // CRS分析
+  const cp=crsP(m.crs);
+  const hasCrs=Object.keys(cp).length>0;
+  if(hasCrs){
+    const crsH={h:0,d:0,a:0};
+    for(const[k,v]of Object.entries(cp)){
+      const g=+k.slice(1,3),e=+k.slice(4,6);
+      if(g>e)crsH.h+=v;else if(g===e)crsH.d+=v;else crsH.a+=v;
+    }
+    r+=` | CRS：主${Math.round(crsH.h*100)}% 平${Math.round(crsH.d*100)}% 客${Math.round(crsH.a*100)}%`;
+  }
+  
+  // 市场概率
+  const mk={h:1/m.odds.home,d:1/m.odds.draw,a:1/m.odds.away};
+  const ms=mk.h+mk.d+mk.a;mk.h/=ms;mk.d/=ms;mk.a/=ms;
+  r+=` | 市场：主${Math.round(mk.h*100)}% 平${Math.round(mk.d*100)}% 客${Math.round(mk.a*100)}%`;
+  
+  // 泊松进球
+  r+=` | 泊松：主${a.hL.toFixed(1)}球 客${a.aL.toFixed(1)}球`;
+  
+  // 价值发现
+  const vals=Object.entries(a.val).filter(([_,v])=>v>.03);
+  if(vals.length){
+    r+=` | 价值：${vals.map(([k,v])=>(k==='h'?'主胜':k==='d'?'平局':'客胜')+'+'+Math.round(v*100)+'%').join('，')}`;
+  }
+  
+  return r;
 }
 
 // ===== 新增：倒计时功能 =====
