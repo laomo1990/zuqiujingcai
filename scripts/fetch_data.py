@@ -2,6 +2,7 @@
 """足球数据自动抓取 — 带持久化预测存储"""
 
 import json, os, re, math
+from scripts.prediction_engine import predict_match
 from urllib.request import urlopen, Request
 from datetime import datetime, timezone, timedelta
 
@@ -113,7 +114,7 @@ def fetch_sporttery():
     return matches
 
 def make_prediction(m):
-    """为单场比赛生成预测（多模型加权+平局增强）"""
+    """为单场比赛生成预测（多维度推演引擎v2.0）"""
     if not m["crs"]: return None
     cp = crs_to_probs(m["crs"])
     
