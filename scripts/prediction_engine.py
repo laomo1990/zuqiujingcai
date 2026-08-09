@@ -5,7 +5,10 @@
 """
 
 import math
+import json
+import os
 from typing import Dict, List, Optional
+from collections import defaultdict
 
 def poisson_pmf(k: int, lam: float) -> float:
     if lam <= 0: return 1.0 if k == 0 else 0.0
@@ -41,15 +44,50 @@ def get_league_cfg(league):
             return v
     return LEAGUE_CFG['default']
 
+def load_team_stats():
+    """从历史数据加载球队战绩"""
+    stats = defaultdict(lambda: {'w': 0, 'd': 0, 'l': 0, 'gf': 0, 'ga': 0, 'matches': 0, 'recent': []})
+    history_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'history.json')
+    if not os.path.exists(history_path):
+        return stats
+    try:
+        with open(history_path, 'r', encoding='utf-8') as f:
+            h = json.load(f)
+        for m in h.get('matches', []):
+            home, away = m['home'], m['away']
+            hs, as_ = m['home_score'], m['away_score']
+            # 主队
+            stats[home]['matches'] += 1
+            stats[home]['gf'] += hs
+            stats[home]['ga'] += as_
+            if hs > as_: stats[home]['w'] += 1; stats[home]['recent'].append('W')
+            elif hs == as_: stats[home]['d'] += 1; stats[home]['recent'].append('D')
+            else: stats[home]['l'] += 1; stats[home]['recent'].append('L')
+            # 客队
+            stats[away]['matches'] += 1
+            stats[away]['gf'] += as_
+            stats[away]['ga'] += hs
+            if as_ > hs: stats[away]['w'] += 1; stats[away]['recent'].append('W')
+            elif hs == as_: stats[away]['d'] += 1; stats[away]['recent'].append('D')
+            else: stats[away]['l'] += 1; stats[away]['recent'].append('L')
+    except:
+        pass
+    return stats
+
+TEAM_STATS = load_team_stats()
+
 WEIGHTS = {
-    'crs': 0.25,
-    'market': 0.20,
-    'handicap': 0.12,
-    'htft': 0.08,
-    'poisson': 0.10,
-    'league': 0.05,
-    'draw_signal': 0.05,
-    'away_boost': 0.15
+    'crs': 0.20,
+    'market': 0.15,
+    'handicap': 0.10,
+    'htft': 0.06,
+    'poisson': 0.08,
+    'league': 0.04,
+    'draw_signal': 0.04,
+    'away_boost': 0.12,
+    'recent_form': 0.12,
+    'head_to_head': 0.05,
+    'schedule': 0.04
 }
 
 class PredictionEngine:
@@ -73,9 +111,12 @@ class PredictionEngine:
         league_hda = self._dim_league()
         draw_sig = self._dim_draw_signal()
         away_boost = self._dim_away_boost()
+        recent_form = self._dim_recent_form()
+        head_to_head = self._dim_head_to_head()
+        schedule = self._dim_schedule()
 
-        dims = [crs_hda, market_hda, hc_hda, ht_hda, poisson_hda, league_hda, draw_sig, away_boost]
-        keys = ['crs', 'market', 'handicap', 'htft', 'poisson', 'league', 'draw_signal', 'away_boost']
+        dims = [crs_hda, market_hda, hc_hda, ht_hda, poisson_hda, league_hda, draw_sig, away_boost, recent_form, head_to_head, schedule]
+        keys = ['crs', 'market', 'handicap', 'htft', 'poisson', 'league', 'draw_signal', 'away_boost', 'recent_form', 'head_to_head', 'schedule']
 
         ph = sum(d['h'] * WEIGHTS[k] for d, k in zip(dims, keys))
         pd = sum(d['d'] * WEIGHTS[k] for d, k in zip(dims, keys))
@@ -113,7 +154,7 @@ class PredictionEngine:
         mx = max(ph, pd, pa)
         pick = '主胜' if ph == mx else ('客胜' if pa == mx else '平局')
 
-        self._build_reasons(crs_hda, market_hda, hc_hda, ht_hda, poisson_hda, league_hda, draw_sig, away_boost)
+        self._build_reasons(crs_hda, market_hda, hc_hda, ht_hda, poisson_hda, league_hda, draw_sig, away_boost, recent_form, head_to_head, schedule)
 
         return {
             'h': ph, 'd': pd, 'a': pa, 'hL': hL, 'aL': aL,
@@ -260,6 +301,155 @@ class PredictionEngine:
         self.dimensions['away_boost'] = {'status': 'ok', 'h': h/t, 'd': d/t, 'a': a/t, 'signals': signals}
         return self.dimensions['away_boost']
 
+    def _dim_recent_form(self):
+        """维度9: 近期战绩分析"""
+        home = self.match['home']['name'] if isinstance(self.match['home'], dict) else self.match['home']
+        away = self.match['away']['name'] if isinstance(self.match['away'], dict) else self.match['away']
+        
+        h_stats = TEAM_STATS.get(home, {'w': 0, 'd': 0, 'l': 0, 'matches': 0, 'recent': []})
+        a_stats = TEAM_STATS.get(away, {'w': 0, 'd': 0, 'l': 0, 'matches': 0, 'recent': []})
+        
+        h, d, a = 0.40, 0.25, 0.35
+        signals = []
+        
+        # 主队近期表现
+        if h_stats['matches'] >= 2:
+            h_wr = h_stats['w'] / h_stats['matches']
+            recent = h_stats['recent'][:5]
+            recent_w = sum(1 for r in recent if r == 'W')
+            
+            if h_wr >= 0.6:
+                h += 0.08
+                signals.append(f"主队近期{recent_w}/{len(recent)}胜")
+            elif h_wr <= 0.2:
+                h -= 0.05
+                signals.append(f"主队近期低迷{recent_w}/{len(recent)}胜")
+        
+        # 客队近期表现
+        if a_stats['matches'] >= 2:
+            a_wr = a_stats['w'] / a_stats['matches']
+            recent = a_stats['recent'][:5]
+            recent_w = sum(1 for r in recent if r == 'W')
+            
+            if a_wr >= 0.6:
+                a += 0.08
+                signals.append(f"客队近期{recent_w}/{len(recent)}胜")
+            elif a_wr <= 0.2:
+                a -= 0.05
+                signals.append(f"客队近期低迷{recent_w}/{len(recent)}胜")
+        
+        # 进攻/防守效率
+        if h_stats['matches'] >= 3:
+            h_gpg = h_stats['gf'] / h_stats['matches']
+            if h_gpg >= 2.0:
+                h += 0.03
+                signals.append(f"主队场均{h_gpg:.1f}球")
+        
+        if a_stats['matches'] >= 3:
+            a_gpg = a_stats['gf'] / a_stats['matches']
+            if a_gpg >= 2.0:
+                a += 0.03
+                signals.append(f"客队场均{a_gpg:.1f}球")
+        
+        t = h + d + a
+        if t > 0: h /= t; d /= t; a /= t
+        
+        self.dimensions['recent_form'] = {'status': 'ok', 'h': h, 'd': d, 'a': a, 'signals': signals}
+        return self.dimensions['recent_form']
+
+    def _dim_head_to_head(self):
+        """维度10: 历史交锋分析"""
+        home = self.match['home']['name'] if isinstance(self.match['home'], dict) else self.match['home']
+        away = self.match['away']['name'] if isinstance(self.match['away'], dict) else self.match['away']
+        
+        h, d, a = 0.40, 0.25, 0.35
+        signals = []
+        
+        # 从历史数据找交锋记录
+        history_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'history.json')
+        if os.path.exists(history_path):
+            try:
+                with open(history_path, 'r', encoding='utf-8') as f:
+                    hist = json.load(f)
+                
+                h2h = []
+                for m in hist.get('matches', []):
+                    if (m['home'] == home and m['away'] == away) or (m['home'] == away and m['away'] == home):
+                        h2h.append(m)
+                
+                if h2h:
+                    h_w = sum(1 for m in h2h if (m['home'] == home and m['home_score'] > m['away_score']) or 
+                              (m['away'] == home and m['away_score'] > m['home_score']))
+                    d_count = sum(1 for m in h2h if m['home_score'] == m['away_score'])
+                    a_w = len(h2h) - h_w - d_count
+                    
+                    if h_w > a_w:
+                        h += 0.06
+                        signals.append(f"交锋主队{h_w}胜{d_count}平{a_w}负")
+                    elif a_w > h_w:
+                        a += 0.06
+                        signals.append(f"交锋客队{a_w}胜{d_count}平{h_w}负")
+                    else:
+                        d += 0.03
+                        signals.append(f"交锋势均力敌{h_w}胜{d_count}平{a_w}负")
+            except:
+                pass
+        
+        if not signals:
+            signals.append("无交锋记录")
+        
+        t = h + d + a
+        if t > 0: h /= t; d /= t; a /= t
+        
+        self.dimensions['head_to_head'] = {'status': 'ok', 'h': h, 'd': d, 'a': a, 'signals': signals}
+        return self.dimensions['head_to_head']
+
+    def _dim_schedule(self):
+        """维度11: 赛程密度分析"""
+        h, d, a = 0.40, 0.25, 0.35
+        signals = []
+        
+        home = self.match['home']['name'] if isinstance(self.match['home'], dict) else self.match['home']
+        away = self.match['away']['name'] if isinstance(self.match['away'], dict) else self.match['away']
+        
+        # 从历史数据计算赛程密度
+        history_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'history.json')
+        if os.path.exists(history_path):
+            try:
+                with open(history_path, 'r', encoding='utf-8') as f:
+                    hist = json.load(f)
+                
+                from datetime import datetime, timedelta
+                match_date = self.match.get('date', '')
+                if match_date:
+                    try:
+                        target = datetime.strptime(match_date, '%Y-%m-%d')
+                    except:
+                        target = None
+                    
+                    if target:
+                        # 主队近7天比赛数
+                        h_recent = sum(1 for m in hist.get('matches', []) 
+                                      if m['home'] == home or m['away'] == home)
+                        # 客队近7天比赛数
+                        a_recent = sum(1 for m in hist.get('matches', []) 
+                                      if m['home'] == away or m['away'] == away)
+                        
+                        if h_recent > a_recent + 2:
+                            a += 0.04
+                            signals.append(f"主队赛程密集({h_recent}场)")
+                        elif a_recent > h_recent + 2:
+                            h += 0.04
+                            signals.append(f"客队赛程密集({a_recent}场)")
+            except:
+                pass
+        
+        t = h + d + a
+        if t > 0: h /= t; d /= t; a /= t
+        
+        self.dimensions['schedule'] = {'status': 'ok', 'h': h, 'd': d, 'a': a, 'signals': signals}
+        return self.dimensions['schedule']
+
     def _dim_draw_signal(self):
         h, d, a = 0.40, 0.25, 0.35
         signals = []
@@ -299,7 +489,7 @@ class PredictionEngine:
         if max_std < 0.15: return 2
         return 1
 
-    def _build_reasons(self, crs, market, hc, ht, poisson, league, draw_sig, away_boost=None):
+    def _build_reasons(self, crs, market, hc, ht, poisson, league, draw_sig, away_boost=None, recent_form=None, head_to_head=None, schedule=None):
         self.reasons = []
         if crs.get('status') == 'ok':
             self.reasons.append(f"CRS赔率：主{crs['h']:.0%} 平{crs['d']:.0%} 客{crs['a']:.0%}")
@@ -315,6 +505,12 @@ class PredictionEngine:
             self.reasons.append(f"平局信号：{', '.join(draw_sig['signals'])}")
         if away_boost and away_boost.get('signals'):
             self.reasons.append(f"客胜信号：{', '.join(away_boost['signals'])}")
+        if recent_form and recent_form.get('signals'):
+            self.reasons.append(f"近期战绩：{', '.join(recent_form['signals'])}")
+        if head_to_head and head_to_head.get('signals'):
+            self.reasons.append(f"交锋记录：{', '.join(head_to_head['signals'])}")
+        if schedule and schedule.get('signals'):
+            self.reasons.append(f"赛程分析：{', '.join(schedule['signals'])}")
 
 
 def predict_match(match):
