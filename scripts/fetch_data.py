@@ -2,7 +2,9 @@
 """足球数据自动抓取 — 带持久化预测存储"""
 
 import json, os, re, math
-from scripts.prediction_engine import predict_match
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from prediction_engine import predict_match
 from urllib.request import urlopen, Request
 from datetime import datetime, timezone, timedelta
 
