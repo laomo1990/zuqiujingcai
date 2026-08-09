@@ -386,6 +386,115 @@ body{font-family:'Inter','PingFang SC','Source Han Sans','Microsoft YaHei',sans-
   .sim-modal{width:95%;border-radius:12px}
   .sim-opt{padding:7px 3px;font-size:11px}
 }
+
+/* ===== Theme Toggle ===== */
+body.light-mode{--bg:#F8FAFC;--card-bg:#FFFFFF;--text:#1E293B;--text-secondary:#475569;--text-muted:#94A3B8;--divider:rgba(59,130,246,0.1)}
+body.light-mode .topnav{background:rgba(248,250,252,0.96)}
+body.light-mode .topnav-title{color:#1E293B}
+body.light-mode .card{box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+body.light-mode .stat{box-shadow:0 2px 12px rgba(0,0,0,0.04)}
+body.light-mode .odds-row{background:rgba(248,250,252,0.8)}
+body.light-mode .reason{background:rgba(248,250,252,0.7)}
+body.light-mode .detail-btn{background:rgba(248,250,252,0.7)}
+body.light-mode .detail-body{background:rgba(248,250,252,0.7)}
+body.light-mode .score{background:rgba(248,250,252,0.7)}
+body.light-mode .sim-overlay{background:rgba(0,0,0,0.4)}
+body.light-mode .parlay-sheet{box-shadow:0 -4px 20px rgba(0,0,0,0.1)}
+body.light-mode .parlay-item{background:rgba(248,250,252,0.8)}
+body.light-mode .h-row{background:#FFFFFF}
+body.light-mode .h-row:nth-child(even){background:rgba(248,250,252,0.5)}
+body.light-mode .sim-match{background:rgba(248,250,252,0.7)}
+body.light-mode .sim-opt{background:rgba(248,250,252,0.5)}
+body.light-mode .panel-section{background:rgba(248,250,252,0.7)}
+body.light-mode .bottom-nav{background:rgba(248,250,252,0.98)}
+body.light-mode .filter-sheet{background:#FFFFFF}
+body.light-mode .model-modal{background:#FFFFFF}
+body.light-mode .filter-sidebar{background:#FFFFFF}
+.theme-toggle{width:36px;height:36px;border-radius:8px;border:1px solid rgba(59,130,246,0.3);background:rgba(59,130,246,0.08);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .25s ease}
+.theme-toggle:hover{background:rgba(59,130,246,0.18);border-color:rgba(59,130,246,0.5)}
+
+/* ===== Filter Toggle ===== */
+.filter-toggle-btn{width:36px;height:36px;border-radius:8px;border:1px solid rgba(59,130,246,0.3);background:rgba(59,130,246,0.08);color:var(--primary);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;transition:all .25s ease}
+.filter-badge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;border-radius:8px;background:var(--danger);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 3px}
+
+/* ===== Filter Sidebar (PC) ===== */
+.filter-sidebar{display:none}
+@media(min-width:1025px){
+  .filter-sidebar{display:block;position:fixed;left:0;top:52px;bottom:0;width:200px;background:var(--card-bg);border-right:1px solid var(--divider);z-index:99;overflow-y:auto;padding:16px 12px;transition:transform .3s ease}
+  .filter-sidebar.collapsed{transform:translateX(-200px)}
+  body.filter-open .app{margin-left:200px}
+}
+.filter-section{margin-bottom:16px}
+.filter-section-title{font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:.5px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(59,130,246,0.08)}
+.filter-checkbox{display:flex;align-items:center;gap:8px;padding:6px 4px;cursor:pointer;font-size:13px;color:var(--text-secondary);transition:color .2s;min-height:36px}
+.filter-checkbox:hover{color:var(--primary)}
+.filter-checkbox input[type="checkbox"]{width:16px;height:16px;accent-color:var(--primary);cursor:pointer}
+.filter-radio{display:flex;align-items:center;gap:8px;padding:6px 4px;cursor:pointer;font-size:13px;color:var(--text-secondary);transition:color .2s;min-height:36px}
+.filter-radio:hover{color:var(--primary)}
+.filter-radio input[type="radio"]{accent-color:var(--primary);cursor:pointer}
+.filter-stars{display:flex;gap:4px;flex-wrap:wrap}
+.filter-star-btn{padding:4px 8px;border-radius:6px;border:1px solid rgba(59,130,246,0.12);background:var(--card-bg);color:var(--text-muted);font-size:12px;cursor:pointer;transition:all .2s;min-height:32px;min-width:32px;display:flex;align-items:center;justify-content:center}
+.filter-star-btn.active{background:rgba(245,158,11,0.15);border-color:var(--warning);color:var(--warning)}
+.filter-clear-btn{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(239,68,68,0.2);background:rgba(239,68,68,0.06);color:var(--danger);font-size:12px;cursor:pointer;transition:all .2s;margin-top:12px}
+.filter-clear-btn:hover{background:rgba(239,68,68,0.12)}
+
+/* ===== Filter Bottom Sheet (Mobile) ===== */
+.filter-sheet-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100}
+.filter-sheet-overlay.show{display:block}
+.filter-sheet{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--card-bg);border-top:1px solid rgba(59,130,246,0.15);border-radius:16px 16px 0 0;z-index:101;max-height:70vh;overflow-y:auto;padding:16px;box-shadow:0 -8px 40px rgba(0,0,0,0.5);transform:translateY(100%);transition:transform .35s cubic-bezier(.22,1,.36,1)}
+.filter-sheet.show{display:block;transform:translateY(0)}
+@media(min-width:1025px){.filter-toggle-btn{display:none}.filter-sheet-overlay,.filter-sheet{display:none!important}}
+
+/* ===== Favorite Star ===== */
+.fav-star{width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:var(--text-muted);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;padding:0;line-height:1}
+.fav-star:hover{color:var(--warning);transform:scale(1.2)}
+.fav-star.active{color:var(--warning)}
+.card.fav-card{border-left-color:var(--warning)!important}
+
+/* ===== Model Modal ===== */
+.model-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;justify-content:center;align-items:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.model-modal-overlay.show{display:flex}
+.model-modal{background:var(--card-bg);border:1px solid rgba(59,130,246,0.12);border-radius:16px;width:90%;max-width:500px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,0.5)}
+.model-modal-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid rgba(59,130,246,0.08)}
+.model-modal-title{font-size:18px;font-weight:700;color:var(--text)}
+.model-modal-close{background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;padding:4px}
+.model-modal-close:hover{color:var(--text)}
+.model-modal-body{flex:1;overflow-y:auto;padding:20px}
+.model-section{margin-bottom:20px}
+.model-section-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.model-section-text{font-size:13px;color:var(--text-secondary);line-height:1.8}
+.dim-list{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.dim-item{font-size:12px;color:var(--text-secondary);padding:6px 8px;background:rgba(59,130,246,0.04);border-radius:6px;border:1px solid rgba(59,130,246,0.06)}
+.model-disclaimer{margin-top:16px;padding:12px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;font-size:13px;color:var(--warning);text-align:center;font-weight:600}
+
+/* ===== Bottom Navigation (Mobile) ===== */
+.bottom-nav{display:none}
+@media(max-width:1024px){
+  .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:56px;background:rgba(18,23,35,0.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--divider);z-index:98;align-items:center;justify-content:space-around;padding:0 8px;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .app{padding-bottom:72px!important}
+}
+.bottom-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 12px;border-radius:8px;border:none;background:transparent;color:var(--text-muted);font-size:10px;cursor:pointer;transition:all .2s;min-width:56px;min-height:44px}
+.bottom-nav-item:hover,.bottom-nav-item.active{color:var(--primary)}
+.bottom-nav-icon{font-size:20px;line-height:1}
+.bottom-nav-label{font-size:10px;font-weight:500}
+
+/* ===== Mobile Touch Targets ===== */
+@media(max-width:768px){
+  .topnav-tab{min-height:44px;min-width:44px}
+  .refresh-btn{min-height:44px;min-width:44px}
+  .theme-toggle{min-height:44px;min-width:44px}
+  .filter-toggle-btn{min-height:44px;min-width:44px}
+  .tab{min-height:44px;padding:6px 16px}
+  .fav-star{min-height:44px;min-width:44px}
+  .parlay-add-btn{min-height:44px}
+  .sim-play{min-height:40px;padding:6px 12px}
+  .sim-opt{min-height:40px}
+}
+
+/* ===== Filter toggle collapse ===== */
+.filter-collapse-btn{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(59,130,246,0.12);background:rgba(59,130,246,0.06);color:var(--primary);font-size:12px;cursor:pointer;transition:all .2s;margin-top:8px}
+.filter-collapse-btn:hover{background:rgba(59,130,246,0.12)}
+
 </style>
 </head>
 <body>
@@ -402,8 +511,78 @@ body{font-family:'Inter','PingFang SC','Source Han Sans','Microsoft YaHei',sans-
     </div>
     <div class="topnav-right">
       <button class="refresh-btn" onclick="load()">🔄 刷新</button>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+      <button class="filter-toggle-btn" id="filterToggleBtn" onclick="toggleFilterPanel()">🔍<span class="filter-badge" id="filterBadge" style="display:none">0</span></button>
     </div>
   </nav>
+
+  <!-- Filter Sidebar (PC) -->
+  <aside class="filter-sidebar" id="filterSidebar">
+    <div class="filter-section">
+      <div class="filter-section-title">⭐ 赛事收藏</div>
+      <label class="filter-checkbox"><input type="checkbox" id="filterFav" onchange="applyFilters()"> 仅显示收藏</label>
+    </div>
+    <div class="filter-section">
+      <div class="filter-section-title">🏟️ 联赛筛选</div>
+      <div id="filterLeagues"></div>
+    </div>
+    <div class="filter-section">
+      <div class="filter-section-title">📊 比赛状态</div>
+      <label class="filter-radio"><input type="radio" name="filterStatus" value="all" checked onchange="applyFilters()"> 全部</label>
+      <label class="filter-radio"><input type="radio" name="filterStatus" value="upcoming" onchange="applyFilters()"> 未开赛</label>
+      <label class="filter-radio"><input type="radio" name="filterStatus" value="live" onchange="applyFilters()"> 进行中</label>
+      <label class="filter-radio"><input type="radio" name="filterStatus" value="finished" onchange="applyFilters()"> 已完场</label>
+    </div>
+    <div class="filter-section">
+      <div class="filter-section-title">⭐ 置信度</div>
+      <div class="filter-stars" id="filterStars">
+        <button class="filter-star-btn active" onclick="setConfFilter(0)">全部</button>
+        <button class="filter-star-btn" onclick="setConfFilter(1)">★</button>
+        <button class="filter-star-btn" onclick="setConfFilter(2)">★★</button>
+        <button class="filter-star-btn" onclick="setConfFilter(3)">★★★</button>
+        <button class="filter-star-btn" onclick="setConfFilter(4)">★★★★</button>
+        <button class="filter-star-btn" onclick="setConfFilter(5)">★★★★★</button>
+      </div>
+    </div>
+    <button class="filter-clear-btn" onclick="clearAllFilters()">🗑️ 清除所有筛选</button>
+    <button class="filter-collapse-btn" onclick="toggleFilterSidebar()">◀ 收起面板</button>
+  </aside>
+
+  <!-- Filter Bottom Sheet (Mobile) -->
+  <div class="filter-sheet-overlay" id="filterSheetOverlay" onclick="toggleFilterPanel()"></div>
+  <div class="filter-sheet" id="filterSheet">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <span style="font-size:16px;font-weight:700;color:var(--text)">🔍 筛选</span>
+      <button onclick="toggleFilterPanel()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">✕</button>
+    </div>
+    <div class="filter-section">
+      <div class="filter-section-title">⭐ 赛事收藏</div>
+      <label class="filter-checkbox"><input type="checkbox" id="filterFavMobile" onchange="applyFilters()"> 仅显示收藏</label>
+    </div>
+    <div class="filter-section">
+      <div class="filter-section-title">🏟️ 联赛筛选</div>
+      <div id="filterLeaguesMobile"></div>
+    </div>
+    <div class="filter-section">
+      <div class="filter-section-title">📊 比赛状态</div>
+      <label class="filter-radio"><input type="radio" name="filterStatusMobile" value="all" checked onchange="applyFilters()"> 全部</label>
+      <label class="filter-radio"><input type="radio" name="filterStatusMobile" value="upcoming" onchange="applyFilters()"> 未开赛</label>
+      <label class="filter-radio"><input type="radio" name="filterStatusMobile" value="live" onchange="applyFilters()"> 进行中</label>
+      <label class="filter-radio"><input type="radio" name="filterStatusMobile" value="finished" onchange="applyFilters()"> 已完场</label>
+    </div>
+    <div class="filter-section">
+      <div class="filter-section-title">⭐ 置信度</div>
+      <div class="filter-stars" id="filterStarsMobile">
+        <button class="filter-star-btn active" onclick="setConfFilter(0)">全部</button>
+        <button class="filter-star-btn" onclick="setConfFilter(1)">★</button>
+        <button class="filter-star-btn" onclick="setConfFilter(2)">★★</button>
+        <button class="filter-star-btn" onclick="setConfFilter(3)">★★★</button>
+        <button class="filter-star-btn" onclick="setConfFilter(4)">★★★★</button>
+        <button class="filter-star-btn" onclick="setConfFilter(5)">★★★★★</button>
+      </div>
+    </div>
+    <button class="filter-clear-btn" onclick="clearAllFilters()">🗑️ 清除所有筛选</button>
+  </div>
 
   <!-- Stats -->
   <div class="stats" id="stats">
@@ -466,7 +645,7 @@ body{font-family:'Inter','PingFang SC','Source Han Sans','Microsoft YaHei',sans-
   </div>
 
   <!-- Footer -->
-  <div class="footer">本网站仅提供足球赛事数据统计、模型逻辑推演与教学科普内容，仅供娱乐参考，不构成任何投注建议。体育彩票为公益娱乐，请理性参与，量力而行。</div>
+  <div class="footer">本网站仅提供足球赛事数据统计、模型逻辑推演与教学科普内容，仅供娱乐参考，不构成任何投注建议。体育彩票为公益娱乐，请理性参与，量力而行。<br><a href="javascript:void(0)" onclick="openModelModal()" style="color:var(--primary);text-decoration:underline;cursor:pointer;font-size:12px">📖 模型说明</a></div>
 </div>
 
 <!-- Right Side Tool Panel (PC) -->
@@ -536,6 +715,75 @@ body{font-family:'Inter','PingFang SC','Source Han Sans','Microsoft YaHei',sans-
   </div>
   <button class="parlay-clear" onclick="clearParlay()">🗑️ 清空串关</button>
 </div>
+
+<!-- Model Explanation Modal -->
+<div class="model-modal-overlay" id="modelModalOverlay" onclick="closeModelModal()">
+  <div class="model-modal" onclick="event.stopPropagation()">
+    <div class="model-modal-header">
+      <span class="model-modal-title">🧠 模型说明</span>
+      <button class="model-modal-close" onclick="closeModelModal()">✕</button>
+    </div>
+    <div class="model-modal-body">
+      <div class="model-section">
+        <div class="model-section-title">🎲 泊松分布模型 (Poisson Distribution)</div>
+        <div class="model-section-text">
+          泊松分布是一种统计概率模型，用于预测独立事件在固定时间/空间内发生的次数。在足球预测中，我们根据CRS比分赔率反推两队的期望进球数（λ），再通过泊松公式 P(k) = (λ^k × e^(-λ)) / k! 计算每个比分的概率。主队期望进球 λ<sub>home</sub> 加入主场优势修正（+0.35球），客队 λ<sub>away</sub> 则相应调减。最终综合所有比分概率，得出主胜/平局/客胜的概率分布。
+        </div>
+      </div>
+      <div class="model-section">
+        <div class="model-section-title">📊 CRS赔率模型 (Correct Score)</div>
+        <div class="model-section-text">
+          CRS（Correct Score，正确比分）赔率是竞彩对每个精确比分开出的赔率。通过赔率的倒数（1/赔率）可以得到该比分的隐含概率，归一化后得到所有比分的概率分布。我们从CRS赔率中提取主胜、平局、客胜的概率，并反推两队的期望进球数。CRS模型是本系统权重最高的模型之一（占比35%），因为它直接反映了市场对每个比分的预期。
+        </div>
+      </div>
+      <div class="model-section">
+        <div class="model-section-title">⚡ 多维推演引擎 (14 Dimensions)</div>
+        <div class="model-section-text">
+          系统从14个维度综合分析每场比赛，加权输出最终推荐：
+        </div>
+        <div class="dim-list">
+          <div class="dim-item">① CRS比分概率分布</div>
+          <div class="dim-item">② 让球盘口隐含胜率</div>
+          <div class="dim-item">③ 半全场赔率倾向</div>
+          <div class="dim-item">④ 市场赔率资金流向</div>
+          <div class="dim-item">⑤ 泊松期望进球</div>
+          <div class="dim-item">⑥ 主场优势系数</div>
+          <div class="dim-item">⑦ 联赛进球基准</div>
+          <div class="dim-item">⑧ 大小球概率</div>
+          <div class="dim-item">⑨ 真实边际值</div>
+          <div class="dim-item">⑩ 价值发现指数</div>
+          <div class="dim-item">⑪ 模型一致性</div>
+          <div class="dim-item">⑫ 平局增强信号</div>
+          <div class="dim-item">⑬ 盘口接近度</div>
+          <div class="dim-item">⑭ 多模型加权融合</div>
+        </div>
+      </div>
+      <div class="model-disclaimer">
+        ⚠️ 本模型仅供参考，不构成投注建议
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation (Mobile) -->
+<nav class="bottom-nav" id="bottomNav">
+  <button class="bottom-nav-item active" onclick="switchBottomTab(this,'matches')">
+    <span class="bottom-nav-icon">⚽</span>
+    <span class="bottom-nav-label">赛事</span>
+  </button>
+  <button class="bottom-nav-item" onclick="switchBottomTab(this,'history')">
+    <span class="bottom-nav-icon">📈</span>
+    <span class="bottom-nav-label">复盘</span>
+  </button>
+  <button class="bottom-nav-item" onclick="switchBottomTab(this,'parlay')">
+    <span class="bottom-nav-icon">🎯</span>
+    <span class="bottom-nav-label">串关</span>
+  </button>
+  <button class="bottom-nav-item" onclick="switchBottomTab(this,'community')">
+    <span class="bottom-nav-icon">💬</span>
+    <span class="bottom-nav-label">交流</span>
+  </button>
+</nav>
 
 <script>
 
@@ -1334,6 +1582,238 @@ function renderKeyMatches(){
   }
   el.innerHTML = html;
 }
+
+
+// ===== NEW FEATURES =====
+
+// ===== Theme Toggle =====
+function toggleTheme(){
+  document.body.classList.toggle('light-mode');
+  var isLight=document.body.classList.contains('light-mode');
+  localStorage.setItem('theme',isLight?'light':'dark');
+  document.getElementById('themeToggle').textContent=isLight?'☀️':'🌙';
+}
+(function(){
+  var saved=localStorage.getItem('theme');
+  if(saved==='light'){
+    document.body.classList.add('light-mode');
+    setTimeout(function(){
+      var btn=document.getElementById('themeToggle');
+      if(btn)btn.textContent='☀️';
+    },0);
+  }
+})();
+
+// ===== Favorites =====
+var favorites={};
+try{favorites=JSON.parse(localStorage.getItem('football_favorites')||'{}');}catch(e){favorites={}}
+function toggleFavorite(idx,e){
+  if(e)e.stopPropagation();
+  if(favorites[idx]){delete favorites[idx];}
+  else{favorites[idx]=true;}
+  localStorage.setItem('football_favorites',JSON.stringify(favorites));
+  renderMatches();
+}
+function isFavorite(idx){return!!favorites[idx];}
+
+// ===== Filter State =====
+var filterState={
+  leagues:[],
+  status:'all',
+  confidence:0,
+  favoritesOnly:false
+};
+
+function initFilterPanel(){
+  var allLeagues=[...new Set(M.map(function(m){return m.league}))].sort();
+  var pcEl=document.getElementById('filterLeagues');
+  var mobileEl=document.getElementById('filterLeaguesMobile');
+  var html='';
+  allLeagues.forEach(function(l){
+    html+='<label class="filter-checkbox"><input type="checkbox" value="'+l+'" onchange="toggleLeagueFilter(\''+l+'\')"> '+l+'</label>';
+  });
+  if(pcEl)pcEl.innerHTML=html;
+  if(mobileEl)mobileEl.innerHTML=html;
+}
+
+function toggleLeagueFilter(league){
+  var idx=filterState.leagues.indexOf(league);
+  if(idx>=0)filterState.leagues.splice(idx,1);
+  else filterState.leagues.push(league);
+  syncFilterCheckboxes();
+  applyFilters();
+}
+
+function syncFilterCheckboxes(){
+  document.querySelectorAll('#filterLeagues input[type="checkbox"],#filterLeaguesMobile input[type="checkbox"]').forEach(function(cb){
+    cb.checked=filterState.leagues.indexOf(cb.value)>=0;
+  });
+  var favPc=document.getElementById('filterFav');
+  var favMob=document.getElementById('filterFavMobile');
+  if(favPc)favPc.checked=filterState.favoritesOnly;
+  if(favMob)favMob.checked=filterState.favoritesOnly;
+  var radios=document.querySelectorAll('input[name="filterStatus"],input[name="filterStatusMobile"]');
+  radios.forEach(function(r){r.checked=r.value===filterState.status;});
+  updateStarButtons();
+  updateFilterBadge();
+}
+
+function setConfFilter(n){
+  filterState.confidence=n;
+  updateStarButtons();
+  applyFilters();
+}
+
+function updateStarButtons(){
+  ['filterStars','filterStarsMobile'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(!el)return;
+    var btns=el.querySelectorAll('.filter-star-btn');
+    btns.forEach(function(btn,i){
+      if(i===filterState.confidence)btn.classList.add('active');
+      else btn.classList.remove('active');
+    });
+  });
+}
+
+function clearAllFilters(){
+  filterState.leagues=[];
+  filterState.status='all';
+  filterState.confidence=0;
+  filterState.favoritesOnly=false;
+  syncFilterCheckboxes();
+  applyFilters();
+}
+
+function updateFilterBadge(){
+  var count=0;
+  if(filterState.leagues.length>0)count++;
+  if(filterState.status!=='all')count++;
+  if(filterState.confidence>0)count++;
+  if(filterState.favoritesOnly)count++;
+  var badge=document.getElementById('filterBadge');
+  if(badge){
+    if(count>0){badge.style.display='flex';badge.textContent=count;}
+    else{badge.style.display='none';}
+  }
+}
+
+function applyFilters(){
+  var favPc=document.getElementById('filterFav');
+  var favMob=document.getElementById('filterFavMobile');
+  filterState.favoritesOnly=(favPc&&favPc.checked)||(favMob&&favMob.checked);
+  var statusRadio=document.querySelector('input[name="filterStatus"]:checked');
+  var statusRadioMob=document.querySelector('input[name="filterStatusMobile"]:checked');
+  filterState.status=(statusRadio?statusRadio.value:'all');
+  if(statusRadioMob&&statusRadioMob.value!=='all')filterState.status=statusRadioMob.value;
+  syncFilterCheckboxes();
+  renderMatches();
+}
+
+function toggleFilterPanel(){
+  var sheet=document.getElementById('filterSheet');
+  var overlay=document.getElementById('filterSheetOverlay');
+  if(sheet.classList.contains('show')){
+    sheet.classList.remove('show');
+    overlay.classList.remove('show');
+  }else{
+    sheet.classList.add('show');
+    overlay.classList.add('show');
+  }
+}
+
+function toggleFilterSidebar(){
+  var sb=document.getElementById('filterSidebar');
+  if(sb)sb.classList.toggle('collapsed');
+  document.body.classList.toggle('filter-open');
+}
+
+// ===== Model Modal =====
+function openModelModal(){
+  document.getElementById('modelModalOverlay').classList.add('show');
+}
+function closeModelModal(){
+  document.getElementById('modelModalOverlay').classList.remove('show');
+}
+
+// ===== Bottom Navigation =====
+function switchBottomTab(btn,section){
+  document.querySelectorAll('.bottom-nav-item').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  if(section==='parlay'){
+    toggleParlayPanel();
+  }else{
+    var el=document.getElementById(section);
+    if(el)el.scrollIntoView({behavior:'smooth'});
+  }
+}
+
+// ===== Override renderMatches for filtering + favorites =====
+var _origRenderMatches=renderMatches;
+renderMatches=function(){
+  var now=new Date();
+  var ms;
+  if(F==='all'){ms=M.slice();}
+  else{ms=M.filter(function(m){return m.league===F;});}
+
+  // Apply additional filters
+  // League filter
+  if(filterState.leagues.length>0){
+    ms=ms.filter(function(m){return filterState.leagues.indexOf(m.league)>=0;});
+  }
+  // Status filter
+  if(filterState.status==='upcoming'){
+    ms=ms.filter(function(m){return new Date(m.time)>now;});
+  }else if(filterState.status==='live'){
+    ms=ms.filter(function(m){var t=new Date(m.time);return t<=now;});
+  }else{
+    ms=ms.filter(function(m){return new Date(m.time)>now;});
+  }
+  // Confidence filter
+  if(filterState.confidence>0){
+    ms=ms.filter(function(m){
+      try{var a=ana(m);return a.conf>=filterState.confidence;}catch(e){return false;}
+    });
+  }
+  // Favorites filter
+  if(filterState.favoritesOnly){
+    ms=ms.filter(function(m,idx){return isFavorite(M.indexOf(m));});
+  }
+
+  ms.sort(function(a,b){
+    var fa=isFavorite(M.indexOf(a))?1:0;
+    var fb=isFavorite(M.indexOf(b))?1:0;
+    if(fa!==fb)return fb-fa;
+    return new Date(a.time)-new Date(b.time);
+  });
+
+  if(!ms.length){
+    document.getElementById('matches').innerHTML='<div style="text-align:center;padding:60px;color:#8892a0">📅 暂无赛事</div>';
+    return;
+  }
+  document.getElementById('matches').innerHTML=ms.map(card).join('');
+};
+
+// Override card to add favorite star
+var _origCard=card;
+card=function(m){
+  var html=_origCard(m);
+  var idx=M.indexOf(m);
+  var favClass=isFavorite(idx)?' active':'';
+  var starHtml='<button class="fav-star'+favClass+'" onclick="toggleFavorite('+idx+',event)">'+(isFavorite(idx)?'★':'☆')+'</button>';
+  html=html.replace('<span class="card-toggle" id="toggle-'+idx+'">▼</span>',starHtml+'<span class="card-toggle" id="toggle-'+idx+'">▼</span>');
+  if(isFavorite(idx)){
+    html=html.replace('class="card"','class="card fav-card"');
+  }
+  return html;
+};
+
+// Initialize filter panel after load
+var _origLoad=load;
+load=async function(){
+  await _origLoad();
+  try{initFilterPanel();}catch(e){console.log('filter init failed:',e);}
+};
 
 // ===== 启动 =====
 load();
