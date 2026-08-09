@@ -42,13 +42,14 @@ def get_league_cfg(league):
     return LEAGUE_CFG['default']
 
 WEIGHTS = {
-    'crs': 0.30,
-    'market': 0.25,
-    'handicap': 0.15,
-    'htft': 0.10,
+    'crs': 0.25,
+    'market': 0.20,
+    'handicap': 0.12,
+    'htft': 0.08,
     'poisson': 0.10,
     'league': 0.05,
-    'draw_signal': 0.05
+    'draw_signal': 0.05,
+    'away_boost': 0.15
 }
 
 class PredictionEngine:
@@ -71,9 +72,10 @@ class PredictionEngine:
         poisson_hda = self._dim_poisson()
         league_hda = self._dim_league()
         draw_sig = self._dim_draw_signal()
+        away_boost = self._dim_away_boost()
 
-        dims = [crs_hda, market_hda, hc_hda, ht_hda, poisson_hda, league_hda, draw_sig]
-        keys = ['crs', 'market', 'handicap', 'htft', 'poisson', 'league', 'draw_signal']
+        dims = [crs_hda, market_hda, hc_hda, ht_hda, poisson_hda, league_hda, draw_sig, away_boost]
+        keys = ['crs', 'market', 'handicap', 'htft', 'poisson', 'league', 'draw_signal', 'away_boost']
 
         ph = sum(d['h'] * WEIGHTS[k] for d, k in zip(dims, keys))
         pd = sum(d['d'] * WEIGHTS[k] for d, k in zip(dims, keys))
@@ -111,7 +113,7 @@ class PredictionEngine:
         mx = max(ph, pd, pa)
         pick = '主胜' if ph == mx else ('客胜' if pa == mx else '平局')
 
-        self._build_reasons(crs_hda, market_hda, hc_hda, ht_hda, poisson_hda, league_hda, draw_sig)
+        self._build_reasons(crs_hda, market_hda, hc_hda, ht_hda, poisson_hda, league_hda, draw_sig, away_boost)
 
         return {
             'h': ph, 'd': pd, 'a': pa, 'hL': hL, 'aL': aL,
@@ -210,6 +212,54 @@ class PredictionEngine:
         self.dimensions['league'] = {'status': 'ok', 'h': h/t, 'd': d/t, 'a': a/t, 'name': self.league}
         return self.dimensions['league']
 
+    def _dim_away_boost(self):
+        """维度8: 客胜增强信号"""
+        h, d, a = 0.40, 0.25, 0.35
+        signals = []
+        
+        # 信号1: 市场客胜赔率低（客队被看好）
+        if self.odds.get('away'):
+            away_odds = self.odds['away']
+            if away_odds < 2.0:
+                a += 0.15
+                signals.append(f"客赔极低({away_odds})")
+            elif away_odds < 2.5:
+                a += 0.10
+                signals.append(f"客赔偏低({away_odds})")
+            elif away_odds < 3.0:
+                a += 0.05
+        
+        # 信号2: 让球盘口+1以上（客队让球）
+        line = float(self.handicap.get('line', '0') or '0')
+        if line >= 1.0:
+            a += 0.10
+            signals.append(f"客队让{line}球")
+        elif line >= 0.5:
+            a += 0.05
+            signals.append(f"客队让{line}球")
+        
+        # 信号3: CRS客胜概率高
+        if self.crs:
+            cp = crs_to_probs(self.crs)
+            away_crs = sum(v for k, v in cp.items() if int(k[1:3]) < int(k[4:6]))
+            if away_crs > 0.40:
+                a += 0.08
+                signals.append(f"CRS客胜{away_crs:.0%}")
+            elif away_crs > 0.35:
+                a += 0.04
+        
+        # 信号4: 半全场客胜概率高
+        if self.htft:
+            ah = sum(v for k, v in self.htft.items() if k[0] == 'a' and v > 0)
+            total = sum(v for v in self.htft.values() if v > 0)
+            if total > 0 and ah/total > 0.35:
+                a += 0.05
+                signals.append(f"半全场客胜{ah/total:.0%}")
+        
+        t = h + d + a
+        self.dimensions['away_boost'] = {'status': 'ok', 'h': h/t, 'd': d/t, 'a': a/t, 'signals': signals}
+        return self.dimensions['away_boost']
+
     def _dim_draw_signal(self):
         h, d, a = 0.40, 0.25, 0.35
         signals = []
@@ -249,7 +299,7 @@ class PredictionEngine:
         if max_std < 0.15: return 2
         return 1
 
-    def _build_reasons(self, crs, market, hc, ht, poisson, league, draw_sig):
+    def _build_reasons(self, crs, market, hc, ht, poisson, league, draw_sig, away_boost=None):
         self.reasons = []
         if crs.get('status') == 'ok':
             self.reasons.append(f"CRS赔率：主{crs['h']:.0%} 平{crs['d']:.0%} 客{crs['a']:.0%}")
@@ -263,6 +313,8 @@ class PredictionEngine:
             self.reasons.append(f"{league['name']}：主场优势{self.lc['home_adv']:.0%}")
         if draw_sig.get('signals'):
             self.reasons.append(f"平局信号：{', '.join(draw_sig['signals'])}")
+        if away_boost and away_boost.get('signals'):
+            self.reasons.append(f"客胜信号：{', '.join(away_boost['signals'])}")
 
 
 def predict_match(match):
