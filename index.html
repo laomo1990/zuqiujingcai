@@ -253,6 +253,52 @@ body{font-family:'Inter','PingFang SC','Source Han Sans','Microsoft YaHei',sans-
 .sim-opt .opt-label{font-weight:600;color:var(--text-secondary)}
 .sim-opt .opt-odds{font-size:11px;margin-top:2px}
 
+/* ===== Right Side Tool Panel ===== */
+.right-panel{display:none}
+@media(min-width:1025px){
+  .app{margin-right:300px}
+  .right-panel{display:block;position:fixed;right:0;top:0;bottom:0;width:280px;background:var(--card-bg);border-left:1px solid var(--divider);z-index:100;overflow-y:auto;padding:60px 14px 20px}
+}
+.panel-section{margin-bottom:16px;padding:14px;background:rgba(18,23,35,0.7);border:1px solid rgba(59,130,246,0.1);border-radius:12px}
+.panel-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.parlay-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;max-height:200px;overflow-y:auto}
+.parlay-item{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(30,37,54,0.8);border:1px solid rgba(59,130,246,0.08);border-radius:8px;font-size:12px}
+.parlay-item-teams{flex:1;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:6px}
+.parlay-item-pick{color:var(--primary);font-weight:600;margin-right:8px;white-space:nowrap}
+.parlay-item-odds{color:var(--warning);font-weight:700;margin-right:8px;white-space:nowrap}
+.parlay-item-remove{width:20px;height:20px;border-radius:50%;border:none;background:rgba(239,68,68,0.15);color:var(--danger);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s ease;flex-shrink:0}
+.parlay-item-remove:hover{background:rgba(239,68,68,0.3)}
+.parlay-types{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.parlay-type-btn{padding:4px 10px;border-radius:6px;border:1px solid rgba(59,130,246,0.12);background:var(--card-bg);color:var(--text-muted);font-size:11px;cursor:pointer;transition:all .2s ease;white-space:nowrap}
+.parlay-type-btn:hover{border-color:rgba(59,130,246,0.35);color:var(--primary)}
+.parlay-type-btn.active{background:rgba(59,130,246,0.12);border-color:rgba(59,130,246,0.5);color:var(--primary);font-weight:600}
+.parlay-result{text-align:center;padding:12px;background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(59,130,246,0.03));border:1px solid rgba(59,130,246,0.15);border-radius:10px;margin-top:10px}
+.parlay-result-label{font-size:12px;color:var(--text-muted);margin-bottom:4px}
+.parlay-result-value{font-size:28px;font-weight:900;color:var(--primary);line-height:1.2}
+.parlay-result-meta{font-size:11px;color:var(--text-muted);margin-top:6px;display:flex;justify-content:space-around}
+.parlay-clear{width:100%;padding:6px;margin-top:8px;border-radius:6px;border:1px solid rgba(239,68,68,0.2);background:rgba(239,68,68,0.06);color:var(--danger);font-size:12px;cursor:pointer;transition:all .2s ease}
+.parlay-clear:hover{background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.4)}
+.parlay-empty{text-align:center;color:var(--text-muted);font-size:12px;padding:20px 0;line-height:1.8}
+.parlay-add-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:8px;border:1px solid rgba(59,130,246,0.25);background:rgba(59,130,246,0.06);color:var(--primary);font-size:12px;cursor:pointer;transition:all .25s ease;font-weight:500;margin-top:8px}
+.parlay-add-btn:hover{background:rgba(59,130,246,0.15);border-color:rgba(59,130,246,0.45)}
+.parlay-add-btn.added{background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.4);color:var(--success)}
+.key-match{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(30,37,54,0.6);border:1px solid rgba(59,130,246,0.06);border-radius:8px;margin-bottom:6px;cursor:pointer;transition:all .2s ease;font-size:12px}
+.key-match:hover{border-color:rgba(59,130,246,0.2);background:rgba(30,37,54,0.9)}
+.key-match-league{color:var(--primary);font-weight:600;font-size:11px;white-space:nowrap}
+.key-match-teams{flex:1;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.key-match-time{color:var(--warning);font-size:11px;white-space:nowrap}
+.model-item{display:flex;align-items:flex-start;gap:6px;padding:6px 0;font-size:12px;color:var(--text-secondary);border-bottom:1px solid rgba(59,130,246,0.05)}
+.model-item:last-child{border-bottom:none}
+.model-icon{font-size:12px;flex-shrink:0;margin-top:1px}
+.parlay-float-btn{display:none;position:fixed;bottom:20px;right:20px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#2563eb);color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 20px rgba(59,130,246,0.4);z-index:99;transition:all .3s ease;align-items:center;justify-content:center}
+.parlay-float-btn:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(59,130,246,0.5)}
+.float-badge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:9px;background:var(--danger);color:#fff;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;padding:0 4px}
+@media(max-width:1024px){.parlay-float-btn{display:flex}}
+.parlay-sheet-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100}
+.parlay-sheet-overlay.show{display:block}
+.parlay-sheet{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--card-bg);border-top:1px solid rgba(59,130,246,0.15);border-radius:16px 16px 0 0;z-index:101;max-height:70vh;overflow-y:auto;padding:16px;box-shadow:0 -8px 40px rgba(0,0,0,0.5);transform:translateY(100%);transition:transform .35s cubic-bezier(.22,1,.36,1)}
+.parlay-sheet.show{display:block;transform:translateY(0)}
+
 /* ===== Footer ===== */
 .footer{text-align:center;padding:24px 12px;color:var(--text-muted);font-size:12px;line-height:1.8;border-top:1px solid var(--divider);margin-top:16px}
 
@@ -421,6 +467,74 @@ body{font-family:'Inter','PingFang SC','Source Han Sans','Microsoft YaHei',sans-
 
   <!-- Footer -->
   <div class="footer">本网站仅提供足球赛事数据统计、模型逻辑推演与教学科普内容，仅供娱乐参考，不构成任何投注建议。体育彩票为公益娱乐，请理性参与，量力而行。</div>
+</div>
+
+<!-- Right Side Tool Panel (PC) -->
+<div class="right-panel">
+  <div class="panel-section">
+    <div class="panel-title">🎯 串关计算器</div>
+    <div class="parlay-list" id="parlayList">
+      <div class="parlay-empty">点击比赛卡片的「加入串关」按钮<br>添加比赛到串关列表</div>
+    </div>
+    <div id="parlayTypes" class="parlay-types"></div>
+    <div class="parlay-result" id="parlayResult" style="display:none">
+      <div class="parlay-result-label">最高奖金</div>
+      <div class="parlay-result-value" id="parlayPrize">¥0</div>
+      <div class="parlay-result-meta">
+        <span>赔率 <strong id="parlayOdds">0</strong></span>
+        <span>注数 <strong id="parlayCombos">0</strong></span>
+        <span>投入 <strong id="parlayCost">0元</strong></span>
+      </div>
+    </div>
+    <button class="parlay-clear" id="parlayClearBtn" onclick="clearParlay()" style="display:none">🗑️ 清空串关</button>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-title">⚡ 今日焦点</div>
+    <div id="keyMatches">
+      <div style="text-align:center;color:var(--text-muted);font-size:12px;padding:10px">加载中...</div>
+    </div>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-title">🧠 模型说明</div>
+    <div class="model-item"><span class="model-icon">📊</span><span>CRS比分赔率 → 概率分布</span></div>
+    <div class="model-item"><span class="model-icon">📐</span><span>让球盘口 → 隐含胜率</span></div>
+    <div class="model-item"><span class="model-icon">⏱️</span><span>半全场赔率 → 赛果倾向</span></div>
+    <div class="model-item"><span class="model-icon">📈</span><span>市场赔率 → 资金流向</span></div>
+    <div class="model-item"><span class="model-icon">🎲</span><span>泊松分布 → 进球期望</span></div>
+    <div class="model-item"><span class="model-icon">⚖️</span><span>多模型加权 → 综合推荐</span></div>
+    <div style="margin-top:8px;font-size:11px;color:var(--text-muted)">权重: CRS 35% + 市场 35% + 泊松 30%</div>
+  </div>
+</div>
+
+<!-- Mobile Parlay Floating Button -->
+<button class="parlay-float-btn" onclick="toggleParlayPanel()">
+  🎯
+  <span class="float-badge" id="parlayFloatBadge">0</span>
+</button>
+
+<!-- Mobile Parlay Bottom Sheet -->
+<div class="parlay-sheet-overlay" id="parlaySheetOverlay" onclick="toggleParlayPanel()"></div>
+<div class="parlay-sheet" id="parlaySheet">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <span style="font-size:16px;font-weight:700;color:var(--text)">🎯 串关计算器</span>
+    <button onclick="toggleParlayPanel()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">✕</button>
+  </div>
+  <div class="parlay-list" id="parlaySheetList">
+    <div class="parlay-empty">点击比赛卡片的「加入串关」按钮<br>添加比赛到串关列表</div>
+  </div>
+  <div id="parlaySheetTypes" class="parlay-types"></div>
+  <div class="parlay-result" id="parlaySheetResult" style="display:none">
+    <div class="parlay-result-label">最高奖金</div>
+    <div class="parlay-result-value" id="parlaySheetPrize">¥0</div>
+    <div class="parlay-result-meta">
+      <span>赔率 <strong id="parlaySheetOdds">0</strong></span>
+      <span>注数 <strong id="parlaySheetCombos">0</strong></span>
+      <span>投入 <strong id="parlaySheetCost">0元</strong></span>
+    </div>
+  </div>
+  <button class="parlay-clear" onclick="clearParlay()">🗑️ 清空串关</button>
 </div>
 
 <script>
@@ -677,6 +791,8 @@ async function load(){
   try{renderTabs();}catch(e){console.log('tabs失败:',e.message);}
   try{renderMatches();}catch(e){console.log('matches失败:',e.message);}
   try{renderHistory();}catch(e){console.log('history失败:',e.message);}
+  try{renderParlay();}catch(e){console.log('parlay失败:',e.message);}
+  try{renderKeyMatches();}catch(e){console.log('keyMatches失败:',e.message);}
 }
 
 // ===== 渲染 =====
@@ -709,8 +825,11 @@ function card(m){
   return`
   <div class="card" data-league="${m.league}" style="animation-delay:${idx*0.06}s">
     <div class="card-head" onclick="toggleCard(${idx})">
-      <span class="card-league">${m.league}</span>
-      <div style="display:flex;align-items:center;gap:8px">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+        <span class="card-league">${m.league}</span>
+        <span class="card-teams">${m.home.name} <span style="color:#8A94A8;font-size:11px">vs</span> ${m.away.name}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
         ${cd.html}
         <span class="card-toggle" id="toggle-${idx}">▼</span>
       </div>
@@ -743,6 +862,7 @@ function card(m){
         <div class="seg seg-a" style="width:${ap}%">${ap}%</div>
       </div>
       <div class="prob-labels"><span>主胜</span><span>平局</span><span>客胜</span></div>
+      <div style="text-align:center;margin-top:4px"><button class="parlay-add-btn${_isInParlay(idx)?' added':''}" onclick="event.stopPropagation();addToParlay(${idx},'${pick}',${pickO})">${_isInParlay(idx)?'✅ 已加入串关':'➕ 加入串关'}</button></div>
     </div>
     <div class="reason"><div class="reason-text">💡 ${reason(m,a)}</div></div>
     <div class="scores">
@@ -1030,6 +1150,189 @@ function submitSim(){
   text += '预计奖金: '+document.getElementById('simPrize').textContent+'元';
   
   navigator.clipboard.writeText(text).then(() => alert('已复制到剪贴板'));
+}
+
+// ===== 串关计算器 =====
+var parlayList = [];
+var parlayType = '2x1';
+var PARLAY_TYPES = {
+  '2x1': {name:'二串一', combos:1, min:2},
+  '3x1': {name:'三串一', combos:1, min:3},
+  '3x4': {name:'三串四', combos:4, min:3},
+  '4x1': {name:'四串一', combos:1, min:4},
+  '4x11': {name:'四串十一', combos:11, min:4}
+};
+
+function _isInParlay(idx){
+  return parlayList.some(function(p){return p.idx===idx});
+}
+
+function addToParlay(matchIdx, pick, odds){
+  var existIdx = -1;
+  for(var i=0;i<parlayList.length;i++){if(parlayList[i].idx===matchIdx){existIdx=i;break;}}
+  if(existIdx>=0){
+    parlayList.splice(existIdx,1);
+  } else {
+    var m = M[matchIdx];
+    parlayList.push({idx:matchIdx, pick:pick, odds:odds, homeName:m.home.name, awayName:m.away.name});
+  }
+  renderParlay();
+  renderMatches();
+}
+
+function removeFromParlay(idx){
+  parlayList.splice(idx,1);
+  renderParlay();
+  renderMatches();
+}
+
+function clearParlay(){
+  parlayList = [];
+  renderParlay();
+  renderMatches();
+}
+
+function setParlayType(type){
+  parlayType = type;
+  renderParlay();
+}
+
+function calculateParlay(){
+  var type = PARLAY_TYPES[parlayType];
+  if(!type || parlayList.length < type.min){return {odds:0,cost:0,prize:0,combos:0,valid:false};}
+  var totalOdds = 1;
+  for(var i=0;i<parlayList.length;i++) totalOdds *= parlayList[i].odds;
+  var combos = type.combos;
+  var cost = combos * 2;
+  var prize = Math.round(totalOdds * 2 * 100) / 100;
+  return {odds:totalOdds, cost:cost, prize:prize, combos:combos, valid:true};
+}
+
+function renderParlay(){
+  var listEl = document.getElementById('parlayList');
+  var resultEl = document.getElementById('parlayResult');
+  var clearBtn = document.getElementById('parlayClearBtn');
+  var typesEl = document.getElementById('parlayTypes');
+  var floatBadge = document.getElementById('parlayFloatBadge');
+
+  // Build parlay item HTML
+  var itemHtml = '';
+  if(parlayList.length===0){
+    itemHtml = '<div class="parlay-empty">点击比赛卡片的「加入串关」按钮<br>添加比赛到串关列表</div>';
+  } else {
+    for(var i=0;i<parlayList.length;i++){
+      var p = parlayList[i];
+      itemHtml += '<div class="parlay-item"><span class="parlay-item-teams">'+p.homeName+' vs '+p.awayName+'</span><span class="parlay-item-pick">'+p.pick+'</span><span class="parlay-item-odds">'+p.odds+'</span><button class="parlay-item-remove" onclick="removeFromParlay('+i+')">✕</button></div>';
+    }
+  }
+
+  // Render type buttons HTML
+  var typesHtml = '';
+  var typeKeys = Object.keys(PARLAY_TYPES);
+  for(var t=0;t<typeKeys.length;t++){
+    var key = typeKeys[t];
+    typesHtml += '<button class="parlay-type-btn'+(parlayType===key?' active':'')+'" onclick="setParlayType(\''+key+'\')">'+PARLAY_TYPES[key].name+'</button>';
+  }
+
+  // Update PC panel
+  if(listEl) listEl.innerHTML = itemHtml;
+  if(typesEl) typesEl.innerHTML = typesHtml;
+
+  // Calculate
+  var result = calculateParlay();
+  if(result.valid && resultEl){
+    resultEl.style.display = 'block';
+    var oddsEl = document.getElementById('parlayOdds');
+    var costEl = document.getElementById('parlayCost');
+    var prizeEl = document.getElementById('parlayPrize');
+    var combosEl = document.getElementById('parlayCombos');
+    if(oddsEl) oddsEl.textContent = result.odds.toFixed(2);
+    if(costEl) costEl.textContent = result.cost+'元';
+    if(prizeEl) prizeEl.textContent = '¥'+result.prize.toFixed(2);
+    if(combosEl) combosEl.textContent = result.combos+'注';
+  } else if(resultEl) {
+    resultEl.style.display = 'block';
+    var oEl = document.getElementById('parlayOdds');
+    var cEl = document.getElementById('parlayCost');
+    var pEl = document.getElementById('parlayPrize');
+    var cbEl = document.getElementById('parlayCombos');
+    if(oEl) oEl.textContent = '--';
+    if(cEl) cEl.textContent = PARLAY_TYPES[parlayType].min+'场起';
+    if(pEl) pEl.textContent = '¥--';
+    if(cbEl) cbEl.textContent = '需'+PARLAY_TYPES[parlayType].min+'场';
+  }
+
+  if(clearBtn) clearBtn.style.display = parlayList.length>0?'block':'none';
+  if(floatBadge){
+    floatBadge.textContent = parlayList.length;
+    floatBadge.style.display = parlayList.length>0?'flex':'none';
+  }
+
+  // Update mobile sheet
+  var sheetList = document.getElementById('parlaySheetList');
+  var sheetTypes = document.getElementById('parlaySheetTypes');
+  if(sheetList) sheetList.innerHTML = itemHtml;
+  if(sheetTypes) sheetTypes.innerHTML = typesHtml;
+  var sRes = document.getElementById('parlaySheetResult');
+  if(sRes && result.valid){
+    sRes.style.display = 'block';
+    var so = document.getElementById('parlaySheetOdds');
+    var sc = document.getElementById('parlaySheetCost');
+    var sp = document.getElementById('parlaySheetPrize');
+    var scb = document.getElementById('parlaySheetCombos');
+    if(so) so.textContent = result.odds.toFixed(2);
+    if(sc) sc.textContent = result.cost+'元';
+    if(sp) sp.textContent = '¥'+result.prize.toFixed(2);
+    if(scb) scb.textContent = result.combos+'注';
+  } else if(sRes) {
+    sRes.style.display = 'block';
+    var so2 = document.getElementById('parlaySheetOdds');
+    var sc2 = document.getElementById('parlaySheetCost');
+    var sp2 = document.getElementById('parlaySheetPrize');
+    var scb2 = document.getElementById('parlaySheetCombos');
+    if(so2) so2.textContent = '--';
+    if(sc2) sc2.textContent = PARLAY_TYPES[parlayType].min+'场起';
+    if(sp2) sp2.textContent = '¥--';
+    if(scb2) scb2.textContent = '需'+PARLAY_TYPES[parlayType].min+'场';
+  }
+}
+
+function toggleParlayPanel(){
+  var sheet = document.getElementById('parlaySheet');
+  var overlay = document.getElementById('parlaySheetOverlay');
+  if(sheet.classList.contains('show')){
+    sheet.classList.remove('show');
+    overlay.classList.remove('show');
+  } else {
+    sheet.classList.add('show');
+    overlay.classList.add('show');
+    renderParlay();
+  }
+}
+
+function scrollToMatch(idx){
+  var cards = document.querySelectorAll('.card');
+  if(cards[idx]){
+    cards[idx].scrollIntoView({behavior:'smooth',block:'center'});
+    cards[idx].style.boxShadow = '0 0 20px rgba(59,130,246,0.4)';
+    setTimeout(function(){if(cards[idx])cards[idx].style.boxShadow='';},1500);
+  }
+}
+
+function renderKeyMatches(){
+  var el = document.getElementById('keyMatches');
+  if(!el || !M.length) return;
+  var now = new Date();
+  var upcoming = M.filter(function(m){return new Date(m.time)>now;}).sort(function(a,b){return new Date(a.time)-new Date(b.time);}).slice(0,5);
+  if(!upcoming.length){el.innerHTML='<div style="text-align:center;color:var(--text-muted);font-size:12px;padding:10px">暂无即将开始的比赛</div>';return;}
+  var html = '';
+  for(var i=0;i<upcoming.length;i++){
+    var m = upcoming[i];
+    var idx = M.indexOf(m);
+    var timeStr = m.time.length>11?m.time.slice(11,16):'--:--';
+    html += '<div class="key-match" onclick="scrollToMatch('+idx+')"><span class="key-match-league">'+m.league+'</span><span class="key-match-teams">'+m.home.name+' vs '+m.away.name+'</span><span class="key-match-time">'+timeStr+'</span></div>';
+  }
+  el.innerHTML = html;
 }
 
 // ===== 启动 =====
