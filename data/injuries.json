@@ -1,0 +1,40 @@
+{
+  "川崎前锋": {
+    "injuries": [
+      "家长昭博",
+      "小林悠"
+    ],
+    "suspensions": [],
+    "impact": "high"
+  },
+  "费耶诺德": {
+    "injuries": [],
+    "suspensions": [
+      "海特勒伊达"
+    ],
+    "impact": "medium"
+  },
+  "阿贾克斯": {
+    "injuries": [
+      "布罗比"
+    ],
+    "suspensions": [],
+    "impact": "low"
+  },
+  "拜仁慕尼黑": {
+    "injuries": [
+      "穆西亚拉",
+      "科曼"
+    ],
+    "suspensions": [],
+    "impact": "high"
+  },
+  "巴塞罗那": {
+    "injuries": [
+      "德容",
+      "佩德里"
+    ],
+    "suspensions": [],
+    "impact": "high"
+  }
+}
