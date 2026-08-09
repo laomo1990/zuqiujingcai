@@ -9,6 +9,9 @@ import json
 import os
 from typing import Dict, List, Optional
 from collections import defaultdict
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from external_data import get_weather, find_city_coords, get_team_injuries, get_expert_opinion
 
 def poisson_pmf(k: int, lam: float) -> float:
     if lam <= 0: return 1.0 if k == 0 else 0.0
@@ -77,17 +80,20 @@ def load_team_stats():
 TEAM_STATS = load_team_stats()
 
 WEIGHTS = {
-    'crs': 0.20,
-    'market': 0.15,
-    'handicap': 0.10,
-    'htft': 0.06,
-    'poisson': 0.08,
+    'crs': 0.18,
+    'market': 0.14,
+    'handicap': 0.09,
+    'htft': 0.05,
+    'poisson': 0.07,
     'league': 0.04,
     'draw_signal': 0.04,
-    'away_boost': 0.12,
-    'recent_form': 0.12,
-    'head_to_head': 0.05,
-    'schedule': 0.04
+    'away_boost': 0.10,
+    'recent_form': 0.10,
+    'head_to_head': 0.04,
+    'schedule': 0.03,
+    'weather': 0.04,
+    'injury': 0.05,
+    'expert': 0.03
 }
 
 class PredictionEngine:
@@ -114,9 +120,12 @@ class PredictionEngine:
         recent_form = self._dim_recent_form()
         head_to_head = self._dim_head_to_head()
         schedule = self._dim_schedule()
+        weather = self._dim_weather()
+        injury = self._dim_injury()
+        expert = self._dim_expert()
 
-        dims = [crs_hda, market_hda, hc_hda, ht_hda, poisson_hda, league_hda, draw_sig, away_boost, recent_form, head_to_head, schedule]
-        keys = ['crs', 'market', 'handicap', 'htft', 'poisson', 'league', 'draw_signal', 'away_boost', 'recent_form', 'head_to_head', 'schedule']
+        dims = [crs_hda, market_hda, hc_hda, ht_hda, poisson_hda, league_hda, draw_sig, away_boost, recent_form, head_to_head, schedule, weather, injury, expert]
+        keys = ['crs', 'market', 'handicap', 'htft', 'poisson', 'league', 'draw_signal', 'away_boost', 'recent_form', 'head_to_head', 'schedule', 'weather', 'injury', 'expert']
 
         ph = sum(d['h'] * WEIGHTS[k] for d, k in zip(dims, keys))
         pd = sum(d['d'] * WEIGHTS[k] for d, k in zip(dims, keys))
@@ -154,7 +163,7 @@ class PredictionEngine:
         mx = max(ph, pd, pa)
         pick = '主胜' if ph == mx else ('客胜' if pa == mx else '平局')
 
-        self._build_reasons(crs_hda, market_hda, hc_hda, ht_hda, poisson_hda, league_hda, draw_sig, away_boost, recent_form, head_to_head, schedule)
+        self._build_reasons(crs_hda, market_hda, hc_hda, ht_hda, poisson_hda, league_hda, draw_sig, away_boost, recent_form, head_to_head, schedule, weather, injury, expert)
 
         return {
             'h': ph, 'd': pd, 'a': pa, 'hL': hL, 'aL': aL,
@@ -450,6 +459,145 @@ class PredictionEngine:
         self.dimensions['schedule'] = {'status': 'ok', 'h': h, 'd': d, 'a': a, 'signals': signals}
         return self.dimensions['schedule']
 
+    def _dim_weather(self):
+        """维度12: 天气因素分析"""
+        h, d, a = 0.40, 0.25, 0.35
+        signals = []
+        
+        home = self.match['home']['name'] if isinstance(self.match['home'], dict) else self.match['home']
+        coords = find_city_coords(home, self.league)
+        
+        if coords:
+            weather = get_weather(coords[0], coords[1])
+            if weather:
+                temp = weather['temp']
+                wind = weather['wind']
+                desc = weather['desc']
+                
+                # 极端高温（>35°C）- 主队有适应优势
+                if temp > 35:
+                    h += 0.04
+                    signals.append(f"高温{temp}°C({desc})")
+                # 极端低温（<0°C）- 可能影响技术型球队
+                elif temp < 0:
+                    d += 0.02
+                    signals.append(f"低温{temp}°C({desc})")
+                
+                # 大风（>30km/h）- 增加不确定性
+                if wind > 30:
+                    d += 0.03
+                    signals.append(f"大风{wind}km/h")
+                
+                # 雨雪天气 - 增加不确定性，偏向身体对抗型
+                if weather['code'] >= 61:
+                    d += 0.02
+                    signals.append(f"{desc}天气")
+                
+                if not signals:
+                    signals.append(f"{temp}°C {desc} 风{wind}km/h")
+        
+        t = h + d + a
+        if t > 0: h /= t; d /= t; a /= t
+        
+        self.dimensions['weather'] = {'status': 'ok', 'h': h, 'd': d, 'a': a, 'signals': signals}
+        return self.dimensions['weather']
+
+    def _dim_injury(self):
+        """维度13: 伤情信息分析"""
+        h, d, a = 0.40, 0.25, 0.35
+        signals = []
+        
+        home = self.match['home']['name'] if isinstance(self.match['home'], dict) else self.match['home']
+        away = self.match['away']['name'] if isinstance(self.match['away'], dict) else self.match['away']
+        
+        h_inj = get_team_injuries(home)
+        a_inj = get_team_injuries(away)
+        
+        # 主队伤停影响
+        if h_inj:
+            impact = h_inj.get('impact', 'low')
+            inj_count = len(h_inj.get('injuries', []))
+            sus_count = len(h_inj.get('suspensions', []))
+            total = inj_count + sus_count
+            
+            if total > 0:
+                if impact == 'high':
+                    a += 0.08
+                    signals.append(f"主队伤停{total}人(影响大)")
+                elif impact == 'medium':
+                    a += 0.04
+                    signals.append(f"主队伤停{total}人")
+                else:
+                    a += 0.02
+                    signals.append(f"主队伤停{total}人(影响小)")
+        
+        # 客队伤停影响
+        if a_inj:
+            impact = a_inj.get('impact', 'low')
+            inj_count = len(a_inj.get('injuries', []))
+            sus_count = len(a_inj.get('suspensions', []))
+            total = inj_count + sus_count
+            
+            if total > 0:
+                if impact == 'high':
+                    h += 0.08
+                    signals.append(f"客队伤停{total}人(影响大)")
+                elif impact == 'medium':
+                    h += 0.04
+                    signals.append(f"客队伤停{total}人")
+                else:
+                    h += 0.02
+                    signals.append(f"客队伤停{total}人(影响小)")
+        
+        if not signals:
+            signals.append("无伤停信息")
+        
+        t = h + d + a
+        if t > 0: h /= t; d /= t; a /= t
+        
+        self.dimensions['injury'] = {'status': 'ok', 'h': h, 'd': d, 'a': a, 'signals': signals}
+        return self.dimensions['injury']
+
+    def _dim_expert(self):
+        """维度14: 专家意见分析"""
+        h, d, a = 0.40, 0.25, 0.35
+        signals = []
+        
+        home = self.match['home']['name'] if isinstance(self.match['home'], dict) else self.match['home']
+        away = self.match['away']['name'] if isinstance(self.match['away'], dict) else self.match['away']
+        
+        opinion = get_expert_opinion(home, away)
+        
+        if opinion:
+            consensus = opinion.get('consensus', '')
+            confidence = opinion.get('confidence', 0.5)
+            reason = opinion.get('reason', '')
+            
+            # 根据专家意见调整
+            boost = confidence * 0.15  # 最大调整15%
+            
+            if consensus == '主胜':
+                h += boost
+                signals.append(f"专家看好主队({confidence:.0%})")
+            elif consensus == '客胜':
+                a += boost
+                signals.append(f"专家看好客队({confidence:.0%})")
+            elif consensus == '平局':
+                d += boost
+                signals.append(f"专家看好平局({confidence:.0%})")
+            
+            if reason:
+                signals.append(f"依据: {reason[:30]}")
+        
+        if not signals:
+            signals.append("无专家意见")
+        
+        t = h + d + a
+        if t > 0: h /= t; d /= t; a /= t
+        
+        self.dimensions['expert'] = {'status': 'ok', 'h': h, 'd': d, 'a': a, 'signals': signals}
+        return self.dimensions['expert']
+
     def _dim_draw_signal(self):
         h, d, a = 0.40, 0.25, 0.35
         signals = []
@@ -489,7 +637,7 @@ class PredictionEngine:
         if max_std < 0.15: return 2
         return 1
 
-    def _build_reasons(self, crs, market, hc, ht, poisson, league, draw_sig, away_boost=None, recent_form=None, head_to_head=None, schedule=None):
+    def _build_reasons(self, crs, market, hc, ht, poisson, league, draw_sig, away_boost=None, recent_form=None, head_to_head=None, schedule=None, weather=None, injury=None, expert=None):
         self.reasons = []
         if crs.get('status') == 'ok':
             self.reasons.append(f"CRS赔率：主{crs['h']:.0%} 平{crs['d']:.0%} 客{crs['a']:.0%}")
@@ -511,6 +659,12 @@ class PredictionEngine:
             self.reasons.append(f"交锋记录：{', '.join(head_to_head['signals'])}")
         if schedule and schedule.get('signals'):
             self.reasons.append(f"赛程分析：{', '.join(schedule['signals'])}")
+        if weather and weather.get('signals'):
+            self.reasons.append(f"天气因素：{', '.join(weather['signals'])}")
+        if injury and injury.get('signals'):
+            self.reasons.append(f"伤情信息：{', '.join(injury['signals'])}")
+        if expert and expert.get('signals'):
+            self.reasons.append(f"专家意见：{', '.join(expert['signals'])}")
 
 
 def predict_match(match):
