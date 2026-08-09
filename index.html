@@ -504,7 +504,7 @@ function reason(m,a){
   const mx=Math.max(a.h,a.d,a.a);
   const pick=a.h===mx?'主队':a.a===mx?'客队':'两队';
   const conf='★'.repeat(a.conf)+'☆'.repeat(5-a.conf);
-  let r=`7维推演 ${conf} · ${pick}概率最高`;
+  let r=`14维推演 ${conf} · ${pick}概率最高`;
   
   // CRS分析
   const cp=crsP(m.crs);
