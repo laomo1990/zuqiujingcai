@@ -538,20 +538,20 @@ function reason(m,a){
 // ===== 新增：倒计时功能 =====
 function getCountdown(timeStr){
   if(!timeStr)return{html:'<span class="countdown"><span class="countdown-icon">⏰</span><span class="countdown-text">--</span></span>',live:false};
+  const target=new Date(timeStr);
+  if(isNaN(target.getTime()))return{html:'<span class="countdown"><span class="countdown-icon">⏰</span><span class="countdown-text">--</span></span>',live:false};
   const now=new Date();
-  const parts=timeStr.match(/(\d{1,2}):(\d{2})/);
-  if(!parts)return{html:'<span class="countdown"><span class="countdown-icon">⏰</span><span class="countdown-text">'+timeStr+'</span></span>',live:false};
-  const h=parseInt(parts[1]),m=parseInt(parts[2]);
-  const target=new Date(now);
-  target.setHours(h,m,0,0);
-  if(target<=now)target.setDate(target.getDate()+1);
   const diff=target-now;
+  if(diff<=0)return{html:'<span class="countdown live"><span class="countdown-icon">🔴</span><span class="countdown-text">进行中</span></span>',live:true};
   const hours=Math.floor(diff/3600000);
   const mins=Math.floor((diff%3600000)/60000);
   const secs=Math.floor((diff%60000)/1000);
-  if(diff<=0)return{html:'<span class="countdown live"><span class="countdown-icon">🔴</span><span class="countdown-text">进行中</span></span>',live:true};
-  if(hours>0)return{html:'<span class="countdown"><span class="countdown-icon">⏰</span><span class="countdown-text">'+hours+'时'+mins+'分</span></span>',live:false};
-  return{html:'<span class="countdown"><span class="countdown-icon">⏰</span><span class="countdown-text">'+mins+':'+String(secs).padStart(2,'0')+'</span></span>',live:false};
+  let text='';
+  if(hours>=24){const days=Math.floor(hours/24);text=days+'天'+(hours%24)+'时';}
+  else if(hours>0)text=hours+'时'+mins+'分';
+  else if(mins>0)text=mins+'分'+secs+'秒';
+  else text=secs+'秒';
+  return{html:'<span class="countdown"><span class="countdown-icon">⏰</span><span class="countdown-text">'+text+'</span></span>',live:false};
 }
 
 // ===== 新增：SVG环形图 =====
@@ -607,7 +607,8 @@ function renderTabs(){
 }
 
 function renderMatches(){
-  const ms=(F==='all'?M:M.filter(m=>m.league===F)).slice().sort((a,b)=>new Date(b.time)-new Date(a.time));
+  const now=new Date();
+  const ms=(F==='all'?M:M.filter(m=>m.league===F)).filter(m=>new Date(m.time)>now).sort((a,b)=>new Date(a.time)-new Date(b.time));
   if(!ms.length){document.getElementById('matches').innerHTML='<div style="text-align:center;padding:60px;color:#8892a0">📅 暂无赛事</div>';return}
   document.getElementById('matches').innerHTML=ms.map(card).join('');
 }
