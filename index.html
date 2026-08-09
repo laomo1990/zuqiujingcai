@@ -59,7 +59,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','SF Pro Display'
 .card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.35),0 0 0 1px rgba(46,204,113,.08)}
 
 /* 卡片头部 */
-.card-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(30,41,59,.4)}
+.card-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(30,41,59,.4);cursor:pointer}
+  .card-toggle{width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:#8892a0;font-size:.8em;transition:transform .3s ease}
+  .card-toggle.open{transform:rotate(180deg)}
+  .card-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+  .card-body.open{max-height:2000px}
+  .card-head{}
 .card-league{font-size:.75em;color:var(--league-color,#7a8599);font-weight:600;display:flex;align-items:center;gap:6px}
 .card-league::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--league-color,#7a8599);flex-shrink:0}
 .card-time{font-size:.75em;color:#f59e0b;font-weight:500}
@@ -675,12 +680,17 @@ function card(m){
   const cd=getCountdown(m.time);
   const bestOdds=Math.max(m.odds.home,m.odds.draw,m.odds.away);
 
+  const idx=M.indexOf(m);
   return`
-  <div class="card" data-league="${m.league}" style="animation-delay:${(M.indexOf(m))*0.06}s">
-    <div class="card-head">
+  <div class="card" data-league="${m.league}" style="animation-delay:${idx*0.06}s">
+    <div class="card-head" onclick="toggleCard(${idx})">
       <span class="card-league">${m.league}</span>
-      ${cd.html}
+      <div style="display:flex;align-items:center;gap:8px">
+        ${cd.html}
+        <span class="card-toggle" id="toggle-${idx}">▼</span>
+      </div>
     </div>
+    <div class="card-body" id="body-${idx}">
     <div class="teams">
       <div class="team"><div class="team-logo">⚽</div><div class="team-name">${m.home.name}</div>${m.home.rank?`<div class="team-rank">${m.home.rank}</div>`:''}</div>
       <div class="vs">VS</div>
@@ -727,7 +737,17 @@ function card(m){
         <div class="d-row"><span class="d-label">竞彩赔率</span><span class="d-value">主${m.odds.home} 平${m.odds.draw} 客${m.odds.away}</span></div>
       </div>
     </div>
+    </div>
   </div>`;
+}
+
+function toggleCard(idx){
+  const body=document.getElementById('body-'+idx);
+  const toggle=document.getElementById('toggle-'+idx);
+  if(body){
+    body.classList.toggle('open');
+    if(toggle)toggle.classList.toggle('open');
+  }
 }
 
 // ===== 复盘 =====
