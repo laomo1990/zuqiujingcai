@@ -1,16 +1,216 @@
 {
-  "updated": "2026-08-09 14:06 UTC",
+  "updated": "2026-08-09 17:18 UTC",
   "summary": {
-    "total": 69,
-    "spf_hit": 54,
-    "spf_rate": 78,
-    "score_hit": 25,
-    "score_rate": 36,
-    "goal_hit": 49,
-    "goal_rate": 71,
-    "roi": 40.9
+    "total": 77,
+    "spf_hit": 58,
+    "spf_rate": 75,
+    "score_hit": 26,
+    "score_rate": 34,
+    "goal_hit": 51,
+    "goal_rate": 66,
+    "roi": 35.6
   },
   "matches": [
+    {
+      "key": "2026-08-09_汉坎_奥勒松",
+      "date": "2026-08-09",
+      "league": "挪超",
+      "home": "汉坎",
+      "away": "奥勒松",
+      "home_score": 1,
+      "away_score": 1,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 50,
+        "score": "2-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 1.9,
+        "draw": 3.65,
+        "away": 3.05
+      }
+    },
+    {
+      "key": "2026-08-09_海伦芬_特温特",
+      "date": "2026-08-09",
+      "league": "荷甲",
+      "home": "海伦芬",
+      "away": "特温特",
+      "home_score": 1,
+      "away_score": 0,
+      "prediction": {
+        "pick": "客胜",
+        "prob": 41,
+        "score": "1-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 2.8,
+        "draw": 3.65,
+        "away": 2.01
+      }
+    },
+    {
+      "key": "2026-08-09_哥德堡_卡尔马",
+      "date": "2026-08-09",
+      "league": "瑞典超",
+      "home": "哥德堡",
+      "away": "卡尔马",
+      "home_score": 3,
+      "away_score": 2,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 42,
+        "score": "1-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 2.24,
+        "draw": 3.35,
+        "away": 2.6
+      }
+    },
+    {
+      "key": "2026-08-09_哈尔姆斯_盖斯",
+      "date": "2026-08-09",
+      "league": "瑞典超",
+      "home": "哈尔姆斯",
+      "away": "盖斯",
+      "home_score": 0,
+      "away_score": 2,
+      "prediction": {
+        "pick": "客胜",
+        "prob": 57,
+        "score": "0-2",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "✅",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 5.2,
+        "draw": 3.9,
+        "away": 1.47
+      }
+    },
+    {
+      "key": "2026-08-09_国际图尔_拉赫蒂",
+      "date": "2026-08-09",
+      "league": "芬超",
+      "home": "国际图尔",
+      "away": "拉赫蒂",
+      "home_score": 0,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 49,
+        "score": "1-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 2.04,
+        "draw": 3.05,
+        "away": 3.21
+      }
+    },
+    {
+      "key": "2026-08-09_利勒斯特_罗森博格",
+      "date": "2026-08-09",
+      "league": "挪超",
+      "home": "利勒斯特",
+      "away": "罗森博格",
+      "home_score": 0,
+      "away_score": 2,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 42,
+        "score": "1-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 2.3,
+        "draw": 3.5,
+        "away": 2.45
+      }
+    },
+    {
+      "key": "2026-08-09_格罗宁根_乌德勒支",
+      "date": "2026-08-09",
+      "league": "荷甲",
+      "home": "格罗宁根",
+      "away": "乌德勒支",
+      "home_score": 2,
+      "away_score": 1,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 46,
+        "score": "1-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 2.05,
+        "draw": 3.35,
+        "away": 2.92
+      }
+    },
+    {
+      "key": "2026-08-09_兹沃勒_阿贾克斯",
+      "date": "2026-08-09",
+      "league": "荷甲",
+      "home": "兹沃勒",
+      "away": "阿贾克斯",
+      "home_score": 0,
+      "away_score": 2,
+      "prediction": {
+        "pick": "客胜",
+        "prob": 61,
+        "score": "1-2",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 5.95,
+        "draw": 4.65,
+        "away": 1.34
+      }
+    },
     {
       "key": "2026-08-09_库奥皮奥_TPS图尔",
       "date": "2026-08-09",
