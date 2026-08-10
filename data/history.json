@@ -1,16 +1,166 @@
 {
-  "updated": "2026-08-09 21:17 UTC",
+  "updated": "2026-08-10 02:52 UTC",
   "summary": {
-    "total": 77,
-    "spf_hit": 58,
-    "spf_rate": 75,
-    "score_hit": 26,
-    "score_rate": 34,
-    "goal_hit": 51,
-    "goal_rate": 66,
-    "roi": 35.6
+    "total": 83,
+    "spf_hit": 61,
+    "spf_rate": 73,
+    "score_hit": 27,
+    "score_rate": 33,
+    "goal_hit": 54,
+    "goal_rate": 65,
+    "roi": 32.3
   },
   "matches": [
+    {
+      "key": "2026-08-10_弗拉门戈_维多利亚",
+      "date": "2026-08-10",
+      "league": "巴西甲",
+      "home": "弗拉门戈",
+      "away": "维多利亚",
+      "home_score": 2,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 78,
+        "score": "2-0",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "✅",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 1.15,
+        "draw": 5.8,
+        "away": 11.5
+      }
+    },
+    {
+      "key": "2026-08-10_桑托斯_巴竞技",
+      "date": "2026-08-10",
+      "league": "巴西甲",
+      "home": "桑托斯",
+      "away": "巴竞技",
+      "home_score": 0,
+      "away_score": 2,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 46,
+        "score": "1-1",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 2.05,
+        "draw": 2.84,
+        "away": 3.45
+      }
+    },
+    {
+      "key": "2026-08-10_摩雷伦斯_布拉加",
+      "date": "2026-08-10",
+      "league": "葡超",
+      "home": "摩雷伦斯",
+      "away": "布拉加",
+      "home_score": 2,
+      "away_score": 2,
+      "prediction": {
+        "pick": "客胜",
+        "prob": 55,
+        "score": "0-1",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 5.45,
+        "draw": 3.7,
+        "away": 1.48
+      }
+    },
+    {
+      "key": "2026-08-10_吉维森特_里奥阿维",
+      "date": "2026-08-10",
+      "league": "葡超",
+      "home": "吉维森特",
+      "away": "里奥阿维",
+      "home_score": 1,
+      "away_score": 0,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 51,
+        "score": "1-1",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.89,
+        "draw": 3.0,
+        "away": 3.75
+      }
+    },
+    {
+      "key": "2026-08-10_克里斯蒂_莫尔德",
+      "date": "2026-08-10",
+      "league": "挪超",
+      "home": "克里斯蒂",
+      "away": "莫尔德",
+      "home_score": 2,
+      "away_score": 1,
+      "prediction": {
+        "pick": "客胜",
+        "prob": 53,
+        "score": "1-2",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 4.3,
+        "draw": 4.2,
+        "away": 1.52
+      }
+    },
+    {
+      "key": "2026-08-10_AC奥卢_赫尔辛基",
+      "date": "2026-08-10",
+      "league": "芬超",
+      "home": "AC奥卢",
+      "away": "赫尔辛基",
+      "home_score": 0,
+      "away_score": 1,
+      "prediction": {
+        "pick": "客胜",
+        "prob": 45,
+        "score": "1-2",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 3.2,
+        "draw": 3.45,
+        "away": 1.9
+      }
+    },
     {
       "key": "2026-08-09_汉坎_奥勒松",
       "date": "2026-08-09",
