@@ -84,7 +84,7 @@ body{font-family:'Inter','PingFang SC','Source Han Sans','Microsoft YaHei',sans-
 .card-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(59,130,246,0.08);cursor:pointer}
 .card-toggle{width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:11px;transition:transform .3s ease}
 .card-toggle.open{transform:rotate(180deg)}
-.card-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.card-body{max-height:2000px;overflow:hidden}
 .card-body.open{max-height:2000px}
 .card-league{font-size:12px;color:var(--league-color,var(--primary));font-weight:600;display:flex;align-items:center;gap:6px}
 .card-league::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--league-color,var(--primary));flex-shrink:0}
@@ -1190,8 +1190,13 @@ function toggleCard(idx){
   const body=document.getElementById('body-'+idx);
   const toggle=document.getElementById('toggle-'+idx);
   if(body){
-    body.classList.toggle('open');
-    if(toggle)toggle.classList.toggle('open');
+    if(body.style.maxHeight==='0px'){
+      body.style.maxHeight='2000px';
+      if(toggle)toggle.classList.remove('open');
+    } else {
+      body.style.maxHeight='0px';
+      if(toggle)toggle.classList.add('open');
+    }
   }
 }
 
