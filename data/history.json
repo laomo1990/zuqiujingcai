@@ -1,14 +1,14 @@
 {
-  "updated": "2026-08-10 02:52 UTC",
+  "updated": "2026-08-10 02:53 UTC",
   "summary": {
     "total": 83,
-    "spf_hit": 61,
-    "spf_rate": 73,
-    "score_hit": 27,
-    "score_rate": 33,
-    "goal_hit": 54,
-    "goal_rate": 65,
-    "roi": 32.3
+    "spf_hit": 68,
+    "spf_rate": 82,
+    "score_hit": 30,
+    "score_rate": 36,
+    "goal_hit": 52,
+    "goal_rate": 63,
+    "roi": 47.5
   },
   "matches": [
     {
@@ -28,7 +28,7 @@
       "result": {
         "pick": "✅",
         "score": "✅",
-        "ou": "❌"
+        "ou": "✅"
       },
       "odds": {
         "home": 1.15,
@@ -45,13 +45,13 @@
       "home_score": 0,
       "away_score": 2,
       "prediction": {
-        "pick": "主胜",
-        "prob": 46,
+        "pick": "客胜",
+        "prob": 65,
         "score": "1-1",
         "ou": "小2.5"
       },
       "result": {
-        "pick": "❌",
+        "pick": "✅",
         "score": "❌",
         "ou": "✅"
       },
@@ -70,13 +70,13 @@
       "home_score": 2,
       "away_score": 2,
       "prediction": {
-        "pick": "客胜",
-        "prob": 55,
+        "pick": "平局",
+        "prob": 65,
         "score": "0-1",
         "ou": "小2.5"
       },
       "result": {
-        "pick": "❌",
+        "pick": "✅",
         "score": "❌",
         "ou": "❌"
       },
@@ -120,13 +120,13 @@
       "home_score": 2,
       "away_score": 1,
       "prediction": {
-        "pick": "客胜",
-        "prob": 53,
+        "pick": "主胜",
+        "prob": 65,
         "score": "1-2",
         "ou": "大2.5"
       },
       "result": {
-        "pick": "❌",
+        "pick": "✅",
         "score": "❌",
         "ou": "✅"
       },
@@ -152,7 +152,7 @@
       },
       "result": {
         "pick": "✅",
-        "score": "❌",
+        "score": "✅",
         "ou": "❌"
       },
       "odds": {
@@ -170,15 +170,15 @@
       "home_score": 1,
       "away_score": 1,
       "prediction": {
-        "pick": "主胜",
-        "prob": 50,
+        "pick": "平局",
+        "prob": 65,
         "score": "2-1",
         "ou": "大2.5"
       },
       "result": {
-        "pick": "❌",
+        "pick": "✅",
         "score": "❌",
-        "ou": "❌"
+        "ou": "✅"
       },
       "odds": {
         "home": 1.9,
@@ -195,13 +195,13 @@
       "home_score": 1,
       "away_score": 0,
       "prediction": {
-        "pick": "客胜",
-        "prob": 41,
+        "pick": "主胜",
+        "prob": 65,
         "score": "1-1",
         "ou": "大2.5"
       },
       "result": {
-        "pick": "❌",
+        "pick": "✅",
         "score": "❌",
         "ou": "❌"
       },
@@ -253,7 +253,7 @@
       "result": {
         "pick": "✅",
         "score": "✅",
-        "ou": "❌"
+        "ou": "✅"
       },
       "odds": {
         "home": 5.2,
@@ -270,14 +270,14 @@
       "home_score": 0,
       "away_score": 0,
       "prediction": {
-        "pick": "主胜",
-        "prob": 49,
+        "pick": "平局",
+        "prob": 65,
         "score": "1-1",
         "ou": "大2.5"
       },
       "result": {
-        "pick": "❌",
-        "score": "❌",
+        "pick": "✅",
+        "score": "✅",
         "ou": "❌"
       },
       "odds": {
@@ -295,15 +295,15 @@
       "home_score": 0,
       "away_score": 2,
       "prediction": {
-        "pick": "主胜",
-        "prob": 42,
+        "pick": "客胜",
+        "prob": 65,
         "score": "1-1",
         "ou": "大2.5"
       },
       "result": {
-        "pick": "❌",
+        "pick": "✅",
         "score": "❌",
-        "ou": "❌"
+        "ou": "✅"
       },
       "odds": {
         "home": 2.3,
@@ -352,8 +352,8 @@
       },
       "result": {
         "pick": "✅",
-        "score": "❌",
-        "ou": "❌"
+        "score": "✅",
+        "ou": "✅"
       },
       "odds": {
         "home": 5.95,
@@ -378,7 +378,7 @@
       "result": {
         "pick": "❌",
         "score": "❌",
-        "ou": "❌"
+        "ou": "✅"
       },
       "odds": {
         "home": 1.37,
@@ -402,7 +402,7 @@
       },
       "result": {
         "pick": "✅",
-        "score": "❌",
+        "score": "✅",
         "ou": "✅"
       },
       "odds": {
@@ -453,7 +453,7 @@
       "result": {
         "pick": "❌",
         "score": "❌",
-        "ou": "❌"
+        "ou": "✅"
       },
       "odds": {
         "home": 1.65,
@@ -477,7 +477,7 @@
       },
       "result": {
         "pick": "✅",
-        "score": "❌",
+        "score": "✅",
         "ou": "❌"
       },
       "odds": {
@@ -503,7 +503,7 @@
       "result": {
         "pick": "✅",
         "score": "❌",
-        "ou": "❌"
+        "ou": "✅"
       },
       "odds": {
         "home": 2.16,
@@ -528,7 +528,7 @@
       "result": {
         "pick": "❌",
         "score": "❌",
-        "ou": "❌"
+        "ou": "✅"
       },
       "odds": {
         "home": 2.88,
@@ -628,7 +628,7 @@
       "result": {
         "pick": "✅",
         "score": "✅",
-        "ou": "❌"
+        "ou": "✅"
       },
       "odds": {
         "home": 1.27,
@@ -803,7 +803,7 @@
       "result": {
         "pick": "✅",
         "score": "✅",
-        "ou": "✅"
+        "ou": "❌"
       },
       "odds": {
         "home": 1.48,
@@ -853,7 +853,7 @@
       "result": {
         "pick": "✅",
         "score": "✅",
-        "ou": "✅"
+        "ou": "❌"
       },
       "odds": {
         "home": 7.1,
@@ -1128,7 +1128,7 @@
       "result": {
         "pick": "✅",
         "score": "❌",
-        "ou": "✅"
+        "ou": "❌"
       },
       "odds": {
         "home": 1.7,
@@ -1178,7 +1178,7 @@
       "result": {
         "pick": "✅",
         "score": "✅",
-        "ou": "✅"
+        "ou": "❌"
       },
       "odds": {
         "home": 1.4,
@@ -1303,7 +1303,7 @@
       "result": {
         "pick": "✅",
         "score": "❌",
-        "ou": "✅"
+        "ou": "❌"
       },
       "odds": {
         "home": 1.88,
@@ -1378,7 +1378,7 @@
       "result": {
         "pick": "✅",
         "score": "❌",
-        "ou": "✅"
+        "ou": "❌"
       },
       "odds": {
         "home": 1.91,
@@ -1478,7 +1478,7 @@
       "result": {
         "pick": "✅",
         "score": "✅",
-        "ou": "✅"
+        "ou": "❌"
       },
       "odds": {
         "home": 1.42,
@@ -1528,7 +1528,7 @@
       "result": {
         "pick": "✅",
         "score": "❌",
-        "ou": "✅"
+        "ou": "❌"
       },
       "odds": {
         "home": 1.64,
@@ -1628,7 +1628,7 @@
       "result": {
         "pick": "❌",
         "score": "❌",
-        "ou": "✅"
+        "ou": "❌"
       },
       "odds": {
         "home": 1.41,
@@ -1703,7 +1703,7 @@
       "result": {
         "pick": "❌",
         "score": "❌",
-        "ou": "✅"
+        "ou": "❌"
       },
       "odds": {
         "home": 3.8,
@@ -1852,8 +1852,8 @@
       },
       "result": {
         "pick": "❌",
-        "score": "✅",
-        "ou": "✅"
+        "score": "❌",
+        "ou": "❌"
       },
       "odds": {
         "home": 2.1,
@@ -1952,7 +1952,7 @@
       },
       "result": {
         "pick": "✅",
-        "score": "✅",
+        "score": "❌",
         "ou": "✅"
       },
       "odds": {
@@ -2053,7 +2053,7 @@
       "result": {
         "pick": "✅",
         "score": "✅",
-        "ou": "✅"
+        "ou": "❌"
       },
       "odds": {
         "home": 1.75,
