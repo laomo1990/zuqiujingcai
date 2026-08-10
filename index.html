@@ -1354,7 +1354,7 @@ function renderSim(){
   const ps = document.getElementById('simParlaySelect');
   if(ps) ps.value = simParlay;
   
-  body.innerHTML = parlayHtml + M.map((m, i) => {
+  body.innerHTML = M.map((m, i) => {
     const sel = simSelections[i] || {play:'spf', selections:[]};
     const plays = [{key:'spf',label:'胜平负'},{key:'score',label:'比分'},{key:'goals',label:'总进球'},{key:'htft',label:'半全场'}];
     
