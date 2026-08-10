@@ -1267,7 +1267,7 @@ setInterval(()=>{
 
 // ===== 模拟选号 =====
 let simSelections = {};
-let simParlay = 2;  // 默认2串1
+let simParlay = 1;  // 默认单关
 let simLocked = {};  // 设胆 {matchIdx: true}
 let simBetAmount = 10;  // 默认投注金额10元
 
@@ -1372,7 +1372,7 @@ function updateSimSummary(){
   const pn = parlayNames[simParlay] || simParlay+'串1';
   document.getElementById('simParlayType').textContent = pn;
   
-  if(count < simParlay){
+  if(count === 0){
     document.getElementById('simTotalOdds').textContent = '0';
     document.getElementById('simCost').textContent = '0';
     document.getElementById('simPrize').textContent = '0';
@@ -1410,7 +1410,7 @@ function updateSimSummary(){
   });
   
   const cost = simBetAmount;
-  const prize = valid && count >= simParlay ? Math.round(totalOdds * simBetAmount * 100) / 100 : 0;
+  const prize = valid ? Math.round(totalOdds * simBetAmount * 100) / 100 : 0;
   
   document.getElementById('simTotalOdds').textContent = totalOdds.toFixed(2);
   document.getElementById('simCost').textContent = cost;
