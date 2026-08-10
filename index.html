@@ -1414,10 +1414,6 @@ function updateSimSummary(){
   const count = selectedMatches.length;
   document.getElementById('simCount').textContent = count;
   
-  const parlayNames = {1:'单关',2:'2串1',3:'3串1',4:'4串1',5:'5串1'};
-  const pn = parlayNames[simParlay] || simParlay+'串1';
-  document.getElementById('simParlayType').textContent = pn;
-  
   if(count === 0){
     document.getElementById('simTotalOdds').textContent = '0';
     document.getElementById('simCost').textContent = '0';
