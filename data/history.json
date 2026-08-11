@@ -1,16 +1,91 @@
 {
-  "updated": "2026-08-10 22:07 UTC",
+  "updated": "2026-08-11 10:37 UTC",
   "summary": {
-    "total": 83,
+    "total": 86,
     "spf_hit": 68,
-    "spf_rate": 82,
+    "spf_rate": 79,
     "score_hit": 30,
-    "score_rate": 36,
-    "goal_hit": 52,
-    "goal_rate": 63,
-    "roi": 47.5
+    "score_rate": 35,
+    "goal_hit": 53,
+    "goal_rate": 62,
+    "roi": 42.3
   },
   "matches": [
+    {
+      "key": "2026-08-11_圣克拉拉_葡国民",
+      "date": "2026-08-11",
+      "league": "葡超",
+      "home": "圣克拉拉",
+      "away": "葡国民",
+      "home_score": 2,
+      "away_score": 2,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 54,
+        "score": "1-0",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 1.73,
+        "draw": 3.15,
+        "away": 4.3
+      }
+    },
+    {
+      "key": "2026-08-11_韦斯特罗_佐加顿斯",
+      "date": "2026-08-11",
+      "league": "瑞典超",
+      "home": "韦斯特罗",
+      "away": "佐加顿斯",
+      "home_score": 1,
+      "away_score": 0,
+      "prediction": {
+        "pick": "客胜",
+        "prob": 51,
+        "score": "1-2",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 3.85,
+        "draw": 3.85,
+        "away": 1.64
+      }
+    },
+    {
+      "key": "2026-08-11_天狼星_布鲁马波",
+      "date": "2026-08-11",
+      "league": "瑞典超",
+      "home": "天狼星",
+      "away": "布鲁马波",
+      "home_score": 2,
+      "away_score": 2,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 72,
+        "score": "2-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.25,
+        "draw": 5.25,
+        "away": 7.25
+      }
+    },
     {
       "key": "2026-08-10_弗拉门戈_维多利亚",
       "date": "2026-08-10",
