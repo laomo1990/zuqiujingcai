@@ -1,16 +1,41 @@
 {
-  "updated": "2026-08-11 15:30 UTC",
+  "updated": "2026-08-11 19:45 UTC",
   "summary": {
-    "total": 86,
+    "total": 87,
     "spf_hit": 58,
     "spf_rate": 67,
     "score_hit": 28,
-    "score_rate": 33,
-    "goal_hit": 47,
+    "score_rate": 32,
+    "goal_hit": 48,
     "goal_rate": 55,
-    "roi": 21.4
+    "roi": 20.0
   },
   "matches": [
+    {
+      "key": "2026-08-11_阿拉木图_索列夫",
+      "date": "2026-08-11",
+      "league": "欧冠",
+      "home": "阿拉木图",
+      "away": "索列夫",
+      "home_score": 0,
+      "away_score": 1,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 37,
+        "score": "1-1",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 2.6,
+        "draw": 2.9,
+        "away": 2.5
+      }
+    },
     {
       "key": "2026-07-25_弗拉门戈_帕尔梅拉斯",
       "date": "2026-07-25",
