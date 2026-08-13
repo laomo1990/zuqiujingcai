@@ -1,7 +1,7 @@
 """
-多维度推演引擎 v2.0
+多维度推演引擎 v3.0
 ===========================
-7个维度交叉验证，输出置信度+推演依据
+优化：降低主胜偏向、联赛差异化、平局增强、客队修正
 """
 
 import math
@@ -30,15 +30,25 @@ def crs_to_probs(crs: Dict[str, float]) -> Dict[str, float]:
     return probs
 
 LEAGUE_CFG = {
-    '欧冠': {'home_adv': 0.30, 'draw_rate': 0.25, 'avg_goals': 2.8},
-    '欧联': {'home_adv': 0.28, 'draw_rate': 0.26, 'avg_goals': 2.7},
-    '巴甲': {'home_adv': 0.40, 'draw_rate': 0.28, 'avg_goals': 2.3},
-    '瑞超': {'home_adv': 0.35, 'draw_rate': 0.24, 'avg_goals': 2.8},
-    '挪超': {'home_adv': 0.38, 'draw_rate': 0.23, 'avg_goals': 2.9},
-    '芬超': {'home_adv': 0.32, 'draw_rate': 0.25, 'avg_goals': 2.5},
-    'K联赛': {'home_adv': 0.35, 'draw_rate': 0.26, 'avg_goals': 2.6},
-    '美职': {'home_adv': 0.42, 'draw_rate': 0.22, 'avg_goals': 3.0},
-    'default': {'home_adv': 0.35, 'draw_rate': 0.25, 'avg_goals': 2.6}
+    '欧冠': {'home_adv': 0.25, 'draw_rate': 0.27, 'avg_goals': 2.8},
+    '欧联': {'home_adv': 0.23, 'draw_rate': 0.28, 'avg_goals': 2.7},
+    '欧洲超级杯': {'home_adv': 0.20, 'draw_rate': 0.28, 'avg_goals': 2.5},
+    '巴甲': {'home_adv': 0.35, 'draw_rate': 0.28, 'avg_goals': 2.3},
+    '巴西甲': {'home_adv': 0.35, 'draw_rate': 0.28, 'avg_goals': 2.3},
+    '巴西杯': {'home_adv': 0.30, 'draw_rate': 0.30, 'avg_goals': 2.2},
+    '解放者杯': {'home_adv': 0.28, 'draw_rate': 0.30, 'avg_goals': 2.3},
+    '瑞超': {'home_adv': 0.30, 'draw_rate': 0.25, 'avg_goals': 2.8},
+    '瑞典超': {'home_adv': 0.30, 'draw_rate': 0.25, 'avg_goals': 2.8},
+    '挪超': {'home_adv': 0.32, 'draw_rate': 0.24, 'avg_goals': 2.9},
+    '芬超': {'home_adv': 0.25, 'draw_rate': 0.28, 'avg_goals': 2.4},
+    'K联赛': {'home_adv': 0.30, 'draw_rate': 0.27, 'avg_goals': 2.5},
+    '美职': {'home_adv': 0.38, 'draw_rate': 0.23, 'avg_goals': 3.0},
+    '荷甲': {'home_adv': 0.32, 'draw_rate': 0.24, 'avg_goals': 2.9},
+    '德乙': {'home_adv': 0.30, 'draw_rate': 0.26, 'avg_goals': 2.7},
+    '葡超': {'home_adv': 0.30, 'draw_rate': 0.26, 'avg_goals': 2.5},
+    'J联赛': {'home_adv': 0.28, 'draw_rate': 0.27, 'avg_goals': 2.5},
+    'J2联赛': {'home_adv': 0.25, 'draw_rate': 0.28, 'avg_goals': 2.3},
+    'default': {'home_adv': 0.28, 'draw_rate': 0.27, 'avg_goals': 2.5}
 }
 
 def get_league_cfg(league):
@@ -49,7 +59,7 @@ def get_league_cfg(league):
 
 def load_team_stats():
     """从历史数据加载球队战绩"""
-    stats = defaultdict(lambda: {'w': 0, 'd': 0, 'l': 0, 'gf': 0, 'ga': 0, 'matches': 0, 'recent': []})
+    stats = defaultdict(lambda: {'w': 0, 'd': 0, 'l': 0, 'gf': 0, 'ga': 0, 'matches': 0, 'recent': [], 'avg_goals': 0})
     history_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'history.json')
     if not os.path.exists(history_path):
         return stats
@@ -59,14 +69,12 @@ def load_team_stats():
         for m in h.get('matches', []):
             home, away = m['home'], m['away']
             hs, as_ = m['home_score'], m['away_score']
-            # 主队
             stats[home]['matches'] += 1
             stats[home]['gf'] += hs
             stats[home]['ga'] += as_
             if hs > as_: stats[home]['w'] += 1; stats[home]['recent'].append('W')
             elif hs == as_: stats[home]['d'] += 1; stats[home]['recent'].append('D')
             else: stats[home]['l'] += 1; stats[home]['recent'].append('L')
-            # 客队
             stats[away]['matches'] += 1
             stats[away]['gf'] += as_
             stats[away]['ga'] += hs
@@ -80,19 +88,19 @@ def load_team_stats():
 TEAM_STATS = load_team_stats()
 
 WEIGHTS = {
-    'crs': 0.18,
-    'market': 0.14,
-    'handicap': 0.09,
+    'crs': 0.20,
+    'market': 0.15,
+    'handicap': 0.08,
     'htft': 0.05,
-    'poisson': 0.07,
-    'league': 0.04,
-    'draw_signal': 0.04,
-    'away_boost': 0.10,
-    'recent_form': 0.10,
+    'poisson': 0.06,
+    'league': 0.03,
+    'draw_signal': 0.06,
+    'away_boost': 0.12,
+    'recent_form': 0.08,
     'head_to_head': 0.04,
     'schedule': 0.03,
-    'weather': 0.04,
-    'injury': 0.05,
+    'weather': 0.03,
+    'injury': 0.04,
     'expert': 0.03
 }
 
@@ -135,6 +143,17 @@ class PredictionEngine:
         if total > 0:
             ph /= total; pd /= total; pa /= total
 
+        # v3优化：主胜修正 - 当多个维度显示平局/客胜时，降低主胜
+        if pd > 0.30 or pa > 0.30:
+            ph_adj = ph * 0.90
+            pd_adj = pd * 1.05 if pd > 0.25 else pd
+            pa_adj = pa * 1.05 if pa > 0.25 else pa
+            t2 = ph_adj + pd_adj + pa_adj
+            if t2 > 0:
+                ph = ph_adj / t2
+                pd = pd_adj / t2
+                pa = pa_adj / t2
+
         conf = self._calc_confidence([crs_hda, market_hda, hc_hda, ht_hda, poisson_hda])
 
         cp = crs_to_probs(self.crs) if self.crs else {}
@@ -148,378 +167,318 @@ class PredictionEngine:
             for k, v in cp.items():
                 score_probs[f"{int(k[1:3])}-{int(k[4:6])}"] = v
         else:
-            for i in range(7):
-                for j in range(7):
-                    p = poisson_pmf(i, hL) * poisson_pmf(j, aL)
-                    if p > 0.01:
-                        score_probs[f"{i}-{j}"] = p
+            for hi in range(4):
+                for ai in range(4):
+                    p = poisson_pmf(hi, hL) * poisson_pmf(ai, aL)
+                    score_probs[f"{hi}-{ai}"] = p
+
         sr = sorted(score_probs.items(), key=lambda x: -x[1])[:5]
+        o25 = sum(v for k, v in score_probs.items() if int(k.split('-')[0]) + int(k.split('-')[1]) > 2)
 
-        o25_crs = sum(v for k, v in cp.items() if int(k[1:3]) + int(k[4:6]) >= 3) if cp else 0
-        o25_p = sum(poisson_pmf(i, hL) * poisson_pmf(j, aL) for i in range(8) for j in range(8) if i + j >= 3)
-        o25 = o25_crs * 0.6 + o25_p * 0.4 if cp else o25_p
-
-        mk = market_hda
-        mx = max(ph, pd, pa)
-        pick = '主胜' if ph == mx else ('客胜' if pa == mx else '平局')
+        market_total = 1/self.odds.get('home', 99) + 1/self.odds.get('draw', 99) + 1/self.odds.get('away', 99)
+        mk = {
+            'h': (1/self.odds.get('home', 99)) / market_total if market_total else 0.33,
+            'd': (1/self.odds.get('draw', 99)) / market_total if market_total else 0.33,
+            'a': (1/self.odds.get('away', 99)) / market_total if market_total else 0.33
+        }
+        te = {'h': (ph - mk['h']) * 100, 'd': (pd - mk['d']) * 100, 'a': (pa - mk['a']) * 100}
+        val = {k: v for k, v in te.items() if v > 3}
 
         self._build_reasons(crs_hda, market_hda, hc_hda, ht_hda, poisson_hda, league_hda, draw_sig, away_boost, recent_form, head_to_head, schedule, weather, injury, expert)
 
+        mx = max(ph, pd, pa)
+        if ph == mx: pick = '主胜'
+        elif pa == mx: pick = '客胜'
+        else: pick = '平局'
+
         return {
-            'h': ph, 'd': pd, 'a': pa, 'hL': hL, 'aL': aL,
+            'h': ph, 'd': pd, 'a': pa,
+            'conf': conf,
+            'pick': pick,
+            'prob': round(mx * 100),
+            'score': sr[0][0] if sr else '1-0',
+            'ou': '大2.5' if o25 > 0.5 else '小2.5',
             'sr': [{'s': s, 'p': p} for s, p in sr],
             'o25': o25,
-            'te': {'h': (ph - mk['h']) * 100, 'd': (pd - mk['d']) * 100, 'a': (pa - mk['a']) * 100},
-            'val': {'h': ph - mk['h'], 'd': pd - mk['d'], 'a': pa - mk['a']},
-            'conf': conf, 'ci': round(abs(ph - mx) * 100 + abs(pd - mx) * 100 + abs(pa - mx) * 100),
-            'models': len([d for d in [crs_hda, market_hda, hc_hda, ht_hda] if d.get('status') == 'ok']),
-            'pick': pick, 'pick_prob': round(mx * 100),
-            'reasons': self.reasons, 'dimensions': self.dimensions
+            'hL': hL, 'aL': aL,
+            'te': te, 'val': val,
+            'reasons': self.reasons,
+            'dimensions': self.dimensions
         }
 
     def _dim_crs(self):
-        if not self.crs or len(self.crs) < 5:
-            self.dimensions['crs'] = {'status': 'no_data', 'h': 0.45, 'd': 0.25, 'a': 0.30}
-            return self.dimensions['crs']
+        """维度1: CRS比分赔率"""
+        if not self.crs:
+            return {'h': 0.40, 'd': 0.25, 'a': 0.35, 'status': 'no_data'}
+
         cp = crs_to_probs(self.crs)
         h = d = a = 0
-        for k, v in cp.items():
-            g, e = int(k[1:3]), int(k[4:6])
-            if g > e: h += v
-            elif g == e: d += v
-            else: a += v
+        for k, p in cp.items():
+            home_goals = int(k[1:3])
+            away_goals = int(k[4:6])
+            if home_goals > away_goals: h += p
+            elif home_goals == away_goals: d += p
+            else: a += p
+
         t = h + d + a
         if t > 0: h /= t; d /= t; a /= t
-        self.dimensions['crs'] = {'status': 'ok', 'h': h, 'd': d, 'a': a}
+        self.dimensions['crs'] = {'h': h, 'd': d, 'a': a, 'status': 'ok'}
         return self.dimensions['crs']
 
     def _dim_market(self):
-        o = self.odds
-        if not o or not o.get('home') or not o.get('draw') or not o.get('away'):
-            self.dimensions['market'] = {'status': 'no_data', 'h': 0.45, 'd': 0.25, 'a': 0.30}
-            return self.dimensions['market']
-        h, d, a = 1/o['home'], 1/o['draw'], 1/o['away']
-        t = h + d + a
-        self.dimensions['market'] = {'status': 'ok', 'h': h/t, 'd': d/t, 'a': a/t}
+        """维度2: 市场隐含概率"""
+        h_odds = self.odds.get('home', 1)
+        d_odds = self.odds.get('draw', 1)
+        a_odds = self.odds.get('away', 1)
+
+        total = 1/h_odds + 1/d_odds + 1/a_odds
+        h = (1/h_odds) / total
+        d = (1/d_odds) / total
+        a = (1/a_odds) / total
+
+        self.dimensions['market'] = {'h': h, 'd': d, 'a': a, 'status': 'ok'}
         return self.dimensions['market']
 
     def _dim_handicap(self):
+        """维度3: 让球盘口"""
         hc = self.handicap
-        if not hc or not hc.get('home') or not hc.get('away'):
-            self.dimensions['handicap'] = {'status': 'no_data', 'h': 0.40, 'd': 0.25, 'a': 0.35}
-            return self.dimensions['handicap']
-        d_o = hc.get('draw', 0)
-        if d_o > 0:
-            s = 1/hc['home'] + 1/d_o + 1/hc['away']
-            h, d, a = (1/hc['home'])/s, (1/d_o)/s, (1/hc['away'])/s
-        else:
-            s = 1/hc['home'] + 1/hc['away']
-            h, d, a = (1/hc['home'])/s, 0.15, (1/hc['away'])/s
-            t = h + d + a; h /= t; d /= t; a /= t
-        self.dimensions['handicap'] = {'status': 'ok', 'h': h, 'd': d, 'a': a, 'line': hc.get('line', '0')}
+        if not hc or 'line' not in hc:
+            return {'h': 0.40, 'd': 0.25, 'a': 0.35, 'status': 'no_data'}
+
+        line = float(hc.get('line', 0))
+        h = 0.40
+        d = 0.25
+        a = 0.35
+
+        # 让球修正
+        if line <= -1.5: a += 0.20; h -= 0.15
+        elif line <= -0.5: a += 0.10; h -= 0.05
+        elif line >= 1.5: h += 0.20; a -= 0.15
+        elif line >= 0.5: h += 0.10; a -= 0.05
+        else: d += 0.05  # 平手盘倾向平局
+
+        t = h + d + a
+        if t > 0: h /= t; d /= t; a /= t
+        self.dimensions['handicap'] = {'h': h, 'd': d, 'a': a, 'status': 'ok'}
         return self.dimensions['handicap']
 
     def _dim_htft(self):
-        if not self.htft:
-            self.dimensions['htft'] = {'status': 'no_data', 'h': 0.40, 'd': 0.25, 'a': 0.35}
-            return self.dimensions['htft']
-        hh = hd = ha = 0
-        for k, o in self.htft.items():
-            if o <= 0: continue
-            p = 1 / o
-            if k[0] == 'h': hh += p
-            elif k[0] == 'd': hd += p
-            else: ha += p
-        t = hh + hd + ha
-        if t > 0:
-            self.dimensions['htft'] = {'status': 'ok', 'h': hh/t, 'd': hd/t, 'a': ha/t}
-        else:
-            self.dimensions['htft'] = {'status': 'no_data', 'h': 0.40, 'd': 0.25, 'a': 0.35}
+        """维度4: 半全场"""
+        ht = self.htft
+        if not ht:
+            return {'h': 0.40, 'd': 0.25, 'a': 0.35, 'status': 'no_data'}
+
+        h = ht.get('HH', 0) + ht.get('DH', 0) * 0.5 + ht.get('AH', 0) * 0.3
+        d = ht.get('DD', 0) + ht.get('HD', 0) * 0.5 + ht.get('AD', 0) * 0.5
+        a = ht.get('AA', 0) + ht.get('DA', 0) * 0.5 + ht.get('HA', 0) * 0.3
+
+        total = sum(1/v for v in ht.values() if v > 0) if ht else 1
+        if total > 0:
+            h = (1/h if h > 0 else 0.33) / total if total else 0.33
+            d = (1/d if d > 0 else 0.33) / total if total else 0.33
+            a = (1/a if a > 0 else 0.33) / total if total else 0.33
+
+        t = h + d + a
+        if t > 0: h /= t; d /= t; a /= t
+        self.dimensions['htft'] = {'h': h, 'd': d, 'a': a, 'status': 'ok'}
         return self.dimensions['htft']
 
     def _dim_poisson(self):
+        """维度5: 泊松分布"""
         cp = crs_to_probs(self.crs) if self.crs else {}
         h_xg = sum(int(k[1:3]) * v for k, v in cp.items()) if cp else 1.2
         a_xg = sum(int(k[4:6]) * v for k, v in cp.items()) if cp else 1.0
         hL = h_xg + self.lc['home_adv']
         aL = max(0.3, a_xg - self.lc['home_adv'] * 0.3)
+
         h = d = a = 0
-        for i in range(8):
-            for j in range(8):
-                p = poisson_pmf(i, hL) * poisson_pmf(j, aL)
-                if i > j: h += p
-                elif i == j: d += p
+        for hi in range(8):
+            for ai in range(8):
+                p = poisson_pmf(hi, hL) * poisson_pmf(ai, aL)
+                if hi > ai: h += p
+                elif hi == ai: d += p
                 else: a += p
-        self.dimensions['poisson'] = {'status': 'ok', 'h': h, 'd': d, 'a': a, 'hL': round(hL, 2), 'aL': round(aL, 2)}
+
+        t = h + d + a
+        if t > 0: h /= t; d /= t; a /= t
+        self.dimensions['poisson'] = {'h': h, 'd': d, 'a': a, 'status': 'ok'}
         return self.dimensions['poisson']
 
     def _dim_league(self):
-        lc = self.lc
-        h = 0.45 + lc['home_adv'] * 0.2
-        d = lc['draw_rate']
-        a = max(0.1, 1 - h - d)
+        """维度6: 联赛特征"""
+        h = 0.35 + self.lc['home_adv'] * 0.3
+        d = self.lc['draw_rate']
+        a = 1 - h - d
+        if a < 0.15: a = 0.15; h = 1 - d - a
+
         t = h + d + a
-        self.dimensions['league'] = {'status': 'ok', 'h': h/t, 'd': d/t, 'a': a/t, 'name': self.league}
+        if t > 0: h /= t; d /= t; a /= t
+        self.dimensions['league'] = {'h': h, 'd': d, 'a': a, 'status': 'ok'}
         return self.dimensions['league']
 
-    def _dim_away_boost(self):
-        """维度8: 客胜增强信号"""
-        h, d, a = 0.40, 0.25, 0.35
+    def _dim_draw_signal(self):
+        """维度7: 平局信号增强"""
+        h, d, a = 0.35, 0.30, 0.35
         signals = []
-        
-        # 信号1: 市场客胜赔率低（客队被看好）
-        if self.odds.get('away'):
-            away_odds = self.odds['away']
-            if away_odds < 2.0:
-                a += 0.15
-                signals.append(f"客赔极低({away_odds})")
-            elif away_odds < 2.5:
-                a += 0.10
-                signals.append(f"客赔偏低({away_odds})")
-            elif away_odds < 3.0:
-                a += 0.05
-        
-        # 信号2: 让球盘口+1以上（客队让球）
-        line = float(self.handicap.get('line', '0') or '0')
-        if line >= 1.0:
-            a += 0.10
-            signals.append(f"客队让{line}球")
-        elif line >= 0.5:
-            a += 0.05
-            signals.append(f"客队让{line}球")
-        
-        # 信号3: CRS客胜概率高
+
+        # CRS平局概率
         if self.crs:
             cp = crs_to_probs(self.crs)
-            away_crs = sum(v for k, v in cp.items() if int(k[1:3]) < int(k[4:6]))
-            if away_crs > 0.40:
-                a += 0.08
-                signals.append(f"CRS客胜{away_crs:.0%}")
-            elif away_crs > 0.35:
-                a += 0.04
-        
-        # 信号4: 半全场客胜概率高
-        if self.htft:
-            ah = sum(v for k, v in self.htft.items() if k[0] == 'a' and v > 0)
-            total = sum(v for v in self.htft.values() if v > 0)
-            if total > 0 and ah/total > 0.35:
-                a += 0.05
-                signals.append(f"半全场客胜{ah/total:.0%}")
-        
+            draw_prob = sum(v for k, v in cp.items() if k[1:3] == k[4:6])
+            if draw_prob > 0.25:
+                d += 0.10
+                signals.append(f"CRS平局{round(draw_prob*100)}%")
+
+        # 市场平局赔率
+        d_odds = self.odds.get('draw', 99)
+        if d_odds < 3.2:
+            d += 0.08
+            signals.append(f"平赔偏低({d_odds})")
+        elif d_odds < 3.5:
+            d += 0.04
+            signals.append(f"平赔适中({d_odds})")
+
+        # 让球盘口接近0
+        hc = self.handicap
+        if hc and 'line' in hc:
+            line = abs(float(hc.get('line', 0)))
+            if line <= 0.25:
+                d += 0.06
+                signals.append("盘口接近平手")
+
         t = h + d + a
-        self.dimensions['away_boost'] = {'status': 'ok', 'h': h/t, 'd': d/t, 'a': a/t, 'signals': signals}
+        if t > 0: h /= t; d /= t; a /= t
+        self.dimensions['draw_signal'] = {'h': h, 'd': d, 'a': a, 'signals': signals, 'status': 'ok'}
+        return self.dimensions['draw_signal']
+
+    def _dim_away_boost(self):
+        """维度8: 客胜增强"""
+        h, d, a = 0.35, 0.25, 0.40
+        signals = []
+
+        a_odds = self.odds.get('away', 99)
+        if a_odds < 1.8:
+            a += 0.18
+            signals.append(f"客赔极低({a_odds})")
+        elif a_odds < 2.0:
+            a += 0.12
+            signals.append(f"客赔偏低({a_odds})")
+        elif a_odds < 2.5:
+            a += 0.06
+            signals.append(f"客赔适中({a_odds})")
+
+        hc = self.handicap
+        if hc and 'line' in hc:
+            line = float(hc.get('line', 0))
+            if line >= 1.0:
+                a += 0.10
+                signals.append(f"客队让{line}球")
+
+        if self.crs:
+            cp = crs_to_probs(self.crs)
+            away_prob = sum(v for k, v in cp.items() if int(k[4:6]) > int(k[1:3]))
+            if away_prob > 0.40:
+                a += 0.08
+                signals.append(f"CRS客胜{round(away_prob*100)}%")
+
+        if self.htft:
+            aa_odds = self.htft.get('AA', 99)
+            if aa_odds < 5:
+                a += 0.05
+                signals.append("半全场客客偏低")
+
+        t = h + d + a
+        if t > 0: h /= t; d /= t; a /= t
+        self.dimensions['away_boost'] = {'h': h, 'd': d, 'a': a, 'signals': signals, 'status': 'ok'}
         return self.dimensions['away_boost']
 
     def _dim_recent_form(self):
-        """维度9: 近期战绩分析"""
+        """维度9: 近期战绩"""
         home = self.match['home']['name'] if isinstance(self.match['home'], dict) else self.match['home']
         away = self.match['away']['name'] if isinstance(self.match['away'], dict) else self.match['away']
-        
-        h_stats = TEAM_STATS.get(home, {'w': 0, 'd': 0, 'l': 0, 'matches': 0, 'recent': []})
-        a_stats = TEAM_STATS.get(away, {'w': 0, 'd': 0, 'l': 0, 'matches': 0, 'recent': []})
-        
-        h, d, a = 0.40, 0.25, 0.35
-        signals = []
-        
-        # 主队近期表现
-        if h_stats['matches'] >= 2:
-            h_wr = h_stats['w'] / h_stats['matches']
-            recent = h_stats['recent'][:5]
-            recent_w = sum(1 for r in recent if r == 'W')
-            
-            if h_wr >= 0.6:
-                h += 0.08
-                signals.append(f"主队近期{recent_w}/{len(recent)}胜")
-            elif h_wr <= 0.2:
-                h -= 0.05
-                signals.append(f"主队近期低迷{recent_w}/{len(recent)}胜")
-        
-        # 客队近期表现
-        if a_stats['matches'] >= 2:
-            a_wr = a_stats['w'] / a_stats['matches']
-            recent = a_stats['recent'][:5]
-            recent_w = sum(1 for r in recent if r == 'W')
-            
-            if a_wr >= 0.6:
-                a += 0.08
-                signals.append(f"客队近期{recent_w}/{len(recent)}胜")
-            elif a_wr <= 0.2:
-                a -= 0.05
-                signals.append(f"客队近期低迷{recent_w}/{len(recent)}胜")
-        
-        # 进攻/防守效率
-        if h_stats['matches'] >= 3:
-            h_gpg = h_stats['gf'] / h_stats['matches']
-            if h_gpg >= 2.0:
-                h += 0.03
-                signals.append(f"主队场均{h_gpg:.1f}球")
-        
-        if a_stats['matches'] >= 3:
-            a_gpg = a_stats['gf'] / a_stats['matches']
-            if a_gpg >= 2.0:
-                a += 0.03
-                signals.append(f"客队场均{a_gpg:.1f}球")
-        
+
+        h_stats = TEAM_STATS.get(home, {'w': 0, 'd': 0, 'l': 0, 'recent': [], 'matches': 0})
+        a_stats = TEAM_STATS.get(away, {'w': 0, 'd': 0, 'l': 0, 'recent': [], 'matches': 0})
+
+        h_total = h_stats['matches'] or 1
+        a_total = a_stats['matches'] or 1
+
+        h_wr = h_stats['w'] / h_total
+        a_wr = a_stats['w'] / a_total
+
+        h = 0.35 + h_wr * 0.20
+        a = 0.35 + a_wr * 0.20
+        d = max(0.15, 1 - h - a)
+
         t = h + d + a
         if t > 0: h /= t; d /= t; a /= t
-        
-        self.dimensions['recent_form'] = {'status': 'ok', 'h': h, 'd': d, 'a': a, 'signals': signals}
+        self.dimensions['recent_form'] = {'h': h, 'd': d, 'a': a, 'status': 'ok'}
         return self.dimensions['recent_form']
 
     def _dim_head_to_head(self):
-        """维度10: 历史交锋分析"""
-        home = self.match['home']['name'] if isinstance(self.match['home'], dict) else self.match['home']
-        away = self.match['away']['name'] if isinstance(self.match['away'], dict) else self.match['away']
-        
+        """维度10: 历史交锋"""
         h, d, a = 0.40, 0.25, 0.35
-        signals = []
-        
-        # 从历史数据找交锋记录
-        history_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'history.json')
-        if os.path.exists(history_path):
-            try:
-                with open(history_path, 'r', encoding='utf-8') as f:
-                    hist = json.load(f)
-                
-                h2h = []
-                for m in hist.get('matches', []):
-                    if (m['home'] == home and m['away'] == away) or (m['home'] == away and m['away'] == home):
-                        h2h.append(m)
-                
-                if h2h:
-                    h_w = sum(1 for m in h2h if (m['home'] == home and m['home_score'] > m['away_score']) or 
-                              (m['away'] == home and m['away_score'] > m['home_score']))
-                    d_count = sum(1 for m in h2h if m['home_score'] == m['away_score'])
-                    a_w = len(h2h) - h_w - d_count
-                    
-                    if h_w > a_w:
-                        h += 0.06
-                        signals.append(f"交锋主队{h_w}胜{d_count}平{a_w}负")
-                    elif a_w > h_w:
-                        a += 0.06
-                        signals.append(f"交锋客队{a_w}胜{d_count}平{h_w}负")
-                    else:
-                        d += 0.03
-                        signals.append(f"交锋势均力敌{h_w}胜{d_count}平{a_w}负")
-            except:
-                pass
-        
-        if not signals:
-            signals.append("无交锋记录")
-        
-        t = h + d + a
-        if t > 0: h /= t; d /= t; a /= t
-        
-        self.dimensions['head_to_head'] = {'status': 'ok', 'h': h, 'd': d, 'a': a, 'signals': signals}
+        self.dimensions['head_to_head'] = {'h': h, 'd': d, 'a': a, 'status': 'no_data'}
         return self.dimensions['head_to_head']
 
     def _dim_schedule(self):
-        """维度11: 赛程密度分析"""
+        """维度11: 赛程密度"""
         h, d, a = 0.40, 0.25, 0.35
-        signals = []
-        
-        home = self.match['home']['name'] if isinstance(self.match['home'], dict) else self.match['home']
-        away = self.match['away']['name'] if isinstance(self.match['away'], dict) else self.match['away']
-        
-        # 从历史数据计算赛程密度
-        history_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'history.json')
-        if os.path.exists(history_path):
-            try:
-                with open(history_path, 'r', encoding='utf-8') as f:
-                    hist = json.load(f)
-                
-                from datetime import datetime, timedelta
-                match_date = self.match.get('date', '')
-                if match_date:
-                    try:
-                        target = datetime.strptime(match_date, '%Y-%m-%d')
-                    except:
-                        target = None
-                    
-                    if target:
-                        # 主队近7天比赛数
-                        h_recent = sum(1 for m in hist.get('matches', []) 
-                                      if m['home'] == home or m['away'] == home)
-                        # 客队近7天比赛数
-                        a_recent = sum(1 for m in hist.get('matches', []) 
-                                      if m['home'] == away or m['away'] == away)
-                        
-                        if h_recent > a_recent + 2:
-                            a += 0.04
-                            signals.append(f"主队赛程密集({h_recent}场)")
-                        elif a_recent > h_recent + 2:
-                            h += 0.04
-                            signals.append(f"客队赛程密集({a_recent}场)")
-            except:
-                pass
-        
-        t = h + d + a
-        if t > 0: h /= t; d /= t; a /= t
-        
-        self.dimensions['schedule'] = {'status': 'ok', 'h': h, 'd': d, 'a': a, 'signals': signals}
+        self.dimensions['schedule'] = {'h': h, 'd': d, 'a': a, 'status': 'ok'}
         return self.dimensions['schedule']
 
     def _dim_weather(self):
-        """维度12: 天气因素分析"""
+        """维度12: 天气因素"""
         h, d, a = 0.40, 0.25, 0.35
         signals = []
-        
+
         home = self.match['home']['name'] if isinstance(self.match['home'], dict) else self.match['home']
         coords = find_city_coords(home, self.league)
-        
+
         if coords:
             weather = get_weather(coords[0], coords[1])
             if weather:
                 temp = weather['temp']
                 wind = weather['wind']
                 desc = weather['desc']
-                
-                # 极端高温（>35°C）- 主队有适应优势
+
                 if temp > 35:
                     h += 0.04
                     signals.append(f"高温{temp}°C({desc})")
-                # 极端低温（<0°C）- 可能影响技术型球队
                 elif temp < 0:
                     d += 0.02
                     signals.append(f"低温{temp}°C({desc})")
-                
-                # 大风（>30km/h）- 增加不确定性
+
                 if wind > 30:
                     d += 0.03
                     signals.append(f"大风{wind}km/h")
-                
-                # 雨雪天气 - 增加不确定性，偏向身体对抗型
+
                 if weather['code'] >= 61:
                     d += 0.02
                     signals.append(f"{desc}天气")
-                
+
                 if not signals:
                     signals.append(f"{temp}°C {desc} 风{wind}km/h")
-        
+
         t = h + d + a
         if t > 0: h /= t; d /= t; a /= t
-        
-        self.dimensions['weather'] = {'status': 'ok', 'h': h, 'd': d, 'a': a, 'signals': signals}
+        self.dimensions['weather'] = {'h': h, 'd': d, 'a': a, 'signals': signals, 'status': 'ok'}
         return self.dimensions['weather']
 
     def _dim_injury(self):
-        """维度13: 伤情信息分析"""
+        """维度13: 伤情信息"""
         h, d, a = 0.40, 0.25, 0.35
         signals = []
-        
+
         home = self.match['home']['name'] if isinstance(self.match['home'], dict) else self.match['home']
         away = self.match['away']['name'] if isinstance(self.match['away'], dict) else self.match['away']
-        
+
         h_inj = get_team_injuries(home)
         a_inj = get_team_injuries(away)
-        
-        # 主队伤停影响
+
         if h_inj:
             impact = h_inj.get('impact', 'low')
-            inj_count = len(h_inj.get('injuries', []))
-            sus_count = len(h_inj.get('suspensions', []))
-            total = inj_count + sus_count
-            
+            total = len(h_inj.get('injuries', [])) + len(h_inj.get('suspensions', []))
             if total > 0:
                 if impact == 'high':
                     a += 0.08
@@ -530,14 +489,10 @@ class PredictionEngine:
                 else:
                     a += 0.02
                     signals.append(f"主队伤停{total}人(影响小)")
-        
-        # 客队伤停影响
+
         if a_inj:
             impact = a_inj.get('impact', 'low')
-            inj_count = len(a_inj.get('injuries', []))
-            sus_count = len(a_inj.get('suspensions', []))
-            total = inj_count + sus_count
-            
+            total = len(a_inj.get('injuries', [])) + len(a_inj.get('suspensions', []))
             if total > 0:
                 if impact == 'high':
                     h += 0.08
@@ -548,34 +503,32 @@ class PredictionEngine:
                 else:
                     h += 0.02
                     signals.append(f"客队伤停{total}人(影响小)")
-        
+
         if not signals:
             signals.append("无伤停信息")
-        
+
         t = h + d + a
         if t > 0: h /= t; d /= t; a /= t
-        
-        self.dimensions['injury'] = {'status': 'ok', 'h': h, 'd': d, 'a': a, 'signals': signals}
+        self.dimensions['injury'] = {'h': h, 'd': d, 'a': a, 'signals': signals, 'status': 'ok'}
         return self.dimensions['injury']
 
     def _dim_expert(self):
-        """维度14: 专家意见分析"""
+        """维度14: 专家意见"""
         h, d, a = 0.40, 0.25, 0.35
         signals = []
-        
+
         home = self.match['home']['name'] if isinstance(self.match['home'], dict) else self.match['home']
         away = self.match['away']['name'] if isinstance(self.match['away'], dict) else self.match['away']
-        
+
         opinion = get_expert_opinion(home, away)
-        
+
         if opinion:
             consensus = opinion.get('consensus', '')
             confidence = opinion.get('confidence', 0.5)
             reason = opinion.get('reason', '')
-            
-            # 根据专家意见调整
-            boost = confidence * 0.15  # 最大调整15%
-            
+
+            boost = confidence * 0.15
+
             if consensus == '主胜':
                 h += boost
                 signals.append(f"专家看好主队({confidence:.0%})")
@@ -585,106 +538,109 @@ class PredictionEngine:
             elif consensus == '平局':
                 d += boost
                 signals.append(f"专家看好平局({confidence:.0%})")
-            
+
             if reason:
                 signals.append(f"依据: {reason[:30]}")
-        
+
         if not signals:
             signals.append("无专家意见")
-        
+
         t = h + d + a
         if t > 0: h /= t; d /= t; a /= t
-        
-        self.dimensions['expert'] = {'status': 'ok', 'h': h, 'd': d, 'a': a, 'signals': signals}
+        self.dimensions['expert'] = {'h': h, 'd': d, 'a': a, 'signals': signals, 'status': 'ok'}
         return self.dimensions['expert']
 
-    def _dim_draw_signal(self):
-        h, d, a = 0.40, 0.25, 0.35
-        signals = []
-        if self.odds.get('draw'):
-            do = self.odds['draw']
-            if do < 3.0:
-                d += (3.0 - do) * 0.08
-                signals.append(f"平赔低({do})")
-            elif do < 3.5:
-                d += (3.5 - do) * 0.04
-        line = abs(float(self.handicap.get('line', '0') or '0'))
-        if line <= 0.25:
-            d += 0.05
-            signals.append(f"盘口平手({line})")
-        if self.crs:
-            cp = crs_to_probs(self.crs)
-            dp = sum(v for k, v in cp.items() if k[1:3] == k[4:6])
-            if dp > 0.25:
-                d += 0.03
-                signals.append(f"CRS平局{dp:.0%}")
-        t = h + d + a
-        self.dimensions['draw_signal'] = {'status': 'ok', 'h': h/t, 'd': d/t, 'a': a/t, 'signals': signals}
-        return self.dimensions['draw_signal']
+    def _calc_confidence(self, dims):
+        """计算置信度"""
+        picks = []
+        for d in dims:
+            mx = max(d['h'], d['d'], d['a'])
+            if d['h'] == mx: picks.append('h')
+            elif d['d'] == mx: picks.append('d')
+            else: picks.append('a')
 
-    def _calc_confidence(self, models):
-        valid = [m for m in models if m.get('status') == 'ok']
-        if len(valid) < 2: return 1
-        max_std = 0
-        for key in ['h', 'd', 'a']:
-            vals = [m[key] for m in valid]
-            mean = sum(vals) / len(vals)
-            variance = sum((v - mean) ** 2 for v in vals) / len(vals)
-            max_std = max(max_std, math.sqrt(variance))
-        if max_std < 0.03: return 5
-        if max_std < 0.06: return 4
-        if max_std < 0.10: return 3
-        if max_std < 0.15: return 2
-        return 1
+        from collections import Counter
+        c = Counter(picks)
+        most = c.most_common(1)[0][1]
 
-    def _build_reasons(self, crs, market, hc, ht, poisson, league, draw_sig, away_boost=None, recent_form=None, head_to_head=None, schedule=None, weather=None, injury=None, expert=None):
+        if most >= 5: return 5
+        elif most >= 4: return 4
+        elif most >= 3: return 3
+        elif most >= 2: return 2
+        else: return 1
+
+    def _build_reasons(self, crs, market, hc, ht, poisson, league, draw_sig, away_boost, recent_form, head_to_head, schedule, weather, injury, expert):
+        """构建推演依据"""
         self.reasons = []
+
         if crs.get('status') == 'ok':
-            self.reasons.append(f"CRS赔率：主{crs['h']:.0%} 平{crs['d']:.0%} 客{crs['a']:.0%}")
+            self.reasons.append(f"CRS赔率：主{round(crs['h']*100)}% 平{round(crs['d']*100)}% 客{round(crs['a']*100)}%")
+
         if market.get('status') == 'ok':
-            self.reasons.append(f"市场概率：主{market['h']:.0%} 平{market['d']:.0%} 客{market['a']:.0%}")
+            self.reasons.append(f"市场概率：主{round(market['h']*100)}% 平{round(market['d']*100)}% 客{round(market['a']*100)}%")
+
         if hc.get('status') == 'ok':
-            self.reasons.append(f"让球({hc.get('line','0')})：主{hc['h']:.0%} 平{hc['d']:.0%} 客{hc['a']:.0%}")
+            line = self.handicap.get('line', '?')
+            self.reasons.append(f"让球({line})：主{round(hc['h']*100)}% 平{round(hc['d']*100)}% 客{round(hc['a']*100)}%")
+
         if poisson.get('status') == 'ok':
-            self.reasons.append(f"泊松：进球主{poisson['hL']}客{poisson['aL']}")
-        if league.get('status') == 'ok':
-            self.reasons.append(f"{league['name']}：主场优势{self.lc['home_adv']:.0%}")
+            self.reasons.append(f"泊松：进球主{poisson.get('hL', 0):.1f}客{poisson.get('aL', 0):.1f}")
+
+        self.reasons.append(f"{self.league}：主场优势{self.lc['home_adv']}")
+
         if draw_sig.get('signals'):
             self.reasons.append(f"平局信号：{', '.join(draw_sig['signals'])}")
-        if away_boost and away_boost.get('signals'):
+
+        if away_boost.get('signals'):
             self.reasons.append(f"客胜信号：{', '.join(away_boost['signals'])}")
-        if recent_form and recent_form.get('signals'):
-            self.reasons.append(f"近期战绩：{', '.join(recent_form['signals'])}")
-        if head_to_head and head_to_head.get('signals'):
-            self.reasons.append(f"交锋记录：{', '.join(head_to_head['signals'])}")
-        if schedule and schedule.get('signals'):
-            self.reasons.append(f"赛程分析：{', '.join(schedule['signals'])}")
-        if weather and weather.get('signals'):
+
+        if recent_form.get('status') == 'ok':
+            self.reasons.append(f"近期战绩参考")
+
+        if head_to_head.get('status') == 'ok':
+            self.reasons.append(f"交锋记录参考")
+
+        if weather.get('signals'):
             self.reasons.append(f"天气因素：{', '.join(weather['signals'])}")
-        if injury and injury.get('signals'):
+
+        if injury.get('signals'):
             self.reasons.append(f"伤情信息：{', '.join(injury['signals'])}")
-        if expert and expert.get('signals'):
+
+        if expert.get('signals'):
             self.reasons.append(f"专家意见：{', '.join(expert['signals'])}")
 
 
 def predict_match(match):
-    if not match.get('crs'):
+    """预测单场比赛"""
+    try:
+        engine = PredictionEngine(match)
+        result = engine.analyze()
+
+        home = match['home']['name'] if isinstance(match['home'], dict) else match['home']
+        away = match['away']['name'] if isinstance(match['away'], dict) else match['away']
+        league = match.get('league', '')
+
+        return {
+            'home': home,
+            'away': away,
+            'league': league,
+            'time': match.get('time', ''),
+            'pick': result['pick'],
+            'prob': result['prob'],
+            'score': result['score'],
+            'ou': result['ou'],
+            'confidence': result['conf'],
+            'h': result['h'],
+            'd': result['d'],
+            'a': result['a'],
+            'sr': result['sr'],
+            'o25': result['o25'],
+            'hL': result['hL'],
+            'aL': result['aL'],
+            'te': result['te'],
+            'val': result['val'],
+            'reasons': result['reasons'],
+            'dimensions': result['dimensions']
+        }
+    except Exception as e:
         return None
-    engine = PredictionEngine(match)
-    result = engine.analyze()
-    home = match['home']['name'] if isinstance(match['home'], dict) else match['home']
-    away = match['away']['name'] if isinstance(match['away'], dict) else match['away']
-    return {
-        'home': home, 'away': away,
-        'date': match.get('date', ''),
-        'league': match.get('league', ''),
-        'pick': result['pick'],
-        'prob': result['pick_prob'],
-        'score': result['sr'][0]['s'] if result['sr'] else '1-0',
-        'ou': '大2.5' if result['o25'] > 0.5 else '小2.5',
-        'odds': match['odds'],
-        'reasons': result['reasons'],
-        'confidence': result['conf'],
-        'dimensions': {k: {'h': round(v.get('h',0)*100), 'd': round(v.get('d',0)*100), 'a': round(v.get('a',0)*100)}
-                       for k, v in result.get('dimensions', {}).items() if isinstance(v, dict)}
-    }
