@@ -1,14 +1,14 @@
 {
-  "updated": "2026-08-13 03:01 UTC",
+  "updated": "2026-08-13 03:02 UTC",
   "summary": {
     "total": 98,
-    "spf_hit": 66,
-    "spf_rate": 67,
+    "spf_hit": 67,
+    "spf_rate": 68,
     "score_hit": 32,
     "score_rate": 33,
     "goal_hit": 55,
     "goal_rate": 56,
-    "roi": 21.2
+    "roi": 23.1
   },
   "matches": [
     {
@@ -195,13 +195,13 @@
       "home_score": 4,
       "away_score": 1,
       "prediction": {
-        "pick": "平局",
+        "pick": "主胜",
         "prob": 62,
         "score": "2-0",
         "ou": "大2.5"
       },
       "result": {
-        "pick": "❌",
+        "pick": "✅",
         "score": "❌",
         "ou": "❌"
       },
