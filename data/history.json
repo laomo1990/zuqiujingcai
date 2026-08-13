@@ -1,16 +1,91 @@
 {
-  "updated": "2026-08-12 22:22 UTC",
+  "updated": "2026-08-13 03:01 UTC",
   "summary": {
-    "total": 95,
-    "spf_hit": 65,
-    "spf_rate": 68,
-    "score_hit": 31,
+    "total": 98,
+    "spf_hit": 66,
+    "spf_rate": 67,
+    "score_hit": 32,
     "score_rate": 33,
-    "goal_hit": 52,
-    "goal_rate": 55,
-    "roi": 23.2
+    "goal_hit": 55,
+    "goal_rate": 56,
+    "roi": 21.2
   },
   "matches": [
+    {
+      "key": "2026-08-13_帕梅拉斯_波特诺",
+      "date": "2026-08-13",
+      "league": "解放者杯",
+      "home": "帕梅拉斯",
+      "away": "波特诺",
+      "home_score": 1,
+      "away_score": 1,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 73,
+        "score": "2-0",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.22,
+        "draw": 4.7,
+        "away": 10.5
+      }
+    },
+    {
+      "key": "2026-08-13_普拉滕斯_科金博联",
+      "date": "2026-08-13",
+      "league": "解放者杯",
+      "home": "普拉滕斯",
+      "away": "科金博联",
+      "home_score": 1,
+      "away_score": 1,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 50,
+        "score": "1-0",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.85,
+        "draw": 2.73,
+        "away": 4.5
+      }
+    },
+    {
+      "key": "2026-08-13_巴黎圣曼_维拉",
+      "date": "2026-08-13",
+      "league": "欧洲超级杯",
+      "home": "巴黎圣曼",
+      "away": "维拉",
+      "home_score": 2,
+      "away_score": 1,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 59,
+        "score": "2-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "✅",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.58,
+        "draw": 3.55,
+        "away": 4.65
+      }
+    },
     {
       "key": "2026-07-25_弗拉门戈_帕尔梅拉斯",
       "date": "2026-07-25",
