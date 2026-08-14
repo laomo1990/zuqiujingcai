@@ -1093,12 +1093,7 @@ let M=[],F='all',H=null;
 // ===== 权限控制 =====
 const SECRET_KEY = 'laomo2026';
 function isUnlocked(){
-  const urlParam = new URLSearchParams(window.location.search).get('key');
-  if(urlParam === SECRET_KEY){
-    localStorage.setItem('unlocked', '1');
-    return true;
-  }
-  return localStorage.getItem('unlocked') === '1';
+  return new URLSearchParams(window.location.search).get('key') === SECRET_KEY;
 }
 function lockPredictions(){
   if(isUnlocked()){
