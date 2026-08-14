@@ -1099,6 +1099,8 @@ function lockPredictions(){
 }
 
 async function load(){
+  try{
+    const r=await fetch('data/matches.json?t='+Date.now());
     const d=await r.json();
     M=d.matches||[];
     document.getElementById('updateTime').textContent=d.updated||'-';
@@ -1119,6 +1121,7 @@ async function load(){
   try{renderHistory();}catch(e){console.log('history失败:',e.message);}
   try{renderParlay();}catch(e){console.log('parlay失败:',e.message);}
   try{renderKeyMatches();}catch(e){console.log('keyMatches失败:',e.message);}
+  try{lockPredictions();}catch(e){}
 }
 
 // ===== 渲染 =====
