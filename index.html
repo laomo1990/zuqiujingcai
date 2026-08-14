@@ -1081,9 +1081,24 @@ function donutChart(h,d,a,size){
 let M=[],F='all',H=null;
 
 // ===== 加载数据 =====
+// ===== 权限控制 =====
+const SECRET_KEY = 'laomo2026';
+function isUnlocked(){
+  const urlParam = new URLSearchParams(window.location.search).get('key');
+  if(urlParam === SECRET_KEY){
+    localStorage.setItem('unlocked', '1');
+    return true;
+  }
+  return localStorage.getItem('unlocked') === '1';
+}
+function lockPredictions(){
+  if(isUnlocked()){
+    const lock = document.getElementById('matchesLock');
+    if(lock) lock.style.display = 'none';
+  }
+}
+
 async function load(){
-  try{
-    const r=await fetch('data/matches.json?t='+Date.now());
     const d=await r.json();
     M=d.matches||[];
     document.getElementById('updateTime').textContent=d.updated||'-';
