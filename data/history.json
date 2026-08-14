@@ -1,16 +1,41 @@
 {
-  "updated": "2026-08-14 11:09 UTC",
+  "updated": "2026-08-14 15:07 UTC",
   "summary": {
-    "total": 108,
-    "spf_hit": 70,
+    "total": 109,
+    "spf_hit": 71,
     "spf_rate": 65,
     "score_hit": 32,
-    "score_rate": 30,
+    "score_rate": 29,
     "goal_hit": 63,
     "goal_rate": 58,
-    "roi": 16.7
+    "roi": 17.2
   },
   "matches": [
+    {
+      "key": "2026-08-14_东京绿茵_柏太阳神",
+      "date": "2026-08-14",
+      "league": "J联赛",
+      "home": "东京绿茵",
+      "away": "柏太阳神",
+      "home_score": 1,
+      "away_score": 3,
+      "prediction": {
+        "pick": "客胜",
+        "prob": 44,
+        "score": "0-1",
+        "ou": "小2.5"
+      },
+      "result": {
+        "pick": "✅",
+        "score": "❌",
+        "ou": "❌"
+      },
+      "odds": {
+        "home": 3.9,
+        "draw": 3.05,
+        "away": 1.84
+      }
+    },
     {
       "key": "2026-08-14_罗萨里奥_科林蒂安",
       "date": "2026-08-14",
