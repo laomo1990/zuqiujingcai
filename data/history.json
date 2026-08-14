@@ -1,16 +1,41 @@
 {
-  "updated": "2026-08-14 15:07 UTC",
+  "updated": "2026-08-14 18:35 UTC",
   "summary": {
-    "total": 109,
+    "total": 110,
     "spf_hit": 71,
     "spf_rate": 65,
     "score_hit": 32,
     "score_rate": 29,
-    "goal_hit": 63,
+    "goal_hit": 64,
     "goal_rate": 58,
-    "roi": 17.2
+    "roi": 16.2
   },
   "matches": [
+    {
+      "key": "2026-08-14_瓦萨_TPS图尔",
+      "date": "2026-08-14",
+      "league": "芬超",
+      "home": "瓦萨",
+      "away": "TPS图尔",
+      "home_score": 1,
+      "away_score": 3,
+      "prediction": {
+        "pick": "主胜",
+        "prob": 60,
+        "score": "2-1",
+        "ou": "大2.5"
+      },
+      "result": {
+        "pick": "❌",
+        "score": "❌",
+        "ou": "✅"
+      },
+      "odds": {
+        "home": 1.54,
+        "draw": 3.8,
+        "away": 4.6
+      }
+    },
     {
       "key": "2026-08-14_东京绿茵_柏太阳神",
       "date": "2026-08-14",
